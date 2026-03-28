@@ -66,7 +66,7 @@ python -c "from pathlib import Path; p=Path('.credentials.json'); print('OK' if 
 ```
 
 - 输出 `OK` → 直接继续
-- 输出 `MISSING` → 询问用户手机号和密码，用 Write 工具写入 `eink-push/.credentials.json`：
+- 输出 `MISSING` → 询问用户手机号和密码，用 Write 工具写入 `.credentials.json`：
 
 ```json
 {
