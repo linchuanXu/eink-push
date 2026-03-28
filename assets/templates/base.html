@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="width:480px;height:800px;overflow:hidden">
+<head>
+<meta charset="UTF-8">
+<style>
+/* ── Reset ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Canvas: 480×800, grayscale ─────────────────────
+   Do not change width/height/overflow.
+   render_image.py clips exactly to this size.        */
+html, body {
+  width: 480px;
+  height: 800px;
+  overflow: hidden;
+  background: #fff;
+  color: #111;
+  font-family: 'MiSans', 'Noto Serif SC', serif;
+  font-size: 28px;      /* 正文基准：墨水屏宜大不宜小 */
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Color tokens (grayscale only) ──────────────────
+   Use these or write your own values.
+   Everything is converted to 4-level gray on device. */
+:root {
+  --black:      #111111;
+  --dark:       #444444;
+  --mid:        #888888;
+  --light:      #cccccc;
+  --white:      #ffffff;
+  --bg-subtle:  #f5f5f5;
+  --border:     #dddddd;
+}
+
+/* ── Font stacks ────────────────────────────────────
+   render_image.py injects local MiSans + Noto Serif SC.
+   Falls back to Google Fonts CDN if local files absent. */
+:root {
+  --sans:  'MiSans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --serif: 'Noto Serif SC', 'SimSun', serif;
+  --mono:  'Space Mono', 'Courier New', monospace;
+}
+</style>
+</head>
+<body>
+<!-- Write anything here. 480×800. No constraints beyond that. -->
+</body>
+</html>
