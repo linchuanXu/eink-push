@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>什么是AI · 卡片叠层 · Tailwind</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { fontFamily: { sans: ["MiSans","PingFang SC","Microsoft YaHei","sans-serif"] } } }
+};
+</script>
+<style>
+/* ── 卡片叠层 Card Stack: 多层卡片 · 大圆角 · 深阴影 · 层级感 ── */
+html { margin: 0 !important; padding: 0 !important; }
+body { width: 100vw !important; height: 100vh !important; max-width: none !important; min-height: 0 !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; }
+</style>
+</head>
+<body class="bg-[#f0f0f0] text-black font-sans">
+<div class="w-full h-full flex flex-col px-4 pt-4 pb-3 gap-3">
+
+  <!-- 顶栏：悬浮小卡片感 -->
+  <div class="flex justify-between items-center shrink-0
+              bg-white rounded-2xl shadow-[4px_4px_0_#000] border-[2px] border-black
+              px-4 py-2.5">
+    <span class="text-[19px] font-bold tracking-[0.1em] uppercase">知识卡</span>
+    <span class="bg-black text-white text-[16px] font-bold rounded-xl px-3 py-1">Tailwind</span>
+    <span class="text-[19px] font-bold tracking-[0.1em] uppercase">入门</span>
+  </div>
+
+  <!-- 主卡片：标题 + 副标 -->
+  <div class="shrink-0 bg-white rounded-3xl border-[3px] border-black
+              shadow-[6px_6px_0_#000]
+              px-5 py-4">
+    <div class="text-[17px] font-bold tracking-[0.22em] text-[#555] uppercase mb-1">WHAT IS</div>
+    <h1 class="text-[52px] font-black leading-none text-black mb-2">什么是<br>人工智能？</h1>
+    <p class="text-[24px] text-[#222] font-semibold">一屏速览 · 卡片叠层 Card Stack</p>
+  </div>
+
+  <!-- 定义卡片 -->
+  <div class="shrink-0 bg-black text-white rounded-2xl border-[3px] border-black
+              shadow-[5px_5px_0_#555]
+              px-5 py-3.5">
+    <div class="text-[15px] font-bold tracking-[0.22em] uppercase text-[#aaa] mb-2">一句话定义</div>
+    <p class="text-[28px] font-semibold leading-snug">
+      让机器从数据里归纳规律，对新情况能判断、预测或生成内容。
+    </p>
+  </div>
+
+  <!-- 三张小卡叠排 -->
+  <div class="flex gap-3 shrink-0">
+    <div class="flex-1 bg-white rounded-2xl border-[2.5px] border-black shadow-[4px_4px_0_#000]
+                flex flex-col items-center justify-center py-3">
+      <div class="text-[36px] font-black leading-none">01</div>
+      <div class="text-[22px] font-bold mt-1">数据</div>
+      <div class="text-[18px] text-[#555] mt-0.5">喂例子</div>
+    </div>
+    <div class="flex-1 bg-[#e8e8e8] rounded-2xl border-[2.5px] border-black shadow-[4px_4px_0_#000]
+                flex flex-col items-center justify-center py-3">
+      <div class="text-[36px] font-black leading-none">02</div>
+      <div class="text-[22px] font-bold mt-1">模型</div>
+      <div class="text-[18px] text-[#555] mt-0.5">找映射</div>
+    </div>
+    <div class="flex-1 bg-white rounded-2xl border-[2.5px] border-black shadow-[4px_4px_0_#000]
+                flex flex-col items-center justify-center py-3">
+      <div class="text-[36px] font-black leading-none">03</div>
+      <div class="text-[22px] font-bold mt-1">输出</div>
+      <div class="text-[18px] text-[#555] mt-0.5">判/猜/写</div>
+    </div>
+  </div>
+
+  <!-- 底部两卡并排 -->
+  <div class="flex gap-3 flex-1 min-h-0">
+    <div class="flex-1 bg-white rounded-2xl border-[2.5px] border-black shadow-[4px_4px_0_#000]
+                flex flex-col justify-center px-4">
+      <div class="text-[15px] font-bold tracking-[0.15em] text-[#555] uppercase mb-1.5">本质</div>
+      <p class="text-[24px] font-semibold leading-snug text-black">≠ 巨型检索库<br>= 学成的映射</p>
+    </div>
+    <div class="flex-1 bg-black text-white rounded-2xl border-[2.5px] border-black shadow-[4px_4px_0_#555]
+                flex flex-col justify-center px-4">
+      <div class="text-[15px] font-bold tracking-[0.15em] text-[#aaa] uppercase mb-1.5">提示</div>
+      <p class="text-[24px] font-semibold leading-snug">长文连读<br>→ epub</p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

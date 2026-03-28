@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>什么是AI · 复古风 · 无框架</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { margin: 0 !important; padding: 0 !important; }
+body { width: 100vw !important; height: 100vh !important; max-width: none !important; min-height: 0 !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; background: #f5f2ea; color: #111; font-family: 'Noto Serif SC', 'SimSun', 'STSong', Georgia, serif; }
+
+/* ── 复古/Vintage: 衬线字 · 装饰线框 · 角花 · 旧纸质感 ── */
+/* 注：背景用极浅暖灰 #f5f2ea，e-ink灰阶转换后接近白色，效果尚可 */
+.shell {
+  width: 100%; height: 100%;
+  padding: 10px;
+  display: flex; flex-direction: column;
+}
+
+/* 外框 */
+.outer-border {
+  flex: 1; display: flex; flex-direction: column;
+  border: 3px solid #222;
+  padding: 6px;
+  min-height: 0;
+}
+
+/* 内框 */
+.inner-border {
+  flex: 1; display: flex; flex-direction: column;
+  border: 1px solid #666;
+  padding: 10px 14px;
+  min-height: 0;
+}
+
+/* 报头 */
+.header {
+  text-align: center; flex-shrink: 0;
+  border-bottom: 3px double #222;
+  padding-bottom: 8px; margin-bottom: 8px;
+}
+.header-deco { font-size: 22px; letter-spacing: 0.4em; color: #888; margin-bottom: 2px; }
+.header-title { font-size: 30px; font-weight: 700; letter-spacing: 0.5em; color: #111; text-indent: 0.5em; }
+.header-sub { font-size: 17px; letter-spacing: 0.18em; color: #666; margin-top: 3px; }
+
+/* 装饰分割线 */
+.ornament { text-align: center; font-size: 20px; color: #888; letter-spacing: 0.2em; margin: 6px 0; flex-shrink: 0; }
+
+/* 主标题 */
+.main-title {
+  text-align: center; flex-shrink: 0;
+  padding: 10px 0 8px;
+}
+.main-title .vol  { font-size: 19px; letter-spacing: 0.22em; color: #888; margin-bottom: 4px; }
+.main-title h1    { font-size: 50px; font-weight: 900; letter-spacing: 0.14em; color: #111; line-height: 1.05; }
+.main-title .sub  { font-size: 22px; color: #555; margin-top: 6px; letter-spacing: 0.08em; }
+
+/* 正文 */
+.body-text {
+  flex: 1; padding: 8px 4px; min-height: 0;
+  font-size: 26px; line-height: 1.7; color: #222;
+  text-align: justify; text-indent: 2em;
+}
+.body-text p { margin-bottom: 4px; }
+
+/* 要点列 */
+.points {
+  border-top: 1px solid #888; padding-top: 8px; flex-shrink: 0;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+}
+.point-item { font-size: 22px; color: #333; display: flex; gap: 6px; align-items: baseline; }
+.point-num  { font-size: 19px; color: #888; min-width: 28px; }
+
+/* 页脚 */
+.footer {
+  border-top: 3px double #222; margin-top: 8px; padding-top: 6px;
+  display: flex; justify-content: space-between;
+  font-size: 18px; color: #888; letter-spacing: 0.14em; flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="outer-border">
+    <div class="inner-border">
+
+      <div class="header">
+        <div class="header-deco">❧ ❧ ❧</div>
+        <div class="header-title">阅 星 曈 知 识 馆</div>
+        <div class="header-sub">KNOWLEDGE COLLECTION · 知识卡系列</div>
+      </div>
+
+      <div class="ornament">── ◆ ──</div>
+
+      <div class="main-title">
+        <div class="vol">第 壹 辑 · 入门篇</div>
+        <h1>人工智能</h1>
+        <div class="sub">机器学习之原理与精髓</div>
+      </div>
+
+      <div class="ornament">── ◇ ──</div>
+
+      <div class="body-text">
+        <p>人工智能者，令机器从数据中归纳规律，对新情况能判断、预测或生成内容之技术也。</p>
+        <p>其本质非检索，乃习得之映射函数——数据为经，模型为纬，输出为其所成之果。</p>
+      </div>
+
+      <div class="points">
+        <div class="point-item"><span class="point-num">壹</span><span>数据喂养，提供样本</span></div>
+        <div class="point-item"><span class="point-num">贰</span><span>模型训练，归纳规律</span></div>
+        <div class="point-item"><span class="point-num">叁</span><span>推理输出，判断生成</span></div>
+        <div class="point-item"><span class="point-num">注</span><span>长文连读 → epub</span></div>
+      </div>
+
+      <div class="footer">
+        <span>壬寅年 · 知识卡第壹辑</span>
+        <span>❧</span>
+        <span>Vintage sample · 2026</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>什么是AI · 新拟态 · 无框架</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { margin: 0 !important; padding: 0 !important; }
+body { width: 100vw !important; height: 100vh !important; max-width: none !important; min-height: 0 !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; background: #d8d8d8; color: #222; font-family: 'MiSans', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+
+/* ── 新拟态 Neumorphism: 凸起/凹陷内阴影 · 浅灰底 · e-ink效果偏弱 ── */
+/* 注：墨水屏灰阶转换后阴影对比度弱，已加深参数补偿 */
+
+.shell { width: 100%; height: 100%; padding: 18px 16px; display: flex; flex-direction: column; gap: 14px; }
+
+/* 凸起卡片：向外突出感 */
+.card-raised {
+  background: #d8d8d8;
+  border-radius: 20px;
+  box-shadow: 5px 5px 10px #a8a8a8, -5px -5px 10px #ffffff;
+  padding: 16px 20px;
+  flex-shrink: 0;
+}
+
+/* 凹陷槽：向内嵌入感 */
+.card-inset {
+  background: #d8d8d8;
+  border-radius: 16px;
+  box-shadow: inset 4px 4px 8px #a8a8a8, inset -4px -4px 8px #ffffff;
+  padding: 14px 18px;
+  flex-shrink: 0;
+}
+
+/* 顶栏 */
+.topbar { display: flex; justify-content: space-between; align-items: center; }
+.topbar-text { font-size: 19px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #444; }
+.badge {
+  background: #d8d8d8;
+  border-radius: 12px;
+  box-shadow: 3px 3px 6px #a8a8a8, -3px -3px 6px #ffffff;
+  padding: 5px 16px; font-size: 17px; font-weight: 700; color: #222;
+}
+
+/* 标题区 */
+.hero-kicker { font-size: 16px; font-weight: 700; letter-spacing: 0.24em; color: #666; text-transform: uppercase; margin-bottom: 6px; }
+h1 { font-size: 54px; line-height: 0.98; font-weight: 900; color: #111; letter-spacing: -0.02em; }
+.hero-sub { font-size: 24px; color: #444; margin-top: 8px; font-weight: 600; }
+
+/* 定义区 */
+.def-label { font-size: 15px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #666; margin-bottom: 8px; }
+.def-text { font-size: 29px; font-weight: 600; line-height: 1.5; color: #111; }
+
+/* 三格 */
+.trio { display: flex; gap: 12px; }
+.trio-item {
+  flex: 1;
+  background: #d8d8d8;
+  border-radius: 16px;
+  box-shadow: 4px 4px 8px #a8a8a8, -4px -4px 8px #ffffff;
+  padding: 14px 8px; text-align: center;
+}
+.trio-item.pressed {
+  box-shadow: inset 3px 3px 7px #a8a8a8, inset -3px -3px 7px #ffffff;
+}
+.trio-n    { font-size: 36px; font-weight: 900; color: #111; line-height: 1; }
+.trio-name { font-size: 22px; font-weight: 700; color: #222; margin-top: 4px; }
+.trio-sub  { font-size: 18px; color: #555; margin-top: 2px; }
+
+/* 要点行 */
+.notes { display: flex; gap: 12px; flex: 1; min-height: 0; }
+.note-card {
+  flex: 1;
+  background: #d8d8d8;
+  border-radius: 16px;
+  box-shadow: 5px 5px 10px #a8a8a8, -5px -5px 10px #ffffff;
+  padding: 14px 16px; display: flex; flex-direction: column; justify-content: center;
+}
+.note-label { font-size: 15px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #666; margin-bottom: 6px; }
+.note-text  { font-size: 25px; font-weight: 600; line-height: 1.45; color: #111; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <!-- 顶栏 -->
+  <div class="card-raised topbar">
+    <span class="topbar-text">知识卡</span>
+    <span class="badge">无框架</span>
+    <span class="topbar-text">入门</span>
+  </div>
+
+  <!-- 标题区 -->
+  <div class="card-raised">
+    <div class="hero-kicker">WHAT IS</div>
+    <h1>人工<br>智能</h1>
+    <p class="hero-sub">新拟态 Neumorphism · 凸起感</p>
+  </div>
+
+  <!-- 定义区（凹陷） -->
+  <div class="card-inset">
+    <div class="def-label">一句话定义</div>
+    <p class="def-text">让机器从数据里归纳规律，对新情况能判断、预测或生成内容。</p>
+  </div>
+
+  <!-- 三格 -->
+  <div class="trio">
+    <div class="trio-item"><div class="trio-n">01</div><div class="trio-name">数据</div><div class="trio-sub">喂例子</div></div>
+    <div class="trio-item pressed"><div class="trio-n">02</div><div class="trio-name">模型</div><div class="trio-sub">找映射</div></div>
+    <div class="trio-item"><div class="trio-n">03</div><div class="trio-name">输出</div><div class="trio-sub">判/猜/写</div></div>
+  </div>
+
+  <!-- 要点行 -->
+  <div class="notes">
+    <div class="note-card">
+      <div class="note-label">本质</div>
+      <p class="note-text">≠ 检索库<br>= 映射函数</p>
+    </div>
+    <div class="note-card">
+      <div class="note-label">提示</div>
+      <p class="note-text">长文连读<br>→ epub</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

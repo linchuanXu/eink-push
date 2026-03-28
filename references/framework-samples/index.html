@@ -3,73 +3,159 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>框架 × 风格对比样例 · 索引</title>
+<title>风格样例索引 · 阅星曈</title>
 <style>
-body { font-family: system-ui, sans-serif; max-width: 44rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.65; color: #111; }
-h1 { font-size: 1.45rem; margin-bottom: 0.4rem; }
-p.desc { color: #444; font-size: 0.95rem; margin-top: 0; }
-table { border-collapse: collapse; width: 100%; margin: 1.2rem 0; font-size: 0.95rem; }
-th, td { border: 1px solid #ccc; padding: 7px 10px; text-align: left; vertical-align: top; }
+body { font-family: system-ui, sans-serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.65; color: #111; }
+h1 { font-size: 1.45rem; margin-bottom: 0.3rem; }
+p.desc { color: #444; font-size: 0.95rem; margin-top: 0 0 1.2rem; }
+h2 { font-size: 1.05rem; margin: 1.6rem 0 0.4rem; border-bottom: 2px solid #ccc; padding-bottom: 4px; color: #333; }
+table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 1rem; font-size: 0.92rem; }
+th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; vertical-align: top; }
 th { background: #f4f4f4; font-weight: 700; }
-td a { color: #111; font-weight: 600; }
-td code { font-size: 0.85em; background: #f0f0f0; padding: 1px 4px; border-radius: 3px; }
-.stars { color: #555; letter-spacing: 0.05em; }
-p.note { font-size: 0.9rem; color: #555; border-left: 3px solid #ccc; padding-left: 0.75rem; margin-top: 1rem; }
+td a { color: #111; font-weight: 600; text-decoration: none; }
+td a:hover { text-decoration: underline; }
+td code { font-size: 0.85em; background: #f0f0f0; padding: 1px 5px; border-radius: 3px; }
+.stars { color: #555; letter-spacing: 0.05em; white-space: nowrap; }
+.limit { color: #888; font-size: 0.88em; }
+p.note { font-size: 0.9rem; color: #555; border-left: 3px solid #ccc; padding-left: 0.75rem; margin-top: 1.2rem; }
 </style>
 </head>
 <body>
-<h1>阅星曈卡片 · 框架 × 风格对比样例</h1>
-<p class="desc">五页主题相同（「什么是人工智能」知识卡），每页采用一种不同视觉风格，分别演示"网页能怎么构图"。画布均为 <strong>480×800 px</strong>，灰阶友好。</p>
+<h1>阅星曈卡片 · 风格样例索引（15 种）</h1>
+<p class="desc">所有样例主题相同（「什么是人工智能」知识卡），画布均为 <strong>480×800 px</strong>，灰阶友好。按 e-ink 适合度排列。</p>
 
+<h2>★★★★★ 墨水屏首选</h2>
 <table>
   <thead>
-    <tr>
-      <th>文件</th>
-      <th>风格</th>
-      <th>框架</th>
-      <th>核心手法</th>
-      <th>e-ink</th>
-    </tr>
+    <tr><th>文件</th><th>风格</th><th>框架</th><th>核心手法</th><th>适用场景</th></tr>
   </thead>
   <tbody>
     <tr>
-      <td><a href="01-no-framework.html">01</a></td>
+      <td><a href="01-brutalism.html">01</a> <code>01-brutalism</code></td>
       <td><strong>野兽派 Brutalism</strong></td>
       <td>无框架</td>
       <td>5px 边框、硬阴影、黑块反色、大号数字</td>
-      <td class="stars">★★★★★</td>
+      <td>知识卡、通知、强调</td>
     </tr>
     <tr>
-      <td><a href="02-tailwind.html">02</a></td>
-      <td><strong>弯当格 Bento Grid</strong></td>
-      <td>Tailwind CDN</td>
-      <td>大小格瓷砖混搭、黑/白/灰三色块、栅格拼版</td>
-      <td class="stars">★★★★☆</td>
-    </tr>
-    <tr>
-      <td><a href="03-water.html">03</a></td>
-      <td><strong>瑞士极简 Swiss Min.</strong></td>
-      <td>Water.css</td>
-      <td>大留白、粗细标尺线、三要素横排、注释编号</td>
-      <td class="stars">★★★★★</td>
-    </tr>
-    <tr>
-      <td><a href="04-pico.css.html">04</a></td>
-      <td><strong>编辑排版 Editorial</strong></td>
-      <td>Pico.css</td>
-      <td>大引言 + 书名号、署名行、全宽黑底、双栏收束</td>
-      <td class="stars">★★★★☆</td>
-    </tr>
-    <tr>
-      <td><a href="05-mvp.css.html">05</a></td>
+      <td><a href="02-dark-mode.html">02</a> <code>02-dark-mode</code></td>
       <td><strong>暗色反相 Dark Mode</strong></td>
       <td>MVP.css</td>
-      <td>黑底白字、白色强调线、深灰辅助信息</td>
-      <td class="stars">★★★★★</td>
+      <td>黑底白字、白色强调线、高对比</td>
+      <td>深色氛围、重要提示</td>
+    </tr>
+    <tr>
+      <td><a href="03-swiss.html">03</a> <code>03-swiss</code></td>
+      <td><strong>瑞士极简 Swiss Min.</strong></td>
+      <td>Water.css</td>
+      <td>大留白、标尺分割线、大锚点数字</td>
+      <td>摘要、语录、单主题</td>
+    </tr>
+    <tr>
+      <td><a href="04-dashboard.html">04</a> <code>04-dashboard</code></td>
+      <td><strong>数据仪表盘 Dashboard</strong></td>
+      <td>无框架</td>
+      <td>大号 KPI 数字、进度条、状态格</td>
+      <td>数据报告、天气、进度</td>
+    </tr>
+    <tr>
+      <td><a href="05-newspaper.html">05</a> <code>05-newspaper</code></td>
+      <td><strong>报纸排版 Newspaper</strong></td>
+      <td>无框架</td>
+      <td>报头、跨列大标题、双栏正文、栏线</td>
+      <td>新闻摘要、资讯卡</td>
+    </tr>
+    <tr>
+      <td><a href="06-poster.html">06</a> <code>06-poster</code></td>
+      <td><strong>极简海报 Minimal Poster</strong></td>
+      <td>无框架</td>
+      <td>超大字母占满画面、极少文字、留白极大</td>
+      <td>金句、倒计时、一句话</td>
     </tr>
   </tbody>
 </table>
 
-<p class="note">更多风格（扁平、卡片叠层、新拟态等）见 <code>references/design-guide.md</code>「风格参考目录」一节。CDN 样例（02–05）需联网加载。</p>
+<h2>★★★★☆ 良好适配</h2>
+<table>
+  <thead>
+    <tr><th>文件</th><th>风格</th><th>框架</th><th>核心手法</th><th>适用场景</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="07-bento.html">07</a> <code>07-bento</code></td>
+      <td><strong>弯当格 Bento Grid</strong></td>
+      <td>Tailwind CDN</td>
+      <td>大小格瓷砖混搭、黑/白/灰三色块</td>
+      <td>多维数据、功能对比</td>
+    </tr>
+    <tr>
+      <td><a href="08-editorial.html">08</a> <code>08-editorial</code></td>
+      <td><strong>编辑排版 Editorial</strong></td>
+      <td>Pico.css</td>
+      <td>大引言框、杂志署名行、双栏</td>
+      <td>简报、深度阅读卡</td>
+    </tr>
+    <tr>
+      <td><a href="09-flat.html">09</a> <code>09-flat</code></td>
+      <td><strong>扁平 Flat Design</strong></td>
+      <td>无框架</td>
+      <td>纯色块分区、无阴影、几何感</td>
+      <td>分类说明、步骤卡</td>
+    </tr>
+    <tr>
+      <td><a href="10-terminal.html">10</a> <code>10-terminal</code></td>
+      <td><strong>终端/代码 Terminal</strong></td>
+      <td>无框架</td>
+      <td>等宽字体、提示符、黑底白字</td>
+      <td>技术教程、代码速查</td>
+    </tr>
+    <tr>
+      <td><a href="11-timeline.html">11</a> <code>11-timeline</code></td>
+      <td><strong>时间线 Timeline</strong></td>
+      <td>无框架</td>
+      <td>垂直轴、节点圆圈、日期标签</td>
+      <td>历史、日程、学习打卡</td>
+    </tr>
+    <tr>
+      <td><a href="12-vintage.html">12</a> <code>12-vintage</code></td>
+      <td><strong>复古/Vintage</strong></td>
+      <td>无框架</td>
+      <td>衬线字、装饰双线框、角花</td>
+      <td>书摘、古典、文艺气质</td>
+    </tr>
+    <tr>
+      <td><a href="13-infographic.html">13</a> <code>13-infographic</code></td>
+      <td><strong>信息图 Infographic</strong></td>
+      <td>无框架</td>
+      <td>内联 SVG 流程图/对比图、图文混排</td>
+      <td>原理说明、对比分析</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>★★★☆☆ 及以下（可用但有限制）</h2>
+<table>
+  <thead>
+    <tr><th>文件</th><th>风格</th><th>框架</th><th>核心手法</th><th>限制说明</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="14-card-stack.html">14</a> <code>14-card-stack</code></td>
+      <td><strong>卡片叠层 Card Stack</strong></td>
+      <td>Tailwind CDN</td>
+      <td>多层卡片、大圆角、深硬阴影</td>
+      <td class="limit">阴影须加深，否则层次感弱</td>
+    </tr>
+    <tr>
+      <td><a href="15-neumorphism.html">15</a> <code>15-neumorphism</code></td>
+      <td><strong>新拟态 Neumorphism</strong></td>
+      <td>无框架</td>
+      <td>凸起/凹陷内阴影、浅灰底</td>
+      <td class="limit">灰阶转换后阴影极弱，慎用</td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="note">CDN 样例（07-bento、08-editorial）需联网加载。完整设计规范见 <code>references/design-guide.md</code>。</p>
 </body>
 </html>
