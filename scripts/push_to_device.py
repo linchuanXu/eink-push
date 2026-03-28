@@ -27,7 +27,6 @@ import argparse
 import mimetypes
 import requests
 from pathlib import Path
-from datetime import datetime
 
 BASE_URL = "https://api-prod.xteink.cn"
 HTTP_TIMEOUT = 30  # 所有 HTTP 请求统一超时（秒）
@@ -295,10 +294,8 @@ def main() -> None:
 
         # 凭证优先确认，避免读完大文件才发现账号有问题
         username, password = load_credentials()
-        filename     = os.path.basename(file_path)
-        base         = os.path.splitext(filename)[0]
-        today        = datetime.now().strftime("%Y-%m-%d")
-        save_path    = f"{folder}/{base}_{today}{ext}"
+        filename  = os.path.basename(file_path)
+        save_path = f"{folder}/{filename}"
 
         with open(file_path, "rb") as f:
             file_data = f.read()
