@@ -4,7 +4,12 @@ output/*.png
 output/*.jpg
 output/*.html
 output/*.epub
+output/*.xth
+output/*.xtc
 !output/.gitkeep
+
+# Credentials (never commit!)
+.credentials.json
 
 # Python
 __pycache__/
