@@ -62,11 +62,13 @@ metadata:
 ## 凭证预检（每次推送前必做）
 
 ```bash
-python -c "from pathlib import Path; p=Path('.credentials.json'); print('OK' if p.exists() else 'MISSING')"
+python -c "from pathlib import Path; cred=Path('scripts/push_to_device.py').resolve().parent.parent/'.credentials.json'; print('OK' if cred.exists() else 'MISSING')"
 ```
 
+> 路径逻辑与 `push_to_device.py` 内部一致（`__file__` 向上两级），不依赖当前工作目录。
+
 - 输出 `OK` → 直接继续
-- 输出 `MISSING` → 询问用户手机号和密码，用 Write 工具写入 `.credentials.json`：
+- 输出 `MISSING` → 询问用户手机号和密码，用 Write 工具写入工作区根目录的 `.credentials.json`：
 
 ```json
 {
@@ -74,6 +76,8 @@ python -c "from pathlib import Path; p=Path('.credentials.json'); print('OK' if 
   "password": "密码"
 }
 ```
+
+- 凭证已存在但密码有误（推送返回 401）→ 运行 `python scripts/push_to_device.py --reset-credentials` 清除后重新询问用户
 
 ---
 
@@ -92,7 +96,6 @@ python -c "from pathlib import Path; p=Path('.credentials.json'); print('OK' if 
 **第 2 步：渲染卡片**
 
 ```bash
-# 在 eink-push/ 目录下运行
 python scripts/render_image.py "output/文件名.html"
 ```
 
@@ -116,7 +119,6 @@ python scripts/push_to_device.py "output/文件名.xth"
 **第 2 步：渲染并打包**
 
 ```bash
-# 在 eink-push/ 目录下运行（传入所有页面，按顺序）
 python scripts/render_image.py "output/主题_p1_20260327-1430.html" "output/主题_p2_20260327-1430.html" --title "标题" --author "龙虾"
 ```
 
@@ -137,7 +139,6 @@ python scripts/push_to_device.py "output/主题_20260327-1430.xtch"
 **第 2 步：生成电子书**
 
 ```bash
-# 在 eink-push/ 目录下运行
 python scripts/render_book.py "output/文件名.md" --title "标题" --author "龙虾"
 ```
 
