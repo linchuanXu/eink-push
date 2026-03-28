@@ -26,6 +26,7 @@ render_epub.py — Markdown → EPUB 3 电子书
 from __future__ import annotations
 
 import argparse
+import random
 import re
 import sys
 import io
@@ -225,119 +226,279 @@ def generate_cover_html(title: str, author: str, date_str: str) -> str:
 </html>"""
 
 
-def _build_cover_html(title: str, author: str, date_str: str) -> str:
-    """
-    生成封面截图用的 HTML（非 epub spine 内嵌页，仅用于 Playwright 截图）。
-    标题若含全角/半角冒号自动拆为主标题 + 副标题。
-    """
-    # 拆主标题 / 副标题
+def _split_title(title: str) -> tuple[str, str]:
+    """拆主标题 / 副标题（以全角或半角冒号为分隔）。"""
     for sep in ("：", ":"):
         if sep in title:
-            main_title, subtitle = title.split(sep, 1)
-            break
-    else:
-        main_title, subtitle = title, ""
+            main, sub = title.split(sep, 1)
+            return main.strip(), sub.strip()
+    return title, ""
 
-    subtitle_html = (
-        f'<div class="subtitle">{subtitle}</div>' if subtitle else ""
-    )
 
+def _cover_newspaper(main_title: str, subtitle: str, author: str, date_str: str) -> str:
+    """A — 报纸头版：粗线夹刊头，超大书名占满中间，作者右对齐底部。"""
+    sub_html = f'<div class="subtitle">{subtitle}</div>' if subtitle else ""
     return f"""<!DOCTYPE html>
-<html lang="zh">
-<head>
-<meta charset="utf-8">
-<style>
-* {{ margin: 0; padding: 0; box-sizing: border-box; }}
-body {{
-  width: 480px; height: 800px;
-  background: #fff;
-  overflow: hidden;
-  font-family: 'Noto Serif SC', serif;
-  color: #000;
-}}
-.top {{
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 460px;
-  background: #000;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 0 44px 44px;
-}}
-.main-title {{
-  font-size: 72px;
-  font-weight: 900;
-  line-height: 1.1;
-  color: #fff;
-  letter-spacing: 4px;
-  word-break: break-all;
-}}
-.subtitle {{
-  font-size: 34px;
-  font-weight: 400;
-  color: #fff;
-  margin-top: 14px;
-  letter-spacing: 2px;
-}}
-.divider {{
-  position: absolute;
-  top: 460px; left: 0; right: 0;
-  height: 8px;
-  background: #000;
-}}
-.bottom {{
-  position: absolute;
-  top: 468px; left: 0; right: 0; bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 44px;
-  gap: 18px;
-}}
-.author {{
-  font-size: 38px;
-  font-weight: 700;
-  color: #000;
-  letter-spacing: 4px;
-}}
-.date {{
-  font-family: 'Space Mono', monospace;
-  font-size: 20px;
-  color: #000;
-  letter-spacing: 3px;
-}}
-.badge {{
-  position: absolute;
-  bottom: 32px; right: 44px;
-  font-family: 'Space Mono', monospace;
-  font-size: 14px;
-  color: #000;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  border: 2px solid #000;
-  padding: 4px 10px;
-}}
-</style>
-</head>
-<body>
-
-<div class="top">
-  <div class="main-title">{main_title}</div>
-  {subtitle_html}
+<html lang="zh"><head><meta charset="utf-8"><style>
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ width:480px; height:800px; background:#fff; overflow:hidden;
+  font-family:'Noto Serif SC',serif; color:#000; }}
+.header {{ padding:28px 40px 0; border-top:10px solid #000; }}
+.masthead {{ display:flex; justify-content:space-between; align-items:baseline;
+  border-bottom:2px solid #000; padding-bottom:10px;
+  font-family:'Space Mono',monospace; font-size:14px; letter-spacing:2px; }}
+.rule {{ height:6px; background:#000; margin-top:10px; }}
+.title-area {{ padding:32px 40px 0; }}
+.main-title {{ font-size:84px; font-weight:900; line-height:1.0;
+  letter-spacing:2px; word-break:break-all; }}
+.subtitle {{ font-size:28px; font-weight:400; margin-top:16px; letter-spacing:1px;
+  border-top:1px solid #000; padding-top:12px; }}
+.footer {{ position:absolute; bottom:0; left:0; right:0;
+  padding:20px 40px 28px; border-top:2px solid #000;
+  display:flex; justify-content:space-between; align-items:baseline; }}
+.author {{ font-size:24px; font-weight:700; letter-spacing:3px; }}
+.date {{ font-family:'Space Mono',monospace; font-size:15px; letter-spacing:2px; }}
+</style></head><body>
+<div class="header">
+  <div class="masthead"><span>EPUB</span><span>{date_str}</span></div>
+  <div class="rule"></div>
 </div>
+<div class="title-area">
+  <div class="main-title">{main_title}</div>
+  {sub_html}
+</div>
+<div class="footer">
+  <span class="author">{author}</span>
+</div>
+</body></html>"""
 
-<div class="divider"></div>
 
-<div class="bottom">
+def _cover_bottom_bar(main_title: str, subtitle: str, author: str, date_str: str) -> str:
+    """B — 底部黑条：书名占上 70%，底部黑条白字作者日期。"""
+    sub_html = f'<div class="subtitle">{subtitle}</div>' if subtitle else ""
+    return f"""<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8"><style>
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ width:480px; height:800px; background:#fff; overflow:hidden;
+  font-family:'Noto Serif SC',serif; color:#000; }}
+.title-area {{ position:absolute; top:0; left:0; right:0; bottom:160px;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding:60px 44px 44px; }}
+.main-title {{ font-size:82px; font-weight:900; line-height:1.0;
+  letter-spacing:3px; word-break:break-all; }}
+.subtitle {{ font-size:28px; font-weight:400; margin-top:18px; letter-spacing:2px; }}
+.bar {{ position:absolute; bottom:0; left:0; right:0; height:160px;
+  background:#000; display:flex; flex-direction:column;
+  justify-content:center; padding:0 44px; gap:10px; }}
+.author {{ font-size:34px; font-weight:700; color:#fff; letter-spacing:4px; }}
+.date {{ font-family:'Space Mono',monospace; font-size:16px;
+  color:#fff; letter-spacing:3px; }}
+</style></head><body>
+<div class="title-area">
+  <div class="main-title">{main_title}</div>
+  {sub_html}
+</div>
+<div class="bar">
   <div class="author">{author}</div>
   <div class="date">{date_str}</div>
 </div>
+</body></html>"""
 
+
+def _cover_left_bar(main_title: str, subtitle: str, author: str, date_str: str) -> str:
+    """C — 左侧黑竖条：20px 黑边贯穿全页，右侧大字居中。"""
+    sub_html = f'<div class="subtitle">{subtitle}</div>' if subtitle else ""
+    return f"""<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8"><style>
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ width:480px; height:800px; background:#fff; overflow:hidden;
+  font-family:'Noto Serif SC',serif; color:#000; }}
+.bar {{ position:absolute; top:0; left:0; bottom:0; width:20px; background:#000; }}
+.content {{ position:absolute; top:0; left:20px; right:0; bottom:0;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:60px 44px 60px 40px; gap:24px; }}
+.main-title {{ font-size:78px; font-weight:900; line-height:1.0;
+  letter-spacing:3px; word-break:break-all; }}
+.subtitle {{ font-size:28px; font-weight:400; letter-spacing:2px;
+  border-top:2px solid #000; padding-top:16px; }}
+.author {{ font-size:32px; font-weight:700; letter-spacing:3px; }}
+.date {{ font-family:'Space Mono',monospace; font-size:16px;
+  letter-spacing:2px; margin-top:8px; }}
+.badge {{ position:absolute; bottom:36px; right:44px;
+  font-family:'Space Mono',monospace; font-size:12px; letter-spacing:3px;
+  border:2px solid #000; padding:4px 10px; }}
+</style></head><body>
+<div class="bar"></div>
+<div class="content">
+  <div class="main-title">{main_title}</div>
+  {sub_html}
+  <div>
+    <div class="author">{author}</div>
+    <div class="date">{date_str}</div>
+  </div>
+</div>
 <div class="badge">EPUB</div>
+</body></html>"""
 
-</body>
-</html>"""
+
+def _cover_corner_frame(main_title: str, subtitle: str, author: str, date_str: str) -> str:
+    """D — 角框装饰：四角 L 形角标，书名居中，细线分隔作者。"""
+    sub_html = f'<div class="subtitle">{subtitle}</div>' if subtitle else ""
+    return f"""<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8"><style>
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ width:480px; height:800px; background:#fff; overflow:hidden;
+  font-family:'Noto Serif SC',serif; color:#000; }}
+.corner {{ position:absolute; width:44px; height:44px;
+  border-color:#000; border-style:solid; }}
+.tl {{ top:28px; left:28px; border-width:5px 0 0 5px; }}
+.tr {{ top:28px; right:28px; border-width:5px 5px 0 0; }}
+.bl {{ bottom:28px; left:28px; border-width:0 0 5px 5px; }}
+.br {{ bottom:28px; right:28px; border-width:0 5px 5px 0; }}
+.content {{ position:absolute; top:0; left:0; right:0; bottom:0;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:90px 64px; }}
+.main-title {{ font-size:76px; font-weight:900; line-height:1.0;
+  letter-spacing:3px; word-break:break-all; }}
+.subtitle {{ font-size:28px; font-weight:400; margin-top:16px; letter-spacing:2px; }}
+.divider {{ height:3px; background:#000; margin:32px 0; }}
+.author {{ font-size:30px; font-weight:700; letter-spacing:4px; }}
+.date {{ font-family:'Space Mono',monospace; font-size:16px;
+  letter-spacing:2px; margin-top:10px; }}
+</style></head><body>
+<div class="corner tl"></div><div class="corner tr"></div>
+<div class="corner bl"></div><div class="corner br"></div>
+<div class="content">
+  <div class="main-title">{main_title}</div>
+  {sub_html}
+  <div class="divider"></div>
+  <div class="author">{author}</div>
+  <div class="date">{date_str}</div>
+</div>
+</body></html>"""
+
+
+def _cover_double_rule(main_title: str, subtitle: str, author: str, date_str: str) -> str:
+    """E — 双横线夹标题：上留白，粗线夹超大书名，下方作者日期。"""
+    sub_html = f'<div class="subtitle">{subtitle}</div>' if subtitle else ""
+    return f"""<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8"><style>
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ width:480px; height:800px; background:#fff; overflow:hidden;
+  font-family:'Noto Serif SC',serif; color:#000; }}
+.top-space {{ height:180px; }}
+.rule {{ height:8px; background:#000; margin:0 40px; }}
+.title-area {{ padding:30px 40px; }}
+.main-title {{ font-size:86px; font-weight:900; line-height:1.0;
+  letter-spacing:3px; word-break:break-all; }}
+.subtitle {{ font-size:28px; font-weight:400; margin-top:16px; letter-spacing:2px; }}
+.footer {{ padding:32px 40px 0; display:flex;
+  justify-content:space-between; align-items:baseline; }}
+.author {{ font-size:28px; font-weight:700; letter-spacing:3px; }}
+.date {{ font-family:'Space Mono',monospace; font-size:16px; letter-spacing:2px; }}
+</style></head><body>
+<div class="top-space"></div>
+<div class="rule"></div>
+<div class="title-area">
+  <div class="main-title">{main_title}</div>
+  {sub_html}
+</div>
+<div class="rule"></div>
+<div class="footer">
+  <span class="author">{author}</span>
+  <span class="date">{date_str}</span>
+</div>
+</body></html>"""
+
+
+def _cover_grid(main_title: str, subtitle: str, author: str, date_str: str) -> str:
+    """F — 网格底纹：浅灰方格纸背景，书名大字居中，黑底白字作者块。"""
+    sub_html = f'<div class="subtitle">{subtitle}</div>' if subtitle else ""
+    return f"""<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8"><style>
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ width:480px; height:800px; overflow:hidden;
+  font-family:'Noto Serif SC',serif; color:#000;
+  background-color:#fff;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.07) 1px, transparent 1px);
+  background-size:40px 40px; }}
+.content {{ position:absolute; top:0; left:0; right:0; bottom:0;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:60px 44px; }}
+.main-title {{ font-size:80px; font-weight:900; line-height:1.0;
+  letter-spacing:3px; word-break:break-all; }}
+.subtitle {{ font-size:28px; font-weight:400; margin-top:16px; letter-spacing:2px; }}
+.author-block {{ margin-top:44px; background:#000;
+  display:inline-block; padding:14px 24px; }}
+.author {{ font-size:30px; font-weight:700; color:#fff; letter-spacing:4px; }}
+.date {{ font-family:'Space Mono',monospace; font-size:15px;
+  color:#fff; letter-spacing:2px; margin-top:6px; }}
+</style></head><body>
+<div class="content">
+  <div class="main-title">{main_title}</div>
+  {sub_html}
+  <div class="author-block">
+    <div class="author">{author}</div>
+    <div class="date">{date_str}</div>
+  </div>
+</div>
+</body></html>"""
+
+
+def _cover_diagonal(main_title: str, subtitle: str, author: str, date_str: str) -> str:
+    """G — 对角线切割：浅灰三角形填充右上，黑线分割，书名上方大字，作者下方。"""
+    sub_html = f'<div class="subtitle">{subtitle}</div>' if subtitle else ""
+    return f"""<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8"><style>
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ width:480px; height:800px; background:#fff; overflow:hidden;
+  font-family:'Noto Serif SC',serif; color:#000; }}
+.diag {{ position:absolute; top:0; right:0; width:0; height:0;
+  border-style:solid; border-width:0 480px 340px 0;
+  border-color:transparent #e8e8e8 transparent transparent; }}
+.divider {{ position:absolute; top:560px; left:0; right:0;
+  height:4px; background:#000; }}
+.title-area {{ position:absolute; top:60px; left:44px; right:44px; }}
+.main-title {{ font-size:80px; font-weight:900; line-height:1.0;
+  letter-spacing:3px; word-break:break-all; }}
+.subtitle {{ font-size:28px; font-weight:400; margin-top:16px; letter-spacing:2px; }}
+.meta {{ position:absolute; bottom:60px; left:44px; right:44px; }}
+.author {{ font-size:30px; font-weight:700; letter-spacing:4px; }}
+.date {{ font-family:'Space Mono',monospace; font-size:16px;
+  letter-spacing:2px; margin-top:10px; }}
+</style></head><body>
+<div class="diag"></div>
+<div class="divider"></div>
+<div class="title-area">
+  <div class="main-title">{main_title}</div>
+  {sub_html}
+</div>
+<div class="meta">
+  <div class="author">{author}</div>
+  <div class="date">{date_str}</div>
+</div>
+</body></html>"""
+
+
+_COVER_TEMPLATES = [
+    _cover_newspaper,
+    _cover_bottom_bar,
+    _cover_left_bar,
+    _cover_corner_frame,
+    _cover_double_rule,
+    _cover_grid,
+    _cover_diagonal,
+]
+
+
+def _build_cover_html(title: str, author: str, date_str: str) -> str:
+    """随机从 7 个封面模板中选一个生成截图用 HTML。"""
+    main_title, subtitle = _split_title(title)
+    template = random.choice(_COVER_TEMPLATES)
+    print(f"[INFO] 封面模板：{template.__doc__.split('：')[0].strip()}")
+    return template(main_title, subtitle, author, date_str)
 
 
 def generate_cover_jpeg(

@@ -6,6 +6,7 @@ output/*.html
 output/*.epub
 output/*.xth
 output/*.xtc
+output/cover_previews/
 !output/.gitkeep
 
 # Generated render artifacts in references (regenerate with render_image.py)
