@@ -1,6 +1,11 @@
 ---
-name: eink-push
+name: eink_push
 description: 将内容推送到阅星曈墨水屏设备。当用户说「发到阅星曈」「推到设备」「发到墨水屏」，或任务完成后要求交付到墨水屏时触发。支持卡片和电子书两种格式。
+metadata:
+  openclaw:
+    requires:
+      bins:
+        - python
 ---
 
 # 阅星曈推送 Skill
