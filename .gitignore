@@ -8,6 +8,9 @@ output/*.xth
 output/*.xtc
 !output/.gitkeep
 
+# Generated render artifacts in references (regenerate with render_image.py)
+references/framework-samples/*.xth
+
 # Credentials (never commit!)
 .credentials.json
 
