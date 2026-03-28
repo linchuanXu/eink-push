@@ -37,6 +37,7 @@ render_image.py — HTML 卡片模板 → 阅星曈设备图片
 """
 
 import argparse
+import re
 import struct
 import sys
 import time
@@ -505,10 +506,14 @@ def main():
     else:
         out_ext = fmt  # xth 或 xtg
 
-    output_path = (
-        Path(args.output).resolve() if args.output
-        else html_paths[0].with_suffix(f".{out_ext}")
-    )
+    if args.output:
+        output_path = Path(args.output).resolve()
+    elif multi:
+        # 多张模式：去掉第一个文件名中的 _pN 序号，作为容器文件名
+        stem = re.sub(r"_p\d+", "", html_paths[0].stem)
+        output_path = html_paths[0].parent / f"{stem}.{out_ext}"
+    else:
+        output_path = html_paths[0].with_suffix(f".{out_ext}")
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     # ── 渲染所有帧 ────────────────────────────────────────────────────────────
