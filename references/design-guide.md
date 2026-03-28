@@ -157,7 +157,7 @@ font-family: 'MiSans', 'Noto Serif SC', serif;
 适合：简报、阅读型卡片、知识摘要
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
 ```
 
 同样写语义 HTML 即可，风格比 Water.css 更工整。
