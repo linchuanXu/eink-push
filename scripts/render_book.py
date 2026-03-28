@@ -239,23 +239,119 @@ def generate_cover_html(title: str, author: str, date_str: str) -> str:
 </html>"""
 
 
-def _wrap_text(text: str, max_chars: int) -> list[str]:
-    """按最大字符数简单折行（中文每字算1，ASCII每字算0.5）。"""
-    lines: list[str] = []
-    line = ""
-    width = 0.0
-    for ch in text:
-        w = 0.5 if ord(ch) < 128 else 1.0
-        if width + w > max_chars:
-            lines.append(line)
-            line = ch
-            width = w
-        else:
-            line += ch
-            width += w
-    if line:
-        lines.append(line)
-    return lines
+def _build_cover_html(title: str, author: str, date_str: str) -> str:
+    """
+    生成封面截图用的 HTML（非 epub spine 内嵌页，仅用于 Playwright 截图）。
+    标题若含全角/半角冒号自动拆为主标题 + 副标题。
+    """
+    # 拆主标题 / 副标题
+    for sep in ("：", ":"):
+        if sep in title:
+            main_title, subtitle = title.split(sep, 1)
+            break
+    else:
+        main_title, subtitle = title, ""
+
+    subtitle_html = (
+        f'<div class="subtitle">{subtitle}</div>' if subtitle else ""
+    )
+
+    return f"""<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<style>
+* {{ margin: 0; padding: 0; box-sizing: border-box; }}
+body {{
+  width: 480px; height: 800px;
+  background: #fff;
+  overflow: hidden;
+  font-family: 'Noto Serif SC', serif;
+  color: #000;
+}}
+.top {{
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 460px;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 44px 44px;
+}}
+.main-title {{
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 1.1;
+  color: #fff;
+  letter-spacing: 4px;
+  word-break: break-all;
+}}
+.subtitle {{
+  font-size: 34px;
+  font-weight: 400;
+  color: #fff;
+  margin-top: 14px;
+  letter-spacing: 2px;
+}}
+.divider {{
+  position: absolute;
+  top: 460px; left: 0; right: 0;
+  height: 8px;
+  background: #000;
+}}
+.bottom {{
+  position: absolute;
+  top: 468px; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 44px;
+  gap: 18px;
+}}
+.author {{
+  font-size: 38px;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 4px;
+}}
+.date {{
+  font-family: 'Space Mono', monospace;
+  font-size: 20px;
+  color: #000;
+  letter-spacing: 3px;
+}}
+.badge {{
+  position: absolute;
+  bottom: 32px; right: 44px;
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  color: #000;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  border: 2px solid #000;
+  padding: 4px 10px;
+}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="main-title">{main_title}</div>
+  {subtitle_html}
+</div>
+
+<div class="divider"></div>
+
+<div class="bottom">
+  <div class="author">{author}</div>
+  <div class="date">{date_str}</div>
+</div>
+
+<div class="badge">EPUB</div>
+
+</body>
+</html>"""
 
 
 def generate_cover_jpeg(
@@ -266,72 +362,56 @@ def generate_cover_jpeg(
     height: int = 800,
 ) -> Optional[bytes]:
     """
-    用 Pillow 生成纯文字封面，返回 JPEG bytes。
-    设备要求 manifest 里有 properties="cover-image" 的标准图片，
-    不能用 XTG / XHTML 替代，否则报「不支持该书的封面」。
+    用 Playwright 截图 HTML 封面，返回 JPEG bytes。
+    Playwright 不可用时退回 Pillow 纯色兜底（保证 epub 合规）。
     """
+    import tempfile, os
+
+    html_str = _build_cover_html(title, author, date_str)
+
+    # ── Playwright 路径 ──────────────────────────────────────
     try:
-        from PIL import Image, ImageDraw, ImageFont
-    except ImportError:
-        print("[WARN] Pillow 未安装，跳过封面图片生成。运行：pip install Pillow")
-        return None
+        _scripts_dir = str(Path(__file__).parent)
+        if _scripts_dir not in sys.path:
+            sys.path.insert(0, _scripts_dir)
+        from render_image import screenshot_html as _screenshot
 
-    img = Image.new("RGB", (width, height), color=(255, 255, 255))
-    draw = ImageDraw.Draw(img)
-
-    # 尝试加载项目字体，失败则退回 Pillow 默认字体
-    font_dir = Path(__file__).parent.parent / "assets" / "fonts"
-
-    def _load(pattern: str, size: int) -> ImageFont.ImageFont:
-        if font_dir.exists():
-            matched = list(font_dir.glob(pattern))
-            if matched:
-                try:
-                    return ImageFont.truetype(str(matched[0]), size)
-                except Exception:
-                    pass
+        tmp = tempfile.NamedTemporaryFile(
+            suffix=".html", delete=False, mode="w", encoding="utf-8"
+        )
         try:
-            return ImageFont.truetype("arial.ttf", size)
-        except Exception:
-            return ImageFont.load_default()
+            tmp.write(html_str)
+            tmp.close()
+            png_bytes = _screenshot(Path(tmp.name), width, height, inject_fonts=True)
+        finally:
+            os.unlink(tmp.name)
 
-    font_title  = _load("NotoSerifSC-Bold*", 36)
-    font_author = _load("NotoSerifSC-Regular*", 24)
-    font_date   = _load("NotoSerifSC-Regular*", 20)
+        from PIL import Image as _PilImg
+        img = _PilImg.open(io.BytesIO(png_bytes)).convert("RGB")
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=92)
+        print("[INFO] 封面：HTML 截图生成")
+        return buf.getvalue()
 
-    # 横线
-    line_y1 = height // 3
-    line_y2 = height // 3 + 4
-    draw.rectangle([60, line_y1, width - 60, line_y2], fill=(0, 0, 0))
+    except Exception as e:
+        print(f"[WARN] Playwright 封面截图失败（{e}），退回 Pillow 兜底")
 
-    # 标题（折行）
-    title_lines = _wrap_text(title, 12)
-    y = line_y2 + 30
-    for tl in title_lines:
-        bbox = draw.textbbox((0, 0), tl, font=font_title)
-        tw = bbox[2] - bbox[0]
-        draw.text(((width - tw) / 2, y), tl, fill=(0, 0, 0), font=font_title)
-        y += bbox[3] - bbox[1] + 10
-
-    # 横线
-    y += 16
-    draw.rectangle([60, y, width - 60, y + 4], fill=(0, 0, 0))
-    y += 24
-
-    # 作者
-    bbox = draw.textbbox((0, 0), author, font=font_author)
-    aw = bbox[2] - bbox[0]
-    draw.text(((width - aw) / 2, y), author, fill=(0, 0, 0), font=font_author)
-    y += bbox[3] - bbox[1] + 12
-
-    # 日期
-    bbox = draw.textbbox((0, 0), date_str, font=font_date)
-    dw = bbox[2] - bbox[0]
-    draw.text(((width - dw) / 2, y), date_str, fill=(100, 100, 100), font=font_date)
-
-    buf = io.BytesIO()
-    img.save(buf, format="JPEG", quality=88)
-    return buf.getvalue()
+    # ── Pillow 兜底：纯白 + 黑色标题文字 ────────────────────
+    try:
+        from PIL import Image as _Img, ImageDraw as _Draw
+        img = _Img.new("RGB", (width, height), (255, 255, 255))
+        draw = _Draw.Draw(img)
+        draw.rectangle([20, 20, width - 20, height - 20], outline=(0, 0, 0), width=3)
+        # 标题居中（默认字体，无法加载自定义字体时的最后保障）
+        draw.text((width // 2, height // 2), title, fill=(0, 0, 0), anchor="mm")
+        draw.text((width // 2, height // 2 + 60), author, fill=(80, 80, 80), anchor="mm")
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=88)
+        print("[INFO] 封面：Pillow 兜底生成")
+        return buf.getvalue()
+    except Exception as e2:
+        print(f"[WARN] Pillow 封面兜底也失败（{e2}），epub 将无封面图片")
+        return None
 
 
 def chapter_to_html(title: str, body_html: str) -> str:
