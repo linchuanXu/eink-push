@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>框架 × 风格对比样例 · 索引</title>
+<style>
+body { font-family: system-ui, sans-serif; max-width: 44rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.65; color: #111; }
+h1 { font-size: 1.45rem; margin-bottom: 0.4rem; }
+p.desc { color: #444; font-size: 0.95rem; margin-top: 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.2rem 0; font-size: 0.95rem; }
+th, td { border: 1px solid #ccc; padding: 7px 10px; text-align: left; vertical-align: top; }
+th { background: #f4f4f4; font-weight: 700; }
+td a { color: #111; font-weight: 600; }
+td code { font-size: 0.85em; background: #f0f0f0; padding: 1px 4px; border-radius: 3px; }
+.stars { color: #555; letter-spacing: 0.05em; }
+p.note { font-size: 0.9rem; color: #555; border-left: 3px solid #ccc; padding-left: 0.75rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<h1>阅星曈卡片 · 框架 × 风格对比样例</h1>
+<p class="desc">五页主题相同（「什么是人工智能」知识卡），每页采用一种不同视觉风格，分别演示"网页能怎么构图"。画布均为 <strong>480×800 px</strong>，灰阶友好。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>文件</th>
+      <th>风格</th>
+      <th>框架</th>
+      <th>核心手法</th>
+      <th>e-ink</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="01-no-framework.html">01</a></td>
+      <td><strong>野兽派 Brutalism</strong></td>
+      <td>无框架</td>
+      <td>5px 边框、硬阴影、黑块反色、大号数字</td>
+      <td class="stars">★★★★★</td>
+    </tr>
+    <tr>
+      <td><a href="02-tailwind.html">02</a></td>
+      <td><strong>弯当格 Bento Grid</strong></td>
+      <td>Tailwind CDN</td>
+      <td>大小格瓷砖混搭、黑/白/灰三色块、栅格拼版</td>
+      <td class="stars">★★★★☆</td>
+    </tr>
+    <tr>
+      <td><a href="03-water.html">03</a></td>
+      <td><strong>瑞士极简 Swiss Min.</strong></td>
+      <td>Water.css</td>
+      <td>大留白、粗细标尺线、三要素横排、注释编号</td>
+      <td class="stars">★★★★★</td>
+    </tr>
+    <tr>
+      <td><a href="04-pico.css.html">04</a></td>
+      <td><strong>编辑排版 Editorial</strong></td>
+      <td>Pico.css</td>
+      <td>大引言 + 书名号、署名行、全宽黑底、双栏收束</td>
+      <td class="stars">★★★★☆</td>
+    </tr>
+    <tr>
+      <td><a href="05-mvp.css.html">05</a></td>
+      <td><strong>暗色反相 Dark Mode</strong></td>
+      <td>MVP.css</td>
+      <td>黑底白字、白色强调线、深灰辅助信息</td>
+      <td class="stars">★★★★★</td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="note">更多风格（扁平、卡片叠层、新拟态等）见 <code>references/design-guide.md</code>「风格参考目录」一节。CDN 样例（02–05）需联网加载。</p>
+</body>
+</html>

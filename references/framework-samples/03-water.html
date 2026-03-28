@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>什么是AI · 瑞士极简 · Water.css</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+<style>
+/* ── 瑞士极简 Swiss Minimalism: 留白即设计 · 字体就是图形 ── */
+html {
+  background: #c0c0c0 !important;
+  display: flex !important; justify-content: center !important; align-items: flex-start !important;
+  min-height: 100vh !important; min-width: 0 !important;
+}
+body {
+  width: 480px !important; height: 800px !important; max-width: 480px !important;
+  overflow: hidden !important; flex-shrink: 0 !important;
+  margin: 0 !important; padding: 0 !important;
+  background: #fff !important; color: #000 !important;
+  font-family: 'MiSans', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+}
+.page {
+  height: 800px; padding: 22px 28px 18px;
+  display: flex; flex-direction: column; gap: 0;
+}
+.rule { height: 4px; background: #000; border: none; margin: 0; }
+.rule-thin { height: 2px; background: #000; border: none; margin: 0; }
+
+/* 顶部标识行 */
+.eyebrow {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 18px !important; font-weight: 700 !important;
+  letter-spacing: 0.22em; text-transform: uppercase; color: #555 !important;
+  padding-bottom: 10px; margin: 0 !important;
+}
+.eyebrow .fw { color: #000; }
+
+/* 大标题区 */
+.display {
+  padding: 14px 0 16px;
+}
+h1 {
+  font-size: 52px !important; font-weight: 900 !important; line-height: 1.05 !important;
+  letter-spacing: -0.02em !important; color: #000 !important; margin: 0 !important;
+}
+.display-sub {
+  font-size: 26px !important; color: #222 !important; margin: 8px 0 0 !important;
+  line-height: 1.4 !important; font-weight: 400 !important;
+}
+
+/* 正文块 */
+.body-block { padding: 16px 0; }
+.body-block p {
+  font-size: 30px !important; line-height: 1.6 !important; color: #000 !important;
+  margin: 0 !important; font-weight: 400 !important;
+}
+
+/* 三要素行 */
+.trio {
+  display: flex; align-items: center; gap: 0; padding: 14px 0;
+}
+.trio-item {
+  flex: 1; text-align: center;
+  font-size: 26px !important; font-weight: 700 !important; color: #000 !important;
+  letter-spacing: 0.04em;
+}
+.trio-sep {
+  font-size: 26px; color: #555; padding: 0 4px;
+}
+
+/* 注释块 */
+.notes { padding: 14px 0 0; }
+.note-item {
+  font-size: 26px !important; color: #000 !important; line-height: 1.55 !important;
+  margin: 0 0 8px !important; display: flex; gap: 10px; align-items: baseline;
+}
+.note-idx { font-size: 20px !important; color: #555 !important; font-weight: 700; min-width: 18px; }
+
+/* 页脚 */
+.footer {
+  margin-top: auto; padding-top: 10px;
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 18px !important; color: #555 !important;
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="eyebrow">
+    <span>Knowledge</span>
+    <span class="fw">Water</span>
+    <span>入门</span>
+  </div>
+  <hr class="rule">
+
+  <div class="display">
+    <h1>什么是<br>人工智能？</h1>
+    <p class="display-sub">一屏速览 · 字体即设计 · 留白有话说</p>
+  </div>
+  <hr class="rule-thin">
+
+  <div class="body-block">
+    <p>让机器从数据里归纳规律，对新情况能判断、预测或生成内容。</p>
+  </div>
+  <hr class="rule-thin">
+
+  <div class="trio">
+    <div class="trio-item">数据</div>
+    <div class="trio-sep">→</div>
+    <div class="trio-item">模型</div>
+    <div class="trio-sep">→</div>
+    <div class="trio-item">输出</div>
+  </div>
+  <hr class="rule-thin">
+
+  <div class="notes">
+    <div class="note-item"><span class="note-idx">①</span><span>不是「巨型检索库」，而是学成可判断、可生成的映射。</span></div>
+    <div class="note-item"><span class="note-idx">②</span><span>流派、训练与安全 → 体系化内容换 epub 承载。</span></div>
+  </div>
+
+  <hr class="rule">
+  <div class="footer">
+    <span>Water.css sample</span>
+    <span>2026-03-28</span>
+  </div>
+</div>
+</body>
+</html>

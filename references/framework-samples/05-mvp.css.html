@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>什么是AI · 暗色反相 · MVP.css</title>
+<link rel="stylesheet" href="https://unpkg.com/mvp.css">
+<style>
+/* ── 暗色反相 Dark Mode Inverted: 黑底白字 · e-ink 戏剧感 ── */
+html {
+  background: #c0c0c0 !important;
+  display: flex !important; justify-content: center !important; align-items: flex-start !important;
+  min-height: 100vh !important;
+}
+body {
+  width: 480px !important; height: 800px !important; overflow: hidden !important;
+  flex-shrink: 0 !important;
+  background: #000 !important; color: #fff !important;
+  font-family: 'MiSans', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+}
+a, a:hover { color: #fff !important; }
+header, main, footer, section, aside { background: #000 !important; color: #fff !important; box-shadow: none !important; }
+header { padding: 0 !important; margin: 0 !important; border: none !important; }
+header h1 { font-size: 60px !important; margin: 0 !important; color: #fff !important; line-height: 1.0 !important; }
+h2, h3 { color: #fff !important; margin: 0 !important; }
+main { padding: 0 !important; }
+p, li { color: #fff !important; margin: 0 !important; }
+hr { border-color: #444 !important; border-width: 2px !important; margin: 0 !important; }
+
+.page { height: 800px; padding: 18px 22px 18px; display: flex; flex-direction: column; gap: 0; }
+
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-bottom: 12px; margin-bottom: 0; flex-shrink: 0;
+  font-size: 19px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #888;
+}
+.topbar .label { border: 2px solid #555; padding: 2px 12px; color: #fff; font-size: 18px; letter-spacing: 0; }
+
+.hero { padding: 14px 0 14px; flex-shrink: 0; }
+.hero-kicker { font-size: 18px; font-weight: 700; letter-spacing: 0.22em; color: #888; margin-bottom: 4px; }
+
+.rule-white { height: 2px; background: #444; margin: 0; flex-shrink: 0; }
+.rule-bright { height: 3px; background: #fff; margin: 0; flex-shrink: 0; }
+
+.tag-row {
+  display: flex; align-items: center; gap: 14px; padding: 12px 0; flex-shrink: 0;
+  font-size: 28px; font-weight: 700; color: #fff;
+}
+.tag-row .sep { color: #555; font-size: 24px; }
+
+.def { padding: 14px 0; flex-shrink: 0; }
+.def-label { font-size: 17px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #888; margin-bottom: 8px; }
+.def-text { font-size: 30px; font-weight: 600; line-height: 1.5; color: #fff; }
+
+.trio { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 14px 0; flex-shrink: 0; }
+.trio-tile {
+  border: 2px solid #444; padding: 10px 6px; text-align: center;
+}
+.trio-tile .n { font-size: 34px; font-weight: 900; color: #fff; line-height: 1; }
+.trio-tile .name { font-size: 22px; color: #aaa; margin-top: 3px; }
+
+.notes { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 10px; min-height: 0; padding: 0 0 10px; }
+.note { font-size: 26px; color: #ccc; line-height: 1.5; display: flex; gap: 10px; }
+.note .idx { color: #555; font-size: 22px; min-width: 20px; padding-top: 2px; }
+
+.footer {
+  border-top: 2px solid #444; padding-top: 10px; flex-shrink: 0;
+  display: flex; justify-content: space-between;
+  font-size: 17px; color: #555; letter-spacing: 0.12em; text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <span>知识卡</span>
+    <span class="label">MVP</span>
+    <span>入门</span>
+  </div>
+  <div class="rule-bright"></div>
+
+  <div class="hero">
+    <div class="hero-kicker">WHAT IS</div>
+    <h1>什么是<br>人工智能？</h1>
+  </div>
+  <div class="rule-white"></div>
+
+  <div class="tag-row">
+    <span>数据</span><span class="sep">→</span>
+    <span>模型</span><span class="sep">→</span>
+    <span>输出</span>
+  </div>
+  <div class="rule-white"></div>
+
+  <div class="def">
+    <div class="def-label">一句话定义</div>
+    <p class="def-text">让机器从数据里归纳规律，对新情况能判断、预测或生成内容。</p>
+  </div>
+  <div class="rule-white"></div>
+
+  <div class="trio">
+    <div class="trio-tile"><div class="n">01</div><div class="name">数据</div></div>
+    <div class="trio-tile"><div class="n">02</div><div class="name">模型</div></div>
+    <div class="trio-tile"><div class="n">03</div><div class="name">输出</div></div>
+  </div>
+  <div class="rule-white"></div>
+
+  <div class="notes">
+    <p class="note"><span class="idx">①</span><span>不是「巨型检索库」，而是学成可判断、可生成的映射。</span></p>
+    <p class="note"><span class="idx">②</span><span>流派、训练与安全 → 体系化内容换 epub 承载。</span></p>
+  </div>
+
+  <div class="footer">
+    <span>MVP.css sample</span>
+    <span>2026-03-28</span>
+  </div>
+</div>
+</body>
+</html>
