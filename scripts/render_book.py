@@ -85,29 +85,17 @@ img {
   height: auto;
 }
 
-/* 封面：不用 flex，仅块级居中 */
-.cover-page {
-  text-align: center;
-  margin-top: 3em;
+/* 封面页：图片全屏撑满，无边距 */
+body.cover-body {
+  margin: 0;
+  padding: 0;
+  background: #000000;
 }
-.cover-title {
-  font-size: 1.4em;
-  font-weight: bold;
-  margin: 0.5em 0;
-}
-.cover-author {
-  font-size: 0.9em;
-  margin: 0.5em 0;
-}
-.cover-date {
-  font-size: 0.85em;
-  margin: 0.5em 0;
-}
-hr.cover-rule {
-  margin: 1em auto;
-  width: 40%;
-  border: none;
-  border-top: 1px solid #000000;
+body.cover-body img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 """
 
@@ -218,23 +206,20 @@ def md_to_html_body(md_content: str) -> str:
 # ─── 封面生成 ─────────────────────────────────────────────────────────────────
 
 def generate_cover_html(title: str, author: str, date_str: str) -> str:
-    """生成纯 HTML 封面页（epub spine 内嵌页，供阅读器翻页展示）。"""
+    """
+    epub spine 封面页：直接全屏显示 cover.jpg。
+    cover.jpg 已通过 set_cover() 注册为 manifest cover-image，
+    此页引用同一张图，保证缩略图和翻页封面完全一致。
+    """
     return f"""<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh">
 <head>
 <meta charset="utf-8"/>
-<title>封面</title>
-<link rel="stylesheet" type="text/css" href="../styles/style.css"/>
+<title>{title}</title>
 </head>
-<body>
-<div class="cover-page">
-  <hr class="cover-rule"/>
-  <div class="cover-title">{title}</div>
-  <hr class="cover-rule"/>
-  <div class="cover-author">{author}</div>
-  <div class="cover-date">{date_str}</div>
-</div>
+<body class="cover-body">
+<img src="cover.jpg" alt="{title}"/>
 </body>
 </html>"""
 
@@ -602,7 +587,8 @@ def build_epub(
     ]
 
     book.toc = toc_items if toc_items else epub_chapters
-    book.spine = ["nav", cover_html] + epub_chapters
+    # cover 第一，nav 标记为 linear=no（目录不占阅读页序）
+    book.spine = [cover_html] + epub_chapters + [("nav", "no")]
 
     book.add_item(epub.EpubNcx())
     book.add_item(epub.EpubNav())
