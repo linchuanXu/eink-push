@@ -12,6 +12,7 @@
     .xtg              单张快刷卡片
     .xtc              多帧快刷图片集
     .xtch             多帧高清图片集
+    其他任意格式      通用文件（自动识别 MIME，存入 /Pushed Files）
 
 凭证管理：
     账号密码由 AI 助手在对话中收集后写入 .credentials.json，脚本直接读取，不做交互式询问。
@@ -23,6 +24,7 @@ import os
 import json
 import hashlib
 import argparse
+import mimetypes
 import requests
 from pathlib import Path
 from datetime import datetime
@@ -96,6 +98,20 @@ FOLDER_MAP = {
     ".xtc":  "/Pushed Images",
     ".xtch": "/Pushed Images",
 }
+
+
+def _resolve_file_meta(ext: str) -> tuple[str, str, str]:
+    """
+    返回 (content_type, prefix, folder)。
+    已知格式走固定映射；其余格式用 mimetypes 自动识别 MIME，
+    统一上传到 uploads/file 前缀和 /Pushed Files 目录。
+    """
+    if ext in MIME_MAP:
+        return MIME_MAP[ext], PREFIX_MAP[ext], FOLDER_MAP[ext]
+
+    guessed, _ = mimetypes.guess_type(f"file{ext}")
+    content_type = guessed or "application/octet-stream"
+    return content_type, "uploads/file", "/Pushed Files"
 
 
 # ─── API 调用 ─────────────────────────────────────────────────────────────────
@@ -250,7 +266,7 @@ def main() -> None:
         description="星曈云文件推送工具",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("file", nargs="?", help="要推送的文件（.epub / .xth / .xtg / .xtc / .xtch）")
+    parser.add_argument("file", nargs="?", help="要推送的文件（支持任意格式；.epub/.xth/.xtg/.xtc/.xtch 走专属路径，其余存入 /Pushed Files）")
     parser.add_argument(
         "--reset-credentials",
         action="store_true",
@@ -275,16 +291,10 @@ def main() -> None:
             sys.exit(1)
 
         ext = os.path.splitext(file_path)[1].lower()
-        if ext not in MIME_MAP:
-            print(f"✗ 不支持的文件类型：{ext}（支持 .epub / .xth / .xtg / .xtc / .xtch）")
-            sys.exit(1)
+        content_type, prefix, folder = _resolve_file_meta(ext)
 
         # 凭证优先确认，避免读完大文件才发现账号有问题
         username, password = load_credentials()
-
-        content_type = MIME_MAP[ext]
-        prefix       = PREFIX_MAP[ext]
-        folder       = FOLDER_MAP[ext]
         filename     = os.path.basename(file_path)
         base         = os.path.splitext(filename)[0]
         today        = datetime.now().strftime("%Y-%m-%d")
