@@ -45,6 +45,25 @@ body {
   --mono:  'Space Mono', 'Courier New', monospace;
 }
 </style>
+<script>
+/* Auto-fit: zoom content to fill 480×800 canvas if it overflows.
+   Runs before Playwright screenshots; also works in browser preview. */
+(function () {
+  function autofit() {
+    var body = document.body;
+    var naturalH = body.scrollHeight;
+    var targetH = window.innerHeight;
+    if (naturalH > targetH + 2) {
+      body.style.zoom = String(targetH / naturalH);
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autofit);
+  } else {
+    autofit();
+  }
+}());
+</script>
 </head>
 <body>
 <!-- 在这里写内容。.shell/.page 容器用 width:100%; height:100% 继承画布大小。 -->
