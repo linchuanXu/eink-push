@@ -10,12 +10,13 @@ tailwind.config = {
 };
 </script>
 <style>
-html { background: #c0c0c0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+html { margin: 0 !important; padding: 0 !important; }
+body { width: 100vw !important; height: 100vh !important; max-width: none !important; min-height: 0 !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; }
 </style>
 </head>
 <!-- ── 弯当格 Bento Grid: 大小格瓷砖拼版 · 部分填黑 ── -->
-<body class="w-[480px] h-[800px] overflow-hidden flex-shrink-0 bg-white text-black font-sans">
-<div class="h-full flex flex-col p-2.5 gap-2">
+<body class="bg-white text-black font-sans">
+<div class="w-full h-full flex flex-col p-2.5 gap-2">
 
   <!-- topbar -->
   <div class="flex justify-between items-center border-b-[2.5px] border-black pb-2 shrink-0
@@ -32,8 +33,7 @@ html { background: #c0c0c0; display: flex; justify-content: center; align-items:
               grid-template-rows:1fr 1fr 1fr auto auto;">
 
     <!-- 主格：标题，横跨3行 -->
-    <div class="row-span-3 border-[3px] border-black rounded-xl p-4
-                flex flex-col justify-between">
+    <div class="row-span-3 border-[3px] border-black rounded-xl p-4 flex flex-col justify-between">
       <div>
         <div class="text-[17px] font-bold tracking-[0.2em] text-[#555] uppercase mb-2">WHAT IS</div>
         <h1 class="text-[46px] font-black leading-none text-black">什么是<br>人工智能？</h1>
@@ -42,20 +42,17 @@ html { background: #c0c0c0; display: flex; justify-content: center; align-items:
     </div>
 
     <!-- 概念格 · 黑 -->
-    <div class="border-[3px] border-black rounded-xl bg-black text-white
-                flex flex-col justify-center items-center text-center p-2">
+    <div class="border-[3px] border-black rounded-xl bg-black text-white flex flex-col justify-center items-center text-center p-2">
       <div class="text-[28px] font-black leading-none">数据</div>
       <div class="text-[21px] mt-1.5 opacity-80">喂例子</div>
     </div>
     <!-- 概念格 · 白 -->
-    <div class="border-[3px] border-black rounded-xl
-                flex flex-col justify-center items-center text-center p-2">
+    <div class="border-[3px] border-black rounded-xl flex flex-col justify-center items-center text-center p-2">
       <div class="text-[28px] font-black leading-none">模型</div>
       <div class="text-[21px] mt-1.5 text-[#222]">找映射</div>
     </div>
     <!-- 概念格 · 灰底 -->
-    <div class="border-[3px] border-black rounded-xl bg-[#ebebeb]
-                flex flex-col justify-center items-center text-center p-2">
+    <div class="border-[3px] border-black rounded-xl bg-[#ebebeb] flex flex-col justify-center items-center text-center p-2">
       <div class="text-[28px] font-black leading-none">输出</div>
       <div class="text-[21px] mt-1.5 text-[#222]">判/猜/写</div>
     </div>
@@ -72,8 +69,7 @@ html { background: #c0c0c0; display: flex; justify-content: center; align-items:
     <div class="border-[3px] border-black rounded-xl p-3 flex items-center">
       <p class="text-[24px] text-black leading-snug">≠ 巨型检索库<br>= 可判断的映射</p>
     </div>
-    <div class="border-[3px] border-black rounded-xl bg-black text-white
-                p-3 flex flex-col justify-center items-center text-center">
+    <div class="border-[3px] border-black rounded-xl bg-black text-white p-3 flex flex-col justify-center items-center text-center">
       <p class="text-[22px] font-bold leading-snug">长文<br>→ epub</p>
     </div>
 
