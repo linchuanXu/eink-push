@@ -36,3 +36,4 @@ Thumbs.db
 *.zip
 assets/fonts/*.ttf
 assets/fonts/*.otf
+output/*.txt
