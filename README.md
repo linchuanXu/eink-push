@@ -2,7 +2,7 @@
 
 [English below ↓](#english)
 
-一个 [Cursor](https://cursor.sh) Agent Skill，让 AI 助手能将任何创作内容——简报、分析、长文——一键推送到**阅星曈**墨水屏设备。
+一个 [OpenClaw](https://openclaw.ai) Agent Skill，让 AI 助手能将任何创作内容——简报、分析、长文——一键推送到**阅星曈**墨水屏设备。
 
 支持三种格式，AI 根据字数自动选择：
 
@@ -16,78 +16,43 @@
 
 ## 安装
 
-### 前提条件
+在 OpenClaw 中，直接告诉 AI：
 
-- [Cursor](https://cursor.sh) IDE
-- Python 3.8+
-- 阅星曈账号及已绑定的设备
+🧑 **你：** 安装技能 `https://github.com/linchuanXu/eink-push`，并且引导我登录账号密码，教我怎么使用这个技能
 
-### 步骤
+🤖 **AI：** 好的，已安装 eink-push 技能！请提供你的**阅星曈手机号**和**密码**，我来帮你完成配置。
 
-**1. 克隆到 Cursor 的 skills 目录**
+🧑 **你：** 手机号 138xxxxxxxx，密码 xxxxxx
 
-```bash
-# macOS / Linux
-git clone https://github.com/your-username/eink-push ~/.cursor/skills/eink-push
+🤖 **AI：** 已保存！以后直接说"发到阅星曈"，我就会把当前内容推送到你的墨水屏设备。
 
-# Windows（PowerShell）
-git clone https://github.com/your-username/eink-push "$env:USERPROFILE\.cursor\skills\eink-push"
+---
+
+## 配置账号
+
+首次使用时，AI 会提示你输入阅星曈手机号和密码，自动保存到本地 `.credentials.json`（不会上传到仓库）。
+
+也可以提前手动创建：
+
+```json
+{
+  "username": "你的手机号",
+  "password": "你的密码"
+}
 ```
-
-**2. 安装 Python 依赖**
-
-```bash
-pip install playwright Pillow requests markdown ebooklib
-playwright install chromium
-```
-
-**3. 下载字体（推荐，获得最佳渲染效果）**
-
-```bash
-cd ~/.cursor/skills/eink-push   # Windows: cd "$env:USERPROFILE\.cursor\skills\eink-push"
-python scripts/setup_fonts.py
-```
-
-不执行此步骤也能运行——渲染脚本会自动从 Google Fonts CDN 拉取字体，或回退到系统字体。
 
 ---
 
 ## 使用方式
 
-在 Cursor 对话中直接说：
+安装后，在 OpenClaw 对话中直接说：
 
 - `发到阅星曈`
 - `推到设备`
 - `整理成电子书发过去`
 - `把这次对话的结论整理成卡片推到墨水屏`
 
-AI 会自动判断内容长度并选择合适格式。任务结束后，若产出超过 100 字，AI 也会主动询问是否推送。
-
-**首次使用**时，AI 会引导你输入阅星曈账号和密码，保存到本地 `.credentials.json`（已加入 `.gitignore`，不会上传到仓库）。
-
----
-
-## 文件结构
-
-```
-eink-push/
-├── SKILL.md                    # Cursor Skill 主文件
-├── assets/
-│   ├── fonts/                  # 本地字体（通过 setup_fonts.py 下载，默认不随仓库分发）
-│   └── templates/
-│       └── base.html           # HTML 卡片起点模板
-├── references/
-│   ├── design-guide.md         # 卡片设计规范（画布、颜色、字体、CSS 框架）
-│   ├── SETUP.md                # 首次安装指引
-│   ├── TROUBLESHOOTING.md      # 故障排查
-│   └── ONBOARDING-COPY.md      # 首次成功后的引导话术
-├── scripts/
-│   ├── render_image.py         # HTML → .xth / .xtc 截图打包
-│   ├── render_book.py          # Markdown → .epub 电子书
-│   ├── push_to_device.py       # 推送文件到阅星曈设备
-│   └── setup_fonts.py          # 下载字体到 assets/fonts/
-└── output/                     # 生成文件暂存目录（已加入 .gitignore）
-```
+AI 会自动判断内容长度，选择合适格式推送。任务结束后，若产出超过 100 字，AI 也会主动询问是否推送。
 
 ---
 
@@ -101,7 +66,7 @@ eink-push/
 
 ## English
 
-A [Cursor](https://cursor.sh) Agent Skill that lets AI push any content—summaries, analyses, long-form articles—to **Yue Xingtong (阅星曈)** e-ink devices with a single command.
+An [OpenClaw](https://openclaw.ai) Agent Skill that lets AI push any content—summaries, analyses, long-form articles—to **Yue Xingtong (阅星曈)** e-ink devices with a single command.
 
 Three formats supported, selected automatically by content length:
 
@@ -111,48 +76,50 @@ Three formats supported, selected automatically by content length:
 | 200–2000 words | Card set | Multiple cards bundled for paged reading |
 | > 2000 words | E-book | EPUB format for immersive reading |
 
-### Installation
+---
 
-**Prerequisites:** [Cursor](https://cursor.sh) IDE · Python 3.8+ · Yue Xingtong account with a bound device
+## Installation
 
-**1. Clone to Cursor's skills directory**
+In OpenClaw, just tell the AI:
 
-```bash
-# macOS / Linux
-git clone https://github.com/your-username/eink-push ~/.cursor/skills/eink-push
+🧑 **You:** Install skill `https://github.com/linchuanXu/eink-push` and guide me to log in, then show me how to use it
 
-# Windows (PowerShell)
-git clone https://github.com/your-username/eink-push "$env:USERPROFILE\.cursor\skills\eink-push"
+🤖 **AI:** Done! Please share your **Yue Xingtong phone number** and **password** so I can finish setup.
+
+🧑 **You:** Phone 138xxxxxxxx, password xxxxxx
+
+🤖 **AI:** Saved! From now on, just say "发到阅星曈" and I'll push your content to the e-ink device.
+
+---
+
+## Credentials setup
+
+On first use, the AI will prompt for your Yue Xingtong phone number and password, and save them locally to `.credentials.json` (excluded from git).
+
+You can also create the file manually in advance:
+
+```json
+{
+  "username": "your_phone_number",
+  "password": "your_password"
+}
 ```
 
-**2. Install Python dependencies**
+---
 
-```bash
-pip install playwright Pillow requests markdown ebooklib
-playwright install chromium
-```
+## Usage
 
-**3. Download fonts (recommended)**
-
-```bash
-cd ~/.cursor/skills/eink-push
-python scripts/setup_fonts.py
-```
-
-This step is optional — the render script will fall back to Google Fonts CDN or system fonts if local fonts are absent.
-
-### Usage
-
-In any Cursor conversation, say:
+In any OpenClaw conversation, say:
 
 - *"发到阅星曈"* — push to e-ink device
 - *"推到设备"* — send to device
 - *"整理成电子书发过去"* — package as an e-book and send
+- *"把这次对话的结论整理成卡片推到墨水屏"* — summarize and push as cards
 
 The AI picks the right format automatically. After tasks that produce more than ~100 words, it will also proactively ask if you'd like to push.
 
-On first use, the AI will prompt for your account credentials, which are saved locally in `.credentials.json` (excluded from git).
+---
 
-### Troubleshooting
+## Troubleshooting
 
 See [`references/TROUBLESHOOTING.md`](references/TROUBLESHOOTING.md).
