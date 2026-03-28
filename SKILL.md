@@ -85,7 +85,8 @@ python -c "from pathlib import Path; p=Path('eink-push/.credentials.json'); prin
 
 - 设计规范见 `references/design-guide.md`（尺寸、色板、字体、**版式目标**、框架菜单）
 - 版式优先：**PPT 式分屏 / 仪表盘 / 资讯卡**（见上文「创作原则」）；再按气质从框架菜单选一个：Tailwind / Water.css / Pico.css / MVP.css / 无框架
-- 需要空白起点时可 Read `assets/templates/base.html`（已含 reset、canvas、色板变量）
+- 需要空白起点时可 Read `assets/templates/base.html`（已含 reset、自适应 canvas、色板变量）
+- canvas 写法：`body { width:100vw !important; height:100vh !important; max-width:none !important; overflow:hidden !important; margin:0 !important; padding:0 !important; }`。`render_image.py` viewport=480×800，`100vw=480px / 100vh=800px`，截图永远正确；浏览器里自动铺满窗口；`!important` 全覆盖防止框架 CSS 干扰
 - 文件命名：`output/{主题词}_{YYYYMMDD-HHMM}.html`，主题词 ≤10 字，跟随用户语言
 
 **第 2 步：渲染卡片**
