@@ -271,7 +271,17 @@ def main() -> None:
         action="store_true",
         help="清除已保存的账号密码，下次运行时重新输入",
     )
+    parser.add_argument(
+        "--check-credentials",
+        action="store_true",
+        help="检查凭证文件是否存在，输出 OK 或 MISSING",
+    )
     args = parser.parse_args()
+
+    # ── 凭证检查模式 ───────────────────────────────────────────
+    if args.check_credentials:
+        print("OK" if _CRED_FILE.exists() else "MISSING")
+        return
 
     # ── 重置凭证模式 ───────────────────────────────────────────
     if args.reset_credentials:
