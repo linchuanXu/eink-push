@@ -85,17 +85,18 @@ img {
   height: auto;
 }
 
-/* 封面页：图片全屏撑满，无边距 */
-body.cover-body {
-  margin: 0;
+/* 封面页：.cover-wrap 用负边距抵消 body margin，图片撑满全屏 */
+.cover-wrap {
+  margin: -0.8em;
   padding: 0;
   background: #000000;
+  line-height: 0;
 }
-body.cover-body img {
+.cover-wrap img {
   display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  max-width: none;
 }
 """
 
@@ -218,8 +219,8 @@ def generate_cover_html(title: str, author: str, date_str: str) -> str:
 <meta charset="utf-8"/>
 <title>{title}</title>
 </head>
-<body class="cover-body">
-<img src="cover.jpg" alt="{title}"/>
+<body>
+<div class="cover-wrap"><img src="cover.jpg" alt="{title}"/></div>
 </body>
 </html>"""
 
@@ -506,10 +507,7 @@ def build_epub(
             print(f"[WARN] 封面图片处理失败（{e}），将自动生成文字封面")
 
     if cover_jpeg is None:
-        # 无外部图片：用 Pillow 生成纯文字封面
         cover_jpeg = generate_cover_jpeg(title, author, date_str)
-        if cover_jpeg:
-            print("[INFO] 自动生成文字封面图片")
 
     if cover_jpeg:
         # create_page=False：禁止 ebooklib 自动生成 cover.xhtml，
