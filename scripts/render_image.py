@@ -438,6 +438,17 @@ def screenshot_html(html_path: Path, width: int, height: int, inject_fonts: bool
                 page.wait_for_load_state("networkidle", timeout=15000)
                 page.evaluate("document.fonts.ready")
 
+        # Auto-fit: if content overflows viewport height, zoom to fit.
+        # Works regardless of whether the HTML uses base.html template.
+        page.evaluate("""() => {
+            var body = document.body;
+            var naturalH = body.scrollHeight;
+            var targetH = window.innerHeight;
+            if (naturalH > targetH + 2) {
+                body.style.zoom = String(targetH / naturalH);
+            }
+        }""")
+
         png_bytes = page.screenshot(
             full_page=False,
             clip={"x": 0, "y": 0, "width": width, "height": height},
