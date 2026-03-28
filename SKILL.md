@@ -59,6 +59,18 @@ metadata:
 
 ---
 
+## 工作目录
+
+以下所有 `python` 命令和文件路径均以**工作区根目录**为基准（即本 `SKILL.md` 所在目录）。执行命令前确认当前目录正确：
+
+```bash
+cd "d:/XU/Documents/eink-push"
+```
+
+如不确定当前目录，先运行 `python -c "import os; print(os.getcwd())"` 确认。
+
+---
+
 ## 凭证预检（每次推送前必做）
 
 ```bash
