@@ -218,7 +218,7 @@ def md_to_html_body(md_content: str) -> str:
 # ─── 封面生成 ─────────────────────────────────────────────────────────────────
 
 def generate_cover_html(title: str, author: str, date_str: str) -> str:
-    """生成纯 HTML 封面页（无图片时使用）。"""
+    """生成纯 HTML 封面页（epub spine 内嵌页，供阅读器翻页展示）。"""
     return f"""<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh">
@@ -237,6 +237,101 @@ def generate_cover_html(title: str, author: str, date_str: str) -> str:
 </div>
 </body>
 </html>"""
+
+
+def _wrap_text(text: str, max_chars: int) -> list[str]:
+    """按最大字符数简单折行（中文每字算1，ASCII每字算0.5）。"""
+    lines: list[str] = []
+    line = ""
+    width = 0.0
+    for ch in text:
+        w = 0.5 if ord(ch) < 128 else 1.0
+        if width + w > max_chars:
+            lines.append(line)
+            line = ch
+            width = w
+        else:
+            line += ch
+            width += w
+    if line:
+        lines.append(line)
+    return lines
+
+
+def generate_cover_jpeg(
+    title: str,
+    author: str,
+    date_str: str,
+    width: int = 480,
+    height: int = 800,
+) -> Optional[bytes]:
+    """
+    用 Pillow 生成纯文字封面，返回 JPEG bytes。
+    设备要求 manifest 里有 properties="cover-image" 的标准图片，
+    不能用 XTG / XHTML 替代，否则报「不支持该书的封面」。
+    """
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+    except ImportError:
+        print("[WARN] Pillow 未安装，跳过封面图片生成。运行：pip install Pillow")
+        return None
+
+    img = Image.new("RGB", (width, height), color=(255, 255, 255))
+    draw = ImageDraw.Draw(img)
+
+    # 尝试加载项目字体，失败则退回 Pillow 默认字体
+    font_dir = Path(__file__).parent.parent / "assets" / "fonts"
+
+    def _load(pattern: str, size: int) -> ImageFont.ImageFont:
+        if font_dir.exists():
+            matched = list(font_dir.glob(pattern))
+            if matched:
+                try:
+                    return ImageFont.truetype(str(matched[0]), size)
+                except Exception:
+                    pass
+        try:
+            return ImageFont.truetype("arial.ttf", size)
+        except Exception:
+            return ImageFont.load_default()
+
+    font_title  = _load("NotoSerifSC-Bold*", 36)
+    font_author = _load("NotoSerifSC-Regular*", 24)
+    font_date   = _load("NotoSerifSC-Regular*", 20)
+
+    # 横线
+    line_y1 = height // 3
+    line_y2 = height // 3 + 4
+    draw.rectangle([60, line_y1, width - 60, line_y2], fill=(0, 0, 0))
+
+    # 标题（折行）
+    title_lines = _wrap_text(title, 12)
+    y = line_y2 + 30
+    for tl in title_lines:
+        bbox = draw.textbbox((0, 0), tl, font=font_title)
+        tw = bbox[2] - bbox[0]
+        draw.text(((width - tw) / 2, y), tl, fill=(0, 0, 0), font=font_title)
+        y += bbox[3] - bbox[1] + 10
+
+    # 横线
+    y += 16
+    draw.rectangle([60, y, width - 60, y + 4], fill=(0, 0, 0))
+    y += 24
+
+    # 作者
+    bbox = draw.textbbox((0, 0), author, font=font_author)
+    aw = bbox[2] - bbox[0]
+    draw.text(((width - aw) / 2, y), author, fill=(0, 0, 0), font=font_author)
+    y += bbox[3] - bbox[1] + 12
+
+    # 日期
+    bbox = draw.textbbox((0, 0), date_str, font=font_date)
+    dw = bbox[2] - bbox[0]
+    draw.text(((width - dw) / 2, y), date_str, fill=(100, 100, 100), font=font_date)
+
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG", quality=88)
+    return buf.getvalue()
 
 
 def chapter_to_html(title: str, body_html: str) -> str:
@@ -330,19 +425,33 @@ def build_epub(
     )
     book.add_item(css_item)
 
-    # ── 封面 ───────────────────────────────────────────────────
+    # ── 封面图片（manifest cover-image，设备必需） ─────────────
+    cover_jpeg: Optional[bytes] = None
     if cover_path and cover_path.exists():
-        cover_bytes = convert_image_to_xtg(cover_path)
-        if cover_bytes:
-            book.add_item(epub.EpubItem(
-                uid="cover-image",
-                file_name="images/cover.xtg",
-                media_type="application/octet-stream",
-                content=cover_bytes,
-            ))
-            book.set_cover("images/cover.xtg", cover_bytes)
+        # 用户提供了图片：转为标准 JPEG
+        try:
+            from PIL import Image as _PilImg
+            _img = _PilImg.open(cover_path).convert("RGB")
+            _img.thumbnail((480, 800))
+            _buf = io.BytesIO()
+            _img.save(_buf, format="JPEG", quality=88)
+            cover_jpeg = _buf.getvalue()
+            print(f"[INFO] 使用封面图片：{cover_path.name}")
+        except Exception as e:
+            print(f"[WARN] 封面图片处理失败（{e}），将自动生成文字封面")
 
-    # 封面 HTML 页
+    if cover_jpeg is None:
+        # 无外部图片：用 Pillow 生成纯文字封面
+        cover_jpeg = generate_cover_jpeg(title, author, date_str)
+        if cover_jpeg:
+            print("[INFO] 自动生成文字封面图片")
+
+    if cover_jpeg:
+        # create_page=False：禁止 ebooklib 自动生成 cover.xhtml，
+        # 由下方手动添加的 cover_html 作为封面页，避免重复
+        book.set_cover("cover.jpg", cover_jpeg, create_page=False)
+
+    # 封面 HTML 页（spine 内翻页用，与封面图片并存）
     cover_html = epub.EpubHtml(
         uid="cover",
         file_name="cover.xhtml",
