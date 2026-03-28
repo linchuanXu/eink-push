@@ -110,7 +110,7 @@ python scripts/render_image.py \
 **第 3 步：推送到设备**
 
 ```bash
-python scripts/push_to_device.py "output/主题_p1_20260327-1430.xtc"
+python scripts/push_to_device.py "output/主题_p1_20260327-1430.xtch"
 ```
 
 ---

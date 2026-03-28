@@ -9,8 +9,8 @@ render_image.py — HTML 卡片模板 → 阅星曈设备图片
     python render_image.py <a.html> <b.html> <c.html> [options]
 
 输出格式（--format，通常无需指定）：
-    xth   高清图，4 灰阶（单张默认）
-    xtg   快刷图，1bit 黑白（多张默认）
+    xth   高清图，4 灰阶（默认）
+    xtg   快刷图，1bit 黑白
 
 选项：
     --output, -o    输出文件路径（单张时有效；默认：第一个输入同目录同名换扩展名）
@@ -459,7 +459,7 @@ def main():
     parser.add_argument("--output", "-o", default=None,
                         help="输出文件路径（默认：第一个输入同名换扩展名）")
     parser.add_argument("--format", choices=["xth", "xtg"], default=None,
-                        help="输出格式：xth 高清图 | xtg 快刷图（单张默认 xth，多张默认 xtg）")
+                        help="输出格式：xth 高清图（默认）| xtg 快刷图")
     parser.add_argument("--title",  default="", help="容器元数据：标题（多帧时写入）")
     parser.add_argument("--author", default="", help="容器元数据：作者（多帧时写入）")
     parser.add_argument("--width",  type=int, default=SCREEN_W)
@@ -486,8 +486,8 @@ def main():
             sys.exit(1)
 
     multi = len(html_paths) > 1
-    # 默认格式：单张高清（xth），多张快刷（xtg）；用户可用 --format 覆盖
-    fmt = args.format if args.format is not None else ("xtg" if multi else "xth")
+    # 默认格式：xth 高清图；用户可用 --format xtg 切换快刷
+    fmt = args.format if args.format is not None else "xth"
 
     params = XtgXthParams(
         brightness=args.brightness,
