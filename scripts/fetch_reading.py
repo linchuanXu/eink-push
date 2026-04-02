@@ -21,7 +21,7 @@ fetch_reading.py — 从星曈云拉取阅读器数据
 
 依赖:
     pip install requests
-    .credentials.json（由 AI 助手在对话中写入）
+    环境变量 EINK_USERNAME / EINK_PASSWORD（通过 ~/.openclaw/openclaw.json 注入）
 """
 
 from __future__ import annotations
@@ -289,7 +289,7 @@ def main() -> None:
     except requests.exceptions.HTTPError as e:
         status = e.response.status_code if e.response is not None else "?"
         if status == 401:
-            print("\n✗ 账号或密码错误（401）。运行 push_to_device.py --reset-credentials 重新输入。",
+            print("\n✗ 账号或密码错误（401）。请在 ~/.openclaw/openclaw.json 中检查 EINK_USERNAME / EINK_PASSWORD，重启会话后重试。",
                   file=sys.stderr)
         else:
             print(f"\n✗ 服务器返回错误 {status}：{e}", file=sys.stderr)

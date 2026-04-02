@@ -4,7 +4,6 @@
 
 用法:
     python push_to_device.py <file>
-    python push_to_device.py --reset-credentials   # 清除已保存的账号
 
 支持格式：
     .epub             电子书
@@ -15,14 +14,13 @@
     其他任意格式      通用文件（自动识别 MIME，存入 /Pushed Files）
 
 凭证管理：
-    优先读取环境变量 EINK_USERNAME / EINK_PASSWORD（OpenClaw 原生凭证注入方式）。
-    回退：读取 .credentials.json（兼容旧配置）。
-    两者均缺失时退出码 2，由 AI 助手引导用户配置后重试。
+    从环境变量 EINK_USERNAME / EINK_PASSWORD 读取账号密码。
+    通过 ~/.openclaw/openclaw.json 的 skills.entries.eink_push.env 注入。
+    未配置时退出码 2，由 AI 助手引导用户配置后重启会话重试。
 """
 
 import sys
 import os
-import json
 import hashlib
 import argparse
 import mimetypes
@@ -32,57 +30,25 @@ from pathlib import Path
 BASE_URL = "https://api-prod.xteink.cn"
 HTTP_TIMEOUT = 30  # 所有 HTTP 请求统一超时（秒）
 
-# 凭证文件保存在脚本同级父目录（eink-push/.credentials.json），不进 git
-_CRED_FILE = Path(__file__).resolve().parent.parent / ".credentials.json"
-
 
 # ─── 凭证管理 ─────────────────────────────────────────────────────────────────
 
 def load_credentials() -> tuple[str, str]:
     """
-    优先从环境变量读取账号密码（OpenClaw 原生凭证注入）：
+    从环境变量读取账号密码（通过 OpenClaw openclaw.json 注入）：
         EINK_USERNAME / EINK_PASSWORD
-    回退到 .credentials.json（兼容旧配置）。
-    两者均缺失时打印 [CREDENTIALS_MISSING] 并以退出码 2 退出，
-    由外部调用方（AI 助手）引导用户配置后重试，不做交互式 input()。
+    未配置时打印 [CREDENTIALS_MISSING] 并以退出码 2 退出，
+    由外部调用方（AI 助手）引导用户配置后重启会话重试，不做交互式 input()。
     """
     username = os.environ.get("EINK_USERNAME", "").strip()
     password = os.environ.get("EINK_PASSWORD", "").strip()
     if username and password:
         return username, password
 
-    # 回退：读取凭证文件
-    if not _CRED_FILE.exists():
-        print("[CREDENTIALS_MISSING] 未找到凭证。"
-              "请在 ~/.openclaw/openclaw.json 中配置 EINK_USERNAME / EINK_PASSWORD，"
-              f"或提供凭证文件：{_CRED_FILE}")
-        sys.exit(2)
-
-    try:
-        creds = json.loads(_CRED_FILE.read_text(encoding="utf-8"))
-    except Exception as e:
-        print(f"[CREDENTIALS_MISSING] 凭证文件损坏（{e}）：{_CRED_FILE}")
-        sys.exit(2)
-
-    username = creds.get("username", "").strip()
-    password = creds.get("password", "").strip()
-
-    if not username or not password:
-        print(f"[CREDENTIALS_MISSING] 凭证文件缺少 username 或 password：{_CRED_FILE}")
-        sys.exit(2)
-
-    return username, password
-
-
-def reset_credentials() -> None:
-    """删除凭证文件。若使用环境变量方式，需在 ~/.openclaw/openclaw.json 中手动移除。"""
-    if _CRED_FILE.exists():
-        _CRED_FILE.unlink()
-        print("[✓] 已清除凭证文件。")
-        print("    如使用环境变量方式，请在 ~/.openclaw/openclaw.json 中移除 EINK_USERNAME / EINK_PASSWORD。")
-    else:
-        print("[!] 未找到凭证文件。")
-        print("    如使用环境变量方式，请在 ~/.openclaw/openclaw.json 中移除 EINK_USERNAME / EINK_PASSWORD。")
+    print("[CREDENTIALS_MISSING] 未找到凭证。"
+          "请在 ~/.openclaw/openclaw.json 中配置 EINK_USERNAME / EINK_PASSWORD，"
+          "重启 OpenClaw 会话后重试。")
+    sys.exit(2)
 
 
 # ─── 文件类型映射 ──────────────────────────────────────────────────────────────
@@ -280,26 +246,16 @@ def main() -> None:
     )
     parser.add_argument("file", nargs="?", help="要推送的文件（支持任意格式；.epub/.xth/.xtg/.xtc/.xtch 走专属路径，其余存入 /Pushed Files）")
     parser.add_argument(
-        "--reset-credentials",
-        action="store_true",
-        help="清除已保存的账号密码，下次运行时重新输入",
-    )
-    parser.add_argument(
         "--check-credentials",
         action="store_true",
-        help="检查凭证是否可用（环境变量或文件均可），输出 OK 或 MISSING",
+        help="检查环境变量凭证是否已注入，输出 OK 或 MISSING",
     )
     args = parser.parse_args()
 
     # ── 凭证检查模式 ───────────────────────────────────────────
     if args.check_credentials:
         has_env = bool(os.environ.get("EINK_USERNAME") and os.environ.get("EINK_PASSWORD"))
-        print("OK" if (has_env or _CRED_FILE.exists()) else "MISSING")
-        return
-
-    # ── 重置凭证模式 ───────────────────────────────────────────
-    if args.reset_credentials:
-        reset_credentials()
+        print("OK" if has_env else "MISSING")
         return
 
     # ── 普通推送模式 ───────────────────────────────────────────
@@ -352,7 +308,7 @@ def main() -> None:
     except requests.exceptions.HTTPError as e:
         status = e.response.status_code if e.response is not None else "?"
         if status == 401:
-            print(f"\n✗ 账号或密码错误（401）。运行 --reset-credentials 重新输入。")
+            print("\n✗ 账号或密码错误（401）。请在 ~/.openclaw/openclaw.json 中检查 EINK_USERNAME / EINK_PASSWORD，重启会话后重试。")
         else:
             print(f"\n✗ 服务器返回错误 {status}：{e}")
         sys.exit(1)
