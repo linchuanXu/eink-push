@@ -27,7 +27,8 @@ metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}}}
 python {baseDir}/scripts/push_to_device.py --check-credentials
 ```
 
-- 输出 `OK` → 继续
+- 输出 `OK` 且是**首次配置**（本次操作前刚写入凭证）→ 继续，并在完成当前操作后 Read `{baseDir}/references/ONBOARDING-COPY.md`，以自然语言向用户展示其内容
+- 输出 `OK` 且凭证早已存在 → 直接继续
 - 输出 `MISSING` → 询问用户手机号和密码，用 Write 工具写入 `{baseDir}/.credentials.json`：
   ```json
   { "username": "手机号", "password": "密码" }
@@ -346,4 +347,4 @@ python {baseDir}/scripts/push_to_device.py "output/阅读看板_时间戳.xth"
 - 本次任务本身就是在执行推送或拉取流程
 - 产出内容不足 50 字（太短，不值得单独推送）
 
-**首次推送成功后**，告知用户常用触发方式，见 `{baseDir}/references/ONBOARDING-COPY.md`。
+**首次推送成功后**（若凭证配置时未展示过），Read `{baseDir}/references/ONBOARDING-COPY.md`，以自然语言向用户展示其内容。
