@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>阅星曈 — 你的个人 AI 终端</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background-color: #FAF8F4;
+      color: #1C1917;
+    }
+
+    /* Gradient text — orange to amber */
+    .grad-text {
+      background: linear-gradient(135deg, #EA580C 0%, #F97316 50%, #D97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Hero radial warm glow */
+    .hero-glow {
+      background: radial-gradient(ellipse 70% 55% at 50% 45%,
+        rgba(251,191,36,0.13) 0%,
+        rgba(249,115,22,0.07) 40%,
+        transparent 70%);
+    }
+
+    /* Feature card */
+    .feat-card { transition: transform 0.18s ease, box-shadow 0.18s ease; }
+    .feat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 36px rgba(180,100,20,0.10);
+    }
+    .feat-card-soon { transition: transform 0.18s ease; }
+    .feat-card-soon:hover { transform: translateY(-2px); }
+
+    /* Scenario card */
+    .scen-card { transition: box-shadow 0.18s ease; }
+    .scen-card:hover { box-shadow: 0 8px 28px rgba(180,100,20,0.09); }
+
+    /* User bubble — WeChat green */
+    .u-bubble {
+      background: #95EC69;
+      color: #1a1a1a;
+      border-radius: 8px 8px 2px 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      line-height: 1.65;
+      align-self: flex-end;
+    }
+
+    /* AI bubble — WeChat received (white) */
+    .ai-bubble {
+      background: #ffffff;
+      border: none;
+      border-radius: 8px 8px 8px 2px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      padding: 10px 14px;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: #1a1a1a;
+    }
+
+    /* Role card (OpenClaw) */
+    .role-card {
+      transition: box-shadow 0.18s ease, transform 0.18s ease;
+    }
+    .role-card:hover {
+      box-shadow: 0 6px 24px rgba(180,100,20,0.10);
+      transform: translateY(-2px);
+    }
+
+    /* Animations */
+    @keyframes bounce-slow {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(7px); }
+    }
+    .scroll-indicator { animation: bounce-slow 2.2s ease-in-out infinite; }
+
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+    .blink { animation: blink 2s ease-in-out infinite; }
+
+    /* Section divider */
+    .warm-line {
+      background: linear-gradient(90deg, transparent, #E7DDD0, transparent);
+      height: 1px;
+    }
+  </style>
+</head>
+<body class="overflow-x-hidden">
+
+  <!-- ─── NAV ──────────────────────────────────────────────────────────── -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-[#FAF8F4]/88 backdrop-blur-xl border-b border-stone-200/60">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-xl font-black tracking-tight text-stone-900">阅星曈</span>
+        <span class="hidden sm:block text-xs text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full">YuXingTong</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="#features"  class="text-sm text-stone-500 hover:text-stone-900 transition-colors hidden sm:block">功能</a>
+        <a href="#scenarios" class="text-sm text-stone-500 hover:text-stone-900 transition-colors hidden sm:block">使用场景</a>
+        <a href="#openclaw"  class="text-sm text-stone-500 hover:text-stone-900 transition-colors hidden sm:block">OpenClaw</a>
+        <a href="#cta" class="text-sm font-semibold bg-orange-500 text-white px-5 py-2 rounded-full hover:bg-orange-600 transition-colors">了解更多</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ──────────────────────────────────────────────────────────── -->
+  <section class="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 pb-16 bg-[#FAF8F4] overflow-hidden">
+
+    <!-- Warm radial glow -->
+    <div class="hero-glow absolute inset-0 pointer-events-none"></div>
+
+    <!-- Subtle decorative ring -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[640px] rounded-full border border-orange-200/30 pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full border border-orange-100/20 pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-5xl mx-auto">
+
+      <!-- Tag -->
+      <div class="inline-flex items-center gap-2.5 bg-orange-50 border border-orange-200 rounded-full px-5 py-2 mb-10">
+        <span class="w-1.5 h-1.5 rounded-full bg-orange-400 blink"></span>
+        <span class="text-orange-600 text-sm font-medium tracking-wide">个人 AI 终端 · 墨水屏设备</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="font-black leading-none tracking-tight mb-8">
+        <span class="block text-7xl md:text-9xl text-stone-900 mb-2">你在生活</span>
+        <span class="block text-7xl md:text-9xl grad-text">AI 在工作</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="text-stone-500 text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-14">
+        墨水屏，是 AI 世界和你的生活之间<br>
+        <span class="text-stone-700 font-medium">唯一安静的接口</span>
+      </p>
+
+      <!-- Install CTA -->
+      <div class="max-w-xl mx-auto w-full mb-5">
+        <p class="text-stone-400 text-xs mb-3">复制发给 OpenClaw，即可安装技能</p>
+        <div class="flex items-center gap-3 bg-white border border-orange-200 rounded-2xl px-5 py-3.5 shadow-sm">
+          <code class="flex-1 text-stone-700 text-sm font-mono text-left leading-relaxed select-all">
+            安装更新技能 https://github.com/linchuanXu/eink-push
+          </code>
+          <button onclick="copyInstall()" id="copy-btn"
+            class="flex-shrink-0 flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors whitespace-nowrap">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+            复制
+          </button>
+        </div>
+        <a href="#scenarios" class="inline-block mt-4 text-sm text-stone-400 hover:text-orange-500 transition-colors">
+          查看使用场景 →
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div class="mt-20 flex items-center justify-center gap-12 flex-wrap">
+        <div class="text-center">
+          <div class="text-stone-900 font-black text-3xl">6+</div>
+          <div class="text-stone-400 text-xs mt-1">已上线功能</div>
+        </div>
+        <div class="w-px h-8 bg-stone-200"></div>
+        <div class="text-center">
+          <div class="text-stone-900 font-black text-3xl">3层</div>
+          <div class="text-stone-400 text-xs mt-1">设备 · 云端 · AI</div>
+        </div>
+        <div class="w-px h-8 bg-stone-200"></div>
+        <div class="text-center">
+          <div class="grad-text font-black text-3xl">∞</div>
+          <div class="text-stone-400 text-xs mt-1">知识飞轮</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="scroll-indicator absolute bottom-10 left-1/2 flex flex-col items-center gap-1 text-stone-300">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ─── THREE PILLARS ─────────────────────────────────────────────────── -->
+  <section class="py-24 px-6 bg-white">
+    <div class="max-w-5xl mx-auto">
+      <div class="grid md:grid-cols-3 gap-1">
+
+        <div class="p-10 text-center group">
+          <div class="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center mx-auto mb-7 group-hover:bg-stone-200 transition-colors">
+            <svg class="w-8 h-8 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-stone-900 mb-3">安静的输出</h3>
+          <p class="text-stone-500 text-sm leading-relaxed">没有弹窗，没有震动<br>AI 完成了，结果就在那里</p>
+        </div>
+
+        <div class="p-10 text-center group border-x border-stone-100">
+          <div class="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-7 group-hover:bg-orange-100 transition-colors">
+            <svg class="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-stone-900 mb-3">持续工作的 AI</h3>
+          <p class="text-stone-500 text-sm leading-relaxed">你睡觉、开会、散步<br>后台一直在跑</p>
+        </div>
+
+        <div class="p-10 text-center group">
+          <div class="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center mx-auto mb-7 group-hover:bg-stone-200 transition-colors">
+            <svg class="w-8 h-8 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-stone-900 mb-3">越用越懂你</h3>
+          <p class="text-stone-500 text-sm leading-relaxed">知识飞轮越转越快<br>积累越来越有价值</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="warm-line max-w-5xl mx-auto"></div>
+
+  <!-- ─── FEATURES ──────────────────────────────────────────────────────── -->
+  <section id="features" class="py-24 px-6 bg-[#FAF8F4]">
+    <div class="max-w-6xl mx-auto">
+
+      <div class="text-center mb-16">
+        <p class="text-xs font-semibold text-orange-500 mb-4 uppercase tracking-widest">核心功能</p>
+        <h2 class="text-4xl md:text-5xl font-black text-stone-900 mb-5 leading-tight">现在就能用<br>更多正在路上</h2>
+        <p class="text-stone-400 text-base">设备 · 星曈云 · AI 推理，三层架构一体协作</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+        <!-- ✅ LIVE -->
+        <div class="feat-card bg-white rounded-2xl p-7 border border-stone-200">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-2xl">📡</div>
+            <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full font-medium">✓ 已上线</span>
+          </div>
+          <h3 class="font-bold text-stone-900 mb-2">信息订阅</h3>
+          <p class="text-sm text-stone-500 leading-relaxed">订阅公众号、博客、RSS，打开设备就有新内容，像有人帮你选好了今天该读什么</p>
+        </div>
+
+        <div class="feat-card bg-white rounded-2xl p-7 border border-stone-200">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-2xl">☁️</div>
+            <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full font-medium">✓ 已上线</span>
+          </div>
+          <h3 class="font-bold text-stone-900 mb-2">云端推书</h3>
+          <p class="text-sm text-stone-500 leading-relaxed">手机上找到的书或文章，点一下，设备上马上就有了，无需数据线、无需 SD 卡</p>
+        </div>
+
+        <div class="feat-card bg-white rounded-2xl p-7 border border-stone-200">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-2xl">🧠</div>
+            <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full font-medium">✓ 已上线</span>
+          </div>
+          <h3 class="font-bold text-stone-900 mb-2">智能摘要</h3>
+          <p class="text-sm text-stone-500 leading-relaxed">8000 字报告变成 400 字要点卡片，5 分钟消化一篇长文，碎片时间也能高效吸收</p>
+        </div>
+
+        <div class="feat-card bg-white rounded-2xl p-7 border border-stone-200">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-2xl">🧹</div>
+            <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full font-medium">✓ 已上线</span>
+          </div>
+          <h3 class="font-bold text-stone-900 mb-2">原文清洗</h3>
+          <p class="text-sm text-stone-500 leading-relaxed">广告、跳转链接、水印全部过滤，推到设备上读起来像一本正经的书</p>
+        </div>
+
+        <div class="feat-card bg-white rounded-2xl p-7 border border-stone-200">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-2xl">📅</div>
+            <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full font-medium">✓ 已上线</span>
+          </div>
+          <h3 class="font-bold text-stone-900 mb-2">日历提醒</h3>
+          <p class="text-sm text-stone-500 leading-relaxed">安静提示接下来的事，不震动不弹窗，不会让你忍不住刷起来</p>
+        </div>
+
+        <div class="feat-card bg-white rounded-2xl p-7 border border-stone-200">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-2xl">🎨</div>
+            <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full font-medium">✓ 已上线</span>
+          </div>
+          <h3 class="font-bold text-stone-900 mb-2">漫画智能裁边</h3>
+          <p class="text-sm text-stone-500 leading-relaxed">AI 自动识别白边，让画面最大化填满屏幕，不用手动处理图片</p>
+        </div>
+
+        <!-- 🔄 COMING SOON -->
+        <div class="feat-card-soon bg-stone-50 rounded-2xl p-7 border border-dashed border-stone-200">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl opacity-50">📚</div>
+            <span class="text-xs text-stone-400 border border-stone-200 bg-white px-3 py-1 rounded-full font-medium">Coming Soon</span>
+          </div>
+          <h3 class="font-bold text-stone-500 mb-2">个人知识库</h3>
+          <p class="text-sm text-stone-400 leading-relaxed">好内容有地方存，AI 帮你整理归档，再也不怕「收藏了就是看过了」</p>
+        </div>
+
+        <div class="feat-card-soon bg-stone-50 rounded-2xl p-7 border border-dashed border-stone-200">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl opacity-50">🎙️</div>
+            <span class="text-xs text-stone-400 border border-stone-200 bg-white px-3 py-1 rounded-full font-medium">Coming Soon</span>
+          </div>
+          <h3 class="font-bold text-stone-500 mb-2">录音转写</h3>
+          <p class="text-sm text-stone-400 leading-relaxed">会议录音交给 AI，转写整理后推到设备，告别手忙脚乱记笔记</p>
+        </div>
+
+        <div class="feat-card-soon bg-stone-50 rounded-2xl p-7 border border-dashed border-stone-200">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl opacity-50">📄</div>
+            <span class="text-xs text-stone-400 border border-stone-200 bg-white px-3 py-1 rounded-full font-medium">Coming Soon</span>
+          </div>
+          <h3 class="font-bold text-stone-500 mb-2">文档结构识别</h3>
+          <p class="text-sm text-stone-400 leading-relaxed">复杂 PDF 丢进来，AI 识别结构转成 EPUB，图表在该在的位置</p>
+        </div>
+
+        <div class="feat-card-soon bg-stone-50 rounded-2xl p-7 border border-dashed border-stone-200 sm:col-span-2 lg:col-span-3">
+          <div class="flex items-start justify-between mb-5">
+            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl opacity-50">🎯</div>
+            <span class="text-xs text-stone-400 border border-stone-200 bg-white px-3 py-1 rounded-full font-medium">Coming Soon</span>
+          </div>
+          <h3 class="font-bold text-stone-500 mb-2">个性化内容推送</h3>
+          <p class="text-sm text-stone-400 leading-relaxed">AI 学会你的阅读口味，过滤低质内容，像私人编辑每天帮你选好。用得越久，推送越准</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── USAGE SCENARIOS ───────────────────────────────────────────────── -->
+  <section id="scenarios" class="py-24 px-6 bg-white">
+    <div class="max-w-6xl mx-auto">
+
+      <div class="text-center mb-16">
+        <p class="text-xs font-semibold text-orange-500 mb-4 uppercase tracking-widest">使用场景</p>
+        <h2 class="text-4xl md:text-5xl font-black text-stone-900 mb-5 leading-tight">一句话<br>AI 就明白了</h2>
+        <p class="text-stone-400 text-base">看看大家都在怎么用</p>
+      </div>
+
+      <!-- ── 信息获取 ── -->
+      <div class="mb-14">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="text-orange-400 text-base font-bold">+</span>
+          <h3 class="text-base font-semibold text-stone-600">信息获取</h3>
+          <div class="flex-1 h-px bg-stone-100"></div>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">「把这篇 8000 字的行业报告摘要一下，推到设备上」</div>
+            <div class="ai-bubble">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
+                <span class="text-xs font-medium text-stone-400">阅星曈</span>
+              </div>
+              已提炼 7 个核心观点，400 字要点卡片推送完成，设备上可以读了
+            </div>
+          </div>
+          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">「我订阅的科技博主昨天更新了，帮我清洗推到设备」</div>
+            <div class="ai-bubble">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
+                <span class="text-xs font-medium text-stone-400">阅星曈</span>
+              </div>
+              找到 2 篇新文章，已过滤广告和跳转链接，推送完成
+            </div>
+          </div>
+          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">「微信收到的 PDF 报告，图表要保留，推到设备」</div>
+            <div class="ai-bubble">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
+                <span class="text-xs font-medium text-stone-400">阅星曈</span>
+              </div>
+              识别 12 处图表，转换 EPUB 格式，排版已还原，推送完成
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 专注工作 ── -->
+      <div class="mb-14">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="text-orange-400 text-base font-bold">+</span>
+          <h3 class="text-base font-semibold text-stone-600">专注工作</h3>
+          <div class="flex-1 h-px bg-stone-100"></div>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">「把今天的日历推到设备，我要进专注模式了」</div>
+            <div class="ai-bubble">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
+                <span class="text-xs font-medium text-stone-400">阅星曈</span>
+              </div>
+              今日 4 个日程已推送，下一个是 14:30 产品评审会，安静等你
+            </div>
+          </div>
+          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">「一小时的会议录音，帮我整理要点推到设备」</div>
+            <div class="ai-bubble">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
+                <span class="text-xs font-medium text-stone-400">阅星曈</span>
+              </div>
+              转写完成，提炼 5 个决策事项和 8 条待办清单，已推送到设备
+            </div>
+          </div>
+          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">「帮我生成今天的执行计划，推到设备上」</div>
+            <div class="ai-bubble">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
+                <span class="text-xs font-medium text-stone-400">阅星曈</span>
+              </div>
+              结合日历和待办，生成 6 个番茄钟计划，已推送，专注模式随时可以开始
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 委托与等待 ── -->
+      <div class="mb-14">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="text-orange-400 text-base font-bold">+</span>
+          <h3 class="text-base font-semibold text-stone-600">委托与等待</h3>
+          <div class="flex-1 h-px bg-stone-100"></div>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">「帮我调研竞品 X 最近的动作，我去开会了」</div>
+            <div class="ai-bubble">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
+                <span class="text-xs font-medium text-stone-400">阅星曈</span>
+              </div>
+              <p>好的，调研完成后直接推到你的设备，你回来就能看</p>
+              <div class="mt-3 pt-3 border-t border-stone-100">
+                <span class="text-xs text-stone-400">2 小时后 · </span>
+                <span class="text-xs text-orange-500 font-medium">调研报告已静静推到墨水屏 🖤</span>
+              </div>
+            </div>
+          </div>
+          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">「帮我把这周工作产出整理成 EPUB 推到设备」</div>
+            <div class="ai-bubble">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
+                <span class="text-xs font-medium text-stone-400">阅星曈</span>
+              </div>
+              整理了 23 篇内容，按主题分 4 章，已推送，今晚可以读
+            </div>
+          </div>
+          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">「睡前吩咐你做个早报，早上醒来墨水屏上有什么？」</div>
+            <div class="ai-bubble">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
+                <span class="text-xs font-medium text-stone-400">阅星曈</span>
+              </div>
+              昨晚监控了 12 个信息源，筛出 5 条值得读的内容，今日 3 个日程，天气多云转晴，早报已推送
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 阅读与知识库 ── -->
+      <div>
+        <div class="flex items-center gap-3 mb-6">
+          <span class="text-orange-400 text-base font-bold">+</span>
+          <h3 class="text-base font-semibold text-stone-600">阅读与知识库</h3>
+          <div class="flex-1 h-px bg-stone-100"></div>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">「我最近读了哪些书，进度怎么样？」</div>
+            <div class="ai-bubble">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
+                <span class="text-xs font-medium text-stone-400">阅星曈</span>
+              </div>
+              书架 8 本：《人类简史》已读完 ✓，《百年孤独》82%，最近活跃是昨天的《悉达多》
+            </div>
+          </div>
+          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">「把《百年孤独》的书签整理成笔记推到设备」</div>
+            <div class="ai-bubble">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
+                <span class="text-xs font-medium text-stone-400">阅星曈</span>
+              </div>
+              找到 23 条书签，按章节整理成 EPUB，像你自己写的读书笔记，已推送
+            </div>
+          </div>
+          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">「把这半年的知识积累整理成一本年鉴」</div>
+            <div class="ai-bubble">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
+                <span class="text-xs font-medium text-stone-400">阅星曈</span>
+              </div>
+              整理了 200 篇收藏，按主题分章，《2026 上半年知识手册》已推送
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── OPENCLAW ──────────────────────────────────────────────────────── -->
+  <section id="openclaw" class="py-28 px-6 bg-[#FDF5EA] relative overflow-hidden">
+
+    <!-- Subtle warm glow -->
+    <div class="absolute top-0 right-0 w-[500px] h-[400px] pointer-events-none"
+         style="background: radial-gradient(ellipse, rgba(251,191,36,0.12) 0%, transparent 65%);"></div>
+    <div class="absolute bottom-0 left-0 w-[400px] h-[300px] pointer-events-none"
+         style="background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 65%);"></div>
+
+    <div class="max-w-6xl mx-auto relative z-10">
+
+      <!-- Header -->
+      <div class="text-center mb-20">
+        <div class="inline-flex items-center gap-2.5 bg-orange-100 border border-orange-200 rounded-full px-5 py-2 mb-8">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 blink"></span>
+          <span class="text-orange-700 text-sm font-medium">规划中 · 战略核心</span>
+        </div>
+        <h2 class="font-black text-stone-900 text-5xl md:text-6xl leading-tight mb-8">
+          OpenClaw<br>
+          <span class="grad-text">你的数字分身</span>
+        </h2>
+        <p class="text-stone-500 text-lg max-w-2xl mx-auto leading-relaxed">
+          AI 团队持续在信息世界里工作<br>
+          你在生活、休息、专注<br>
+          <span class="text-stone-700 font-medium">墨水屏，是这两个世界之间唯一的安静接口</span>
+        </p>
+      </div>
+
+      <!-- Four Roles -->
+      <p class="text-stone-400 text-xs font-semibold uppercase tracking-widest text-center mb-8">设备四个角色</p>
+      <div class="grid md:grid-cols-2 gap-4 mb-20">
+
+        <div class="role-card bg-white rounded-2xl p-8 border border-orange-100">
+          <div class="flex items-center gap-4 mb-5">
+            <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-2xl">📡</div>
+            <div>
+              <div class="text-stone-900 font-bold text-lg">监控端</div>
+              <div class="text-orange-500 text-xs">实时状态</div>
+            </div>
+          </div>
+          <p class="text-stone-500 text-sm leading-relaxed">实时显示 OpenClaw 的运行状态——当前执行什么任务、进度百分比、有无需要介入。不解锁手机，抬头扫一眼，AI 团队在干什么一目了然</p>
+        </div>
+
+        <div class="role-card bg-white rounded-2xl p-8 border border-orange-100">
+          <div class="flex items-center gap-4 mb-5">
+            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-2xl">🔔</div>
+            <div>
+              <div class="text-stone-900 font-bold text-lg">显示端</div>
+              <div class="text-amber-600 text-xs">安静通知</div>
+            </div>
+          </div>
+          <p class="text-stone-500 text-sm leading-relaxed">OpenClaw 通过星曈云把消息、通知、任务完成提醒推送到设备。重要信息静静出现在屏幕上，不震动不弹窗，你看到了自然会看到</p>
+        </div>
+
+        <div class="role-card bg-white rounded-2xl p-8 border border-orange-100">
+          <div class="flex items-center gap-4 mb-5">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-2xl">📖</div>
+            <div>
+              <div class="text-stone-900 font-bold text-lg">输出端</div>
+              <div class="text-emerald-600 text-xs">AI 产出文库</div>
+            </div>
+          </div>
+          <p class="text-stone-500 text-sm leading-relaxed">调研报告、知识手册、会议纪要、个人年鉴，经星曈云整理推送。每天有新内容等你读——不是算法喂给你的，是你的 AI 帮你生产的</p>
+        </div>
+
+        <div class="role-card bg-white rounded-2xl p-8 border border-orange-100">
+          <div class="flex items-center gap-4 mb-5">
+            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-2xl">🔄</div>
+            <div>
+              <div class="text-stone-900 font-bold text-lg">反馈端</div>
+              <div class="text-amber-600 text-xs">知识飞轮</div>
+            </div>
+          </div>
+          <p class="text-stone-500 text-sm leading-relaxed">设备上的阅读行为和标记，通过星曈云反哺知识库和 OpenClaw 的偏好模型。AI 知道你在意什么，下次推得更准</p>
+        </div>
+
+      </div>
+
+      <!-- Scenarios -->
+      <p class="text-stone-400 text-xs font-semibold uppercase tracking-widest text-center mb-8">典型场景</p>
+      <div class="grid md:grid-cols-3 gap-5 mb-20">
+
+        <div class="bg-white rounded-2xl p-7 border border-orange-100">
+          <div class="text-orange-500 text-xs font-semibold uppercase tracking-widest mb-4">AI 早报</div>
+          <p class="text-stone-500 text-sm leading-relaxed">你睡觉，OpenClaw 后台运行。早上醒来，墨水屏上是昨晚的"AI 夜班日志"——发现了什么值得关注、今天有什么日程安排。拿起手机的第一眼，变成有价值的信息</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-7 border border-orange-100">
+          <div class="text-amber-600 text-xs font-semibold uppercase tracking-widest mb-4">长任务异步</div>
+          <p class="text-stone-500 text-sm leading-relaxed">微信告诉 OpenClaw "帮我调研竞品"，放下手机去开会。两小时后墨水屏上静静出现完成卡，点开是整理好的调研报告。不用等、不用盯，AI 干完了自然告诉你</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-7 border border-orange-100">
+          <div class="text-emerald-600 text-xs font-semibold uppercase tracking-widest mb-4">AI 个人年鉴</div>
+          <p class="text-stone-500 text-sm leading-relaxed">OpenClaw 每月自动把知识积累、深度对话精华、工作产出整理成一本 EPUB 推到设备。每季度回顾，看到的是自己真实的成长轨迹，而不是刷过就忘的信息流</p>
+        </div>
+
+      </div>
+
+      <!-- Flywheel -->
+      <div class="text-center border-t border-orange-100 pt-16 max-w-3xl mx-auto mb-20">
+        <p class="text-stone-400 text-xs uppercase tracking-widest mb-6">知识库飞轮</p>
+        <p class="text-stone-600 text-lg leading-relaxed">
+          用得越久，系统越懂你，推送越精准，积累越有价值
+        </p>
+        <p class="text-stone-900 font-bold text-xl mt-3">这是一个正向飞轮，不是用完即走的工具</p>
+      </div>
+
+
+    </div>
+  </section>
+
+  <!-- ─── CTA ───────────────────────────────────────────────────────────── -->
+  <section id="cta" class="py-32 px-6 bg-white text-center">
+    <div class="max-w-2xl mx-auto">
+      <p class="text-orange-500 text-xs font-semibold uppercase tracking-widest mb-6">阅星曈 · YuXingTong</p>
+      <h2 class="text-5xl md:text-6xl font-black text-stone-900 leading-tight mb-6">
+        AI 时代的<br>个人终端
+      </h2>
+      <p class="text-stone-400 text-lg mb-14 leading-relaxed">
+        让你的 AI，有一个安静的家
+      </p>
+      <a href="#" class="inline-flex items-center gap-2 bg-orange-500 text-white px-10 py-4 rounded-full font-semibold text-base hover:bg-orange-600 transition-colors">
+        了解更多
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ────────────────────────────────────────────────────────── -->
+  <footer class="border-t border-stone-100 py-8 px-6 bg-[#FAF8F4]">
+    <div class="max-w-6xl mx-auto flex items-center justify-between text-sm text-stone-400">
+      <span class="font-semibold text-stone-600">阅星曈</span>
+      <span>个人 AI 终端 · 墨水屏设备</span>
+    </div>
+  </footer>
+
+  <script>
+    function copyInstall() {
+      const text = '安装更新技能 https://github.com/linchuanXu/eink-push';
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = '已复制 ✓';
+        btn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+        btn.classList.add('bg-emerald-500');
+        setTimeout(() => {
+          btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> 复制`;
+          btn.classList.remove('bg-emerald-500');
+          btn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
+
+
