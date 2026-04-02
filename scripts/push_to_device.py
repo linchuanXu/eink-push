@@ -15,8 +15,9 @@
     其他任意格式      通用文件（自动识别 MIME，存入 /Pushed Files）
 
 凭证管理：
-    账号密码由 AI 助手在对话中收集后写入 .credentials.json，脚本直接读取，不做交互式询问。
-    若凭证文件不存在，脚本退出码 2，由 AI 助手引导用户提供后再重试。
+    优先读取环境变量 EINK_USERNAME / EINK_PASSWORD（OpenClaw 原生凭证注入方式）。
+    回退：读取 .credentials.json（兼容旧配置）。
+    两者均缺失时退出码 2，由 AI 助手引导用户配置后重试。
 """
 
 import sys
@@ -39,12 +40,22 @@ _CRED_FILE = Path(__file__).resolve().parent.parent / ".credentials.json"
 
 def load_credentials() -> tuple[str, str]:
     """
-    从 .credentials.json 读取账号密码。
-    文件不存在或字段缺失时打印 [CREDENTIALS_MISSING] 并以退出码 2 退出，
-    由外部调用方（AI 助手）在对话中收集凭证后重试，不做交互式 input()。
+    优先从环境变量读取账号密码（OpenClaw 原生凭证注入）：
+        EINK_USERNAME / EINK_PASSWORD
+    回退到 .credentials.json（兼容旧配置）。
+    两者均缺失时打印 [CREDENTIALS_MISSING] 并以退出码 2 退出，
+    由外部调用方（AI 助手）引导用户配置后重试，不做交互式 input()。
     """
+    username = os.environ.get("EINK_USERNAME", "").strip()
+    password = os.environ.get("EINK_PASSWORD", "").strip()
+    if username and password:
+        return username, password
+
+    # 回退：读取凭证文件
     if not _CRED_FILE.exists():
-        print(f"[CREDENTIALS_MISSING] 凭证文件不存在：{_CRED_FILE}")
+        print("[CREDENTIALS_MISSING] 未找到凭证。"
+              "请在 ~/.openclaw/openclaw.json 中配置 EINK_USERNAME / EINK_PASSWORD，"
+              f"或提供凭证文件：{_CRED_FILE}")
         sys.exit(2)
 
     try:
@@ -64,12 +75,14 @@ def load_credentials() -> tuple[str, str]:
 
 
 def reset_credentials() -> None:
-    """删除凭证文件，AI 助手下次推送前会重新向用户收集账号密码。"""
+    """删除凭证文件。若使用环境变量方式，需在 ~/.openclaw/openclaw.json 中手动移除。"""
     if _CRED_FILE.exists():
         _CRED_FILE.unlink()
-        print("[✓] 已清除凭证，下次推送时 AI 助手会重新向你确认账号密码。")
+        print("[✓] 已清除凭证文件。")
+        print("    如使用环境变量方式，请在 ~/.openclaw/openclaw.json 中移除 EINK_USERNAME / EINK_PASSWORD。")
     else:
-        print("[!] 未找到凭证文件，无需清除。")
+        print("[!] 未找到凭证文件。")
+        print("    如使用环境变量方式，请在 ~/.openclaw/openclaw.json 中移除 EINK_USERNAME / EINK_PASSWORD。")
 
 
 # ─── 文件类型映射 ──────────────────────────────────────────────────────────────
@@ -274,13 +287,14 @@ def main() -> None:
     parser.add_argument(
         "--check-credentials",
         action="store_true",
-        help="检查凭证文件是否存在，输出 OK 或 MISSING",
+        help="检查凭证是否可用（环境变量或文件均可），输出 OK 或 MISSING",
     )
     args = parser.parse_args()
 
     # ── 凭证检查模式 ───────────────────────────────────────────
     if args.check_credentials:
-        print("OK" if _CRED_FILE.exists() else "MISSING")
+        has_env = bool(os.environ.get("EINK_USERNAME") and os.environ.get("EINK_PASSWORD"))
+        print("OK" if (has_env or _CRED_FILE.exists()) else "MISSING")
         return
 
     # ── 重置凭证模式 ───────────────────────────────────────────

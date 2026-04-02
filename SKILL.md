@@ -28,11 +28,22 @@ python {baseDir}/scripts/push_to_device.py --check-credentials
 ```
 
 - 输出 `OK` → 继续
-- 输出 `MISSING` → 询问用户手机号和密码，用 Write 工具写入 `{baseDir}/.credentials.json`：
+- 输出 `MISSING` → 凭证未配置，引导用户在 `~/.openclaw/openclaw.json` 中添加以下内容，然后重启 OpenClaw 会话使环境变量生效，再重试：
   ```json
-  { "username": "手机号", "password": "密码" }
+  {
+    "skills": {
+      "entries": {
+        "eink_push": {
+          "env": {
+            "EINK_USERNAME": "手机号",
+            "EINK_PASSWORD": "密码"
+          }
+        }
+      }
+    }
+  }
   ```
-- 操作返回 401 → `python {baseDir}/scripts/push_to_device.py --reset-credentials` 后重新询问
+- 操作返回 401 → 告知用户「账号或密码有误」，引导到 `~/.openclaw/openclaw.json` 修改后重启会话重试
 
 ---
 
@@ -307,8 +318,8 @@ python {baseDir}/scripts/push_to_device.py "output/阅读看板_时间戳.xth"
 
 | 错误 | 处理方式 |
 |------|----------|
-| `[CREDENTIALS_MISSING]` 或退出码 2 | 凭证文件缺失或字段不全，走凭证预检流程重新收集 |
-| HTTP 401 | 告知用户"账号或密码有误"，运行 `--reset-credentials`，重新收集 |
+| `[CREDENTIALS_MISSING]` 或退出码 2 | 凭证未配置，引导用户在 `~/.openclaw/openclaw.json` 中配置 `EINK_USERNAME` / `EINK_PASSWORD`，重启会话后重试 |
+| HTTP 401 | 告知用户「账号或密码有误」，引导到 `~/.openclaw/openclaw.json` 修改后重启会话重试 |
 | 网络超时 / 连接失败 | "网络连接异常，请检查网络后重试" |
 | 未找到绑定设备 | "未找到绑定设备，请先在阅星曈 App 中绑定设备" |
 | `[ERROR] Playwright 未安装` | 引导用户执行 `pip install playwright && playwright install chromium` |
