@@ -1,0 +1,83 @@
+---
+description: OpenClaw / 龙虾 平台背景知识，用于正确理解和评审本项目的 Skill
+alwaysApply: true
+---
+
+# OpenClaw（小龙虾）背景知识
+
+## 什么是 OpenClaw
+
+OpenClaw（昵称「龙虾 / 小龙虾」）是一个开源的个人 AI Agent 框架，不是聊天机器人，而是「AI 执行引擎」。它连接大模型的思考能力与电脑的真实操作权限，可以执行脚本、控制浏览器、管理文件、发送消息、定时触发任务。
+
+- 官网：https://xiaolongxia.org/
+- 文档：https://docs.openclaw.ai/
+- 技能市场：https://clawhub.com/
+
+## 什么是 Skill
+
+Skill 是 OpenClaw 的核心扩展机制。每个 Skill 是一个目录，包含一个 `SKILL.md` 文件。OpenClaw 在会话开始时加载 Skill 并注入 Agent 的 system prompt，从而教会 Agent 在特定场景下调用特定工具或执行特定工作流。
+
+### SKILL.md 格式
+
+```markdown
+---
+name: skill_name           # snake_case，唯一标识
+description: 一句话说明   # 展示给 Agent，用于触发匹配；应简洁，不要塞触发词列表
+metadata: {"openclaw": {"emoji": "🔧", "requires": {"bins": ["python"]}}}
+---
+
+# Skill 正文
+
+Agent 指令写在这里...
+```
+
+### `{baseDir}` 占位符
+
+OpenClaw 原生支持 `{baseDir}` 占位符，Agent 执行时自动替换为该 Skill 目录的绝对路径。在 Skill 正文里使用 `{baseDir}/scripts/xxx.py` 是正确且推荐的写法。
+
+### metadata 字段
+
+- `metadata.openclaw.emoji`：Skills UI 中的图标
+- `metadata.openclaw.requires.bins`：环境门控，列表中所有二进制必须在 PATH 上，否则 Skill 不加载
+- `metadata.openclaw.requires.env`：环境变量门控
+- `metadata.openclaw.os`：平台限制（`darwin` / `linux` / `win32`）
+
+### 凭证管理（原生方式）
+
+OpenClaw 支持通过 `~/.openclaw/openclaw.json` 向 Skill 注入环境变量，无需在项目目录写明文凭证文件：
+
+```json
+{
+  "skills": {
+    "entries": {
+      "skill_name": {
+        "env": { "API_KEY": "xxx" }
+      }
+    }
+  }
+}
+```
+
+### Token 成本
+
+Skills 列表注入到 system prompt 的成本公式：
+```
+total = 195 + Σ (97 + len(name) + len(description) + len(location))
+```
+因此 `description` 字段应尽量简短，触发词逻辑放到 Skill 正文里。
+
+## 本项目中的「龙虾」
+
+`--author "龙虾"` 是项目所有者的个人代号，是有意为之的个人化标识，不是待替换的占位符。
+
+## Skill 加载优先级
+
+```
+/skills（工作区）> /.agents/skills > ~/.agents/skills > ~/.openclaw/skills > 内置 > extraDirs
+```
+
+同名 Skill 高优先级覆盖低优先级。
+
+## ClawHub
+
+ClawHub（https://clawhub.com/）是 OpenClaw 的公共 Skill 注册表，类似 npm。可通过 `openclaw skills install <name>` 安装。
