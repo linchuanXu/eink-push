@@ -18,9 +18,24 @@ playwright install chromium
 > 前提：已安装 Node.js >= 18（https://nodejs.org/）
 
 ```bash
-# 在 eink-push/ 根目录执行一次
+# 在 Skill 根目录执行（即本文件所在的 eink-push/ 目录）
 npm install marknative
 ```
+
+> ⚠️ **重要**：`npm install` 必须在实际运行 Skill 的目录执行，不是 git clone 的开发目录。  
+> OpenClaw 默认将 Skill 安装到 `C:\Users\{用户名}\AppData\Roaming\LobsterAI\SKILLs\eink-push\`，  
+> 需要在该目录下运行一次 `npm install marknative`。
+
+如果遇到 `skia-canvas 的 native 模块不兼容` 报错，说明预编译二进制与当前 Node.js 版本不匹配，尝试重新编译：
+
+```bash
+# 需要已安装 Visual C++ 生成工具（Windows）或 build-essential（Linux）
+npm rebuild skia-canvas
+```
+
+若重编译也失败，降级 Node.js 到最新 LTS 版本（v22.x）后重新 `npm install marknative`。
+
+---
 
 ## 字体（可选，推荐）
 
@@ -34,6 +49,8 @@ render_image.py 按以下优先级自动选择字体：
 1. `assets/fonts/` 有本地文件 → 直接注入（推荐，离线可用）
 2. 无本地字体 → 自动从 Google Fonts CDN 拉取（需联网，约 +3s）
 3. CDN 也失败 → Playwright 使用系统字体兜底（macOS：宋体-简 Songti SC；Windows：宋体 SimSun）
+
+---
 
 ## 快速验证
 
