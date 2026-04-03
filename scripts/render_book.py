@@ -5,7 +5,7 @@ render_book.py — Markdown → XTC 翻页集（墨水屏电子书，快刷 1-bi
 流程：Markdown → marknative（Node.js）→ 分页 PNG → XTG → XTC
 
 用法：
-    python render_book.py <input.md> [--output|-o output.xtc] [--title|-t 标题] [--author|-a 作者]
+    python render_book.py <input.md> [--output|-o output.xtc] [--title|-t 标题] [--author|-a 作者] [--push]
 
 依赖：
     Node.js >= 18 + npm install marknative（在项目根目录执行一次）
@@ -129,10 +129,21 @@ def main():
         "--title", "-t", help="书名（默认：Markdown 首行 # 标题）"
     )
     parser.add_argument("--author", "-a", default="龙虾", help="作者（默认：龙虾）")
+    parser.add_argument(
+        "--push", action="store_true", help="渲染完成后立即推送到设备"
+    )
     args = parser.parse_args()
 
     output = build_book(args.input, args.output, args.title, args.author)
     print(f"[OK] 已生成：{output}")
+
+    if args.push:
+        push_script = _SCRIPT_DIR / "push_to_device.py"
+        result = subprocess.run(
+            [sys.executable, str(push_script), output],
+            cwd=str(_SCRIPT_DIR.parent),
+        )
+        sys.exit(result.returncode)
 
 
 if __name__ == "__main__":

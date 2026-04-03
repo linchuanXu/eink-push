@@ -109,8 +109,7 @@ python {baseDir}/scripts/push_to_device.py "output/渲染结果文件"
 → 说：「正在生成并推送「{标题}」…」
 
 ```bash
-python {baseDir}/scripts/render_book.py "output/文件名.md" --title "标题" --author "龙虾"
-python {baseDir}/scripts/push_to_device.py "output/文件名.xtc"
+python {baseDir}/scripts/render_book.py "output/文件名.md" --title "标题" --author "龙虾" --push
 ```
 
 → 成功后说：「已推送到阅星曈，设备上即可接收。」
@@ -231,8 +230,7 @@ python {baseDir}/scripts/push_to_device.py "output/书名_摘录_时间戳.xtch"
 → 说：「正在整理《{书名}》阅读笔记并推送…」
 
 ```bash
-python {baseDir}/scripts/render_book.py "output/书名_笔记_时间戳.md" --title "《书名》阅读笔记" --author "龙虾"
-python {baseDir}/scripts/push_to_device.py "output/书名_笔记_时间戳.xtc"
+python {baseDir}/scripts/render_book.py "output/书名_笔记_时间戳.md" --title "《书名》阅读笔记" --author "龙虾" --push
 ```
 
 → 成功后说：「已推送到阅星曈，设备上即可接收。」
