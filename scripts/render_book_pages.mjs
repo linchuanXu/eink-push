@@ -12,17 +12,25 @@
  */
 
 import { renderMarkdown, defaultTheme } from 'marknative';
-import { FontLibrary } from 'skia-canvas';
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+
+// skia-canvas 是 marknative 的原生依赖，版本不匹配时降级，不影响渲染
+let FontLibrary;
+try {
+  ({ FontLibrary } = await import('skia-canvas'));
+} catch {
+  /* 原生模块不可用，字体加载跳过，使用系统字体 */
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(__dirname, '..');
 const FONT_DIR = join(PROJECT_ROOT, 'assets', 'fonts');
 
-// ── 注册本地中文字体 ────────────────────────────────────────────────────────
+// ── 注册本地中文字体（FontLibrary 不可用时静默跳过）──────────────────────────
 function loadFonts() {
+  if (!FontLibrary) return;
   const fonts = [
     { alias: 'Noto Serif SC', files: ['NotoSerifSC-Regular.otf', 'NotoSerifSC-Bold.otf', 'NotoSerifSC-Black.otf'] },
     { alias: 'MiSans',        files: ['MiSans-Regular.otf', 'MiSans-Medium.otf', 'MiSans-Demibold.otf', 'MiSans-Bold.otf'] },
@@ -32,7 +40,7 @@ function loadFonts() {
       try { readFileSync(p); return true; } catch { return false; }
     });
     if (paths.length > 0) {
-      try { FontLibrary.use(alias, paths); } catch { /* 字体加载失败时静默降级 */ }
+      try { FontLibrary.use(alias, paths); } catch { /* 静默降级 */ }
     }
   }
 }

@@ -289,4 +289,5 @@ python {baseDir}/scripts/push_to_device.py "output/阅读看板_时间戳.xth"
 | `[CREDENTIALS_MISSING]` 或退出码 2 | 走凭证预检流程重新收集 |
 | 未找到绑定设备 | 告知用户在阅星曈 App 中绑定设备后重试 |
 | 依赖缺失（`[ERROR]` 开头） | 告知用户按 `{baseDir}/references/SETUP.md` 安装对应依赖后重试 |
+| `skia-canvas` native 模块报错 | 告知用户在 Skill 目录执行 `npm install marknative`；若仍失败见 `{baseDir}/references/SETUP.md` |
 | 其他脚本报错 | 将完整报错原文展示给用户，说明需手动排查 |
