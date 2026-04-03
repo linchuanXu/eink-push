@@ -39,6 +39,7 @@ render_image.py — HTML 卡片模板 → 阅星曈设备图片
 import argparse
 import re
 import struct
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -479,6 +480,7 @@ def main():
     parser.add_argument("--preview", action="store_true",
                         help="额外输出 PNG 预览图（仅单张有效）")
     parser.add_argument("--no-fonts", action="store_true", help="跳过本地字体注入")
+    parser.add_argument("--push", action="store_true", help="渲染完成后立即推送到设备")
 
     # 图像调整
     parser.add_argument("--brightness", type=int,   default=0,   metavar="N")
@@ -569,6 +571,11 @@ def main():
         print(f"[OK] {fmt.upper()} 已生成：{output_path}  ({len(data) // 1024} KB)")
 
     print(f"OUTPUT:{output_path}")
+
+    if args.push:
+        push_script = Path(__file__).parent / "push_to_device.py"
+        result = subprocess.run([sys.executable, str(push_script), str(output_path)])
+        sys.exit(result.returncode)
 
 
 if __name__ == "__main__":
