@@ -13,22 +13,39 @@
 
 import { renderMarkdown, defaultTheme } from 'marknative';
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
-import { join, resolve } from 'path';
+import { join, resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+// ── 加载 MiSans 可变体（内置于 assets/fonts/MiSansVF.ttf）──────────────────
+let FontLibrary;
+try {
+  ({ FontLibrary } = await import('skia-canvas'));
+} catch { /* skia 不可用，退回系统字体 */ }
+
+const FONT_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'fonts');
+
+function loadFonts() {
+  if (!FontLibrary) return;
+  try {
+    const vf = join(FONT_DIR, 'MiSansVF.ttf');
+    readFileSync(vf);
+    FontLibrary.use('MiSans', [vf]);
+  } catch { /* 无 VF，退回系统字体 */ }
+}
 
 // ── 配置阅星曈屏幕主题（480×800）──────────────────────────────────────────
-// 字体由 Skia 从系统中自动匹配（sans-serif / monospace）
 function applyEinkTheme() {
   defaultTheme.page.width = 480;
   defaultTheme.page.height = 800;
   defaultTheme.page.margin = { top: 20, right: 18, bottom: 20, left: 18 };
 
-  defaultTheme.typography.body.font       = '500 30px sans-serif';
+  defaultTheme.typography.body.font       = '550 30px "MiSans", sans-serif';
   defaultTheme.typography.body.lineHeight = 48;
-  defaultTheme.typography.h1.font         = 'bold 44px sans-serif';
+  defaultTheme.typography.h1.font         = 'bold 44px "MiSans", sans-serif';
   defaultTheme.typography.h1.lineHeight   = 64;
-  defaultTheme.typography.h2.font         = 'bold 36px sans-serif';
+  defaultTheme.typography.h2.font         = 'bold 36px "MiSans", sans-serif';
   defaultTheme.typography.h2.lineHeight   = 56;
-  defaultTheme.typography.code.font       = '500 24px monospace';
+  defaultTheme.typography.code.font       = '550 24px "MiSans", monospace';
   defaultTheme.typography.code.lineHeight = 36;
 
   defaultTheme.blocks.paragraph.marginBottom  = 24;
@@ -63,6 +80,7 @@ try {
   process.exit(1);
 }
 
+loadFonts();
 applyEinkTheme();
 
 let pages;
