@@ -49,15 +49,15 @@ function loadFonts() {
 function applyEinkTheme() {
   defaultTheme.page.width = 480;
   defaultTheme.page.height = 800;
-  defaultTheme.page.margin = { top: 40, right: 36, bottom: 40, left: 36 };
+  defaultTheme.page.margin = { top: 20, right: 18, bottom: 20, left: 18 };
 
-  defaultTheme.typography.body.font       = '30px "Noto Serif SC", serif';
+  defaultTheme.typography.body.font       = '500 30px "Noto Serif SC", serif';
   defaultTheme.typography.body.lineHeight = 48;
-  defaultTheme.typography.h1.font         = 'bold 44px "Noto Serif SC", serif';
+  defaultTheme.typography.h1.font         = '900 44px "Noto Serif SC", serif';
   defaultTheme.typography.h1.lineHeight   = 64;
-  defaultTheme.typography.h2.font         = 'bold 36px "Noto Serif SC", serif';
+  defaultTheme.typography.h2.font         = '800 36px "Noto Serif SC", serif';
   defaultTheme.typography.h2.lineHeight   = 56;
-  defaultTheme.typography.code.font       = '24px monospace';
+  defaultTheme.typography.code.font       = '600 24px monospace';
   defaultTheme.typography.code.lineHeight = 36;
 
   defaultTheme.blocks.paragraph.marginBottom  = 24;
