@@ -13,51 +13,22 @@
 
 import { renderMarkdown, defaultTheme } from 'marknative';
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
-import { join, resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-// skia-canvas 是 marknative 的原生依赖，版本不匹配时降级，不影响渲染
-let FontLibrary;
-try {
-  ({ FontLibrary } = await import('skia-canvas'));
-} catch {
-  /* 原生模块不可用，字体加载跳过，使用系统字体 */
-}
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const PROJECT_ROOT = resolve(__dirname, '..');
-const FONT_DIR = join(PROJECT_ROOT, 'assets', 'fonts');
-
-// ── 注册本地中文字体（FontLibrary 不可用时静默跳过）──────────────────────────
-function loadFonts() {
-  if (!FontLibrary) return;
-  const fonts = [
-    { alias: 'MiSans',        files: ['MiSans-Regular.otf', 'MiSans-Medium.otf', 'MiSans-Demibold.otf', 'MiSans-Bold.otf'] },
-    { alias: 'Noto Serif SC', files: ['NotoSerifSC-Regular.otf', 'NotoSerifSC-Bold.otf', 'NotoSerifSC-Black.otf'] },
-  ];
-  for (const { alias, files } of fonts) {
-    const paths = files.map(f => join(FONT_DIR, f)).filter(p => {
-      try { readFileSync(p); return true; } catch { return false; }
-    });
-    if (paths.length > 0) {
-      try { FontLibrary.use(alias, paths); } catch { /* 静默降级 */ }
-    }
-  }
-}
+import { join, resolve } from 'path';
 
 // ── 配置阅星曈屏幕主题（480×800）──────────────────────────────────────────
+// 字体由 Skia 从系统中自动匹配（sans-serif / monospace）
 function applyEinkTheme() {
   defaultTheme.page.width = 480;
   defaultTheme.page.height = 800;
   defaultTheme.page.margin = { top: 20, right: 18, bottom: 20, left: 18 };
 
-  defaultTheme.typography.body.font       = '500 30px "MiSans", "Noto Serif SC", sans-serif';
+  defaultTheme.typography.body.font       = '500 30px sans-serif';
   defaultTheme.typography.body.lineHeight = 48;
-  defaultTheme.typography.h1.font         = '900 44px "MiSans", "Noto Serif SC", sans-serif';
+  defaultTheme.typography.h1.font         = 'bold 44px sans-serif';
   defaultTheme.typography.h1.lineHeight   = 64;
-  defaultTheme.typography.h2.font         = '800 36px "MiSans", "Noto Serif SC", sans-serif';
+  defaultTheme.typography.h2.font         = 'bold 36px sans-serif';
   defaultTheme.typography.h2.lineHeight   = 56;
-  defaultTheme.typography.code.font       = '600 24px "MiSans", monospace';
+  defaultTheme.typography.code.font       = '500 24px monospace';
   defaultTheme.typography.code.lineHeight = 36;
 
   defaultTheme.blocks.paragraph.marginBottom  = 24;
@@ -92,7 +63,6 @@ try {
   process.exit(1);
 }
 
-loadFonts();
 applyEinkTheme();
 
 let pages;
