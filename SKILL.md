@@ -74,22 +74,16 @@ python {baseDir}/scripts/push_to_device.py --check-credentials
 | body 写法 | `width:100vw; height:100vh; overflow:hidden; margin:0; padding:0` |
 | 起点模板 | Read `{baseDir}/assets/templates/base.html` |
 
-**第 2 步：渲染**
-
-```bash
-# 单张
-python {baseDir}/scripts/render_image.py "output/文件名.html"
-
-# 多张（自动打包）
-python {baseDir}/scripts/render_image.py "output/主题_p1_时间戳.html" "output/主题_p2_时间戳.html" --title "标题" --author "龙虾"
-```
-
-**第 3 步：推送**
+**第 2 步：推送**
 
 → 说：「正在推送「{标题}」…」
 
 ```bash
-python {baseDir}/scripts/push_to_device.py "output/渲染结果文件"
+# 单张
+python {baseDir}/scripts/render_image.py "output/文件名.html" --push
+
+# 多张
+python {baseDir}/scripts/render_image.py "output/主题_p1_时间戳.html" "output/主题_p2_时间戳.html" --title "标题" --author "龙虾" --push
 ```
 
 → 成功后说：「已推送到阅星曈，设备上即可接收。」
@@ -104,7 +98,7 @@ python {baseDir}/scripts/push_to_device.py "output/渲染结果文件"
 
 文件命名：`output/{主题词}_{YYYYMMDD-HHMM}.md`，主题词 ≤10 字。
 
-**第 2 步：生成并推送**
+**第 2 步：推送**
 
 → 说：「正在生成并推送「{标题}」…」
 
@@ -192,13 +186,12 @@ python {baseDir}/scripts/fetch_reading.py bookmarks --all
 - 文件命名：`output/{clean_name}_摘录_p1_{YYYYMMDD-HHMM}.html`、`_p2_`…
 - 设计规范见 `{baseDir}/references/design-guide.md`
 
-**第 3 步：渲染 + 推送**
+**第 3 步：推送**
 
 → 说：「正在生成《{书名}》书摘卡片并推送…」
 
 ```bash
-python {baseDir}/scripts/render_image.py "output/书名_摘录_p1_时间戳.html" "output/书名_摘录_p2_时间戳.html" --title "《书名》书摘" --author "龙虾"
-python {baseDir}/scripts/push_to_device.py "output/书名_摘录_时间戳.xtch"
+python {baseDir}/scripts/render_image.py "output/书名_摘录_p1_时间戳.html" "output/书名_摘录_p2_时间戳.html" --title "《书名》书摘" --author "龙虾" --push
 ```
 
 → 成功后说：「已推送到阅星曈，设备上即可接收。」
@@ -225,7 +218,7 @@ python {baseDir}/scripts/push_to_device.py "output/书名_摘录_时间戳.xtch"
 
 文件命名：`output/{clean_name}_笔记_{YYYYMMDD-HHMM}.md`
 
-**第 3 步：生成并推送**
+**第 3 步：推送**
 
 → 说：「正在整理《{书名}》阅读笔记并推送…」
 
@@ -252,13 +245,12 @@ python {baseDir}/scripts/render_book.py "output/书名_笔记_时间戳.md" --ti
 
 版式：仪表盘 / 多栏，突出「正在读」和「总时长」。文件命名：`output/阅读看板_{YYYYMMDD-HHMM}.html`
 
-**第 3 步：渲染 + 推送**
+**第 3 步：推送**
 
 → 说：「正在生成阅读看板并推送…」
 
 ```bash
-python {baseDir}/scripts/render_image.py "output/阅读看板_时间戳.html"
-python {baseDir}/scripts/push_to_device.py "output/阅读看板_时间戳.xth"
+python {baseDir}/scripts/render_image.py "output/阅读看板_时间戳.html" --push
 ```
 
 → 成功后说：「已推送到阅星曈，设备上即可接收。」
