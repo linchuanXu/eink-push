@@ -38,3 +38,4 @@ Thumbs.db
 assets/fonts/*.ttf
 assets/fonts/*.otf
 output/*.txt
+node_modules/
