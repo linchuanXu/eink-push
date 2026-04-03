@@ -13,11 +13,14 @@ render_book.py — Markdown → XTC 翻页集（墨水屏电子书，快刷 1-bi
 """
 
 import argparse
+import io
 import json
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent))
 from render_image import XtgXthParams, png_bytes_to_xtg_xth, encode_xtc
@@ -107,10 +110,18 @@ def build_book(
             print("[ERROR] marknative 未生成任何页面", file=sys.stderr)
             sys.exit(1)
 
+        _TARGET_W, _TARGET_H = 480, 800
         params = XtgXthParams()
         xtg_pages = []
         for png_file in png_files:
             png_bytes = Path(png_file).read_bytes()
+            # marknative renders at 2x DPR; downsample to device resolution
+            img = Image.open(io.BytesIO(png_bytes))
+            if img.size != (_TARGET_W, _TARGET_H):
+                img = img.resize((_TARGET_W, _TARGET_H), Image.LANCZOS)
+                buf = io.BytesIO()
+                img.save(buf, format="PNG")
+                png_bytes = buf.getvalue()
             xtg_bytes, _ = png_bytes_to_xtg_xth(png_bytes, params)
             xtg_pages.append(xtg_bytes)
 
