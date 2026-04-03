@@ -38,6 +38,7 @@ Thumbs.db
 *.zip
 assets/fonts/*.ttf
 assets/fonts/*.otf
+!assets/fonts/MiSansVF.ttf
 output/*.txt
 node_modules/
 output/
