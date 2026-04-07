@@ -1,7 +1,25 @@
 ---
 name: eink_push
 description: 推送内容到阅星曈墨水屏（卡片 / 电子书），或拉取书架、书签等阅读数据。
-metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}, "install": [{"id": "npm-marknative", "kind": "node", "package": "marknative", "label": "安装 marknative（电子书路径，需 Node.js ≥ 18）"}]}}
+homepage: https://github.com/linchuanXu/eink-push
+metadata:
+  openclaw:
+    emoji: '🖤'
+    requires:
+      bins: ['python']
+    install:
+      - id: npm-marknative
+        kind: node
+        package: marknative
+        label: 安装 marknative（电子书路径，需 Node.js ≥ 18）
+  security:
+    credentials_usage: |
+      This skill stores username and password in .credentials.json (written by the user
+      on first setup) and sends them ONLY to the official 阅星曈 API (api-prod.xteink.cn)
+      for authentication. Credentials are never logged, stored elsewhere, or transmitted
+      to any other domain.
+    allowed_domains:
+      - api-prod.xteink.cn
 ---
 
 # 阅星曈 Skill
@@ -37,6 +55,8 @@ metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}, "inst
 > **Gateway / Skills UI 安装器说明**：frontmatter 仅声明了 `node→marknative`，供 Gateway 执行 `npm install marknative`。`playwright` 是 Python library（脚本用 `import playwright`），OpenClaw 无 `pip` kind，**无法通过 install spec 自动装**；无论是否用过 Gateway 安装器，都需手动执行上表命令补全。
 
 字体可选：`python {baseDir}/scripts/setup_fonts.py`（见 `references/SETUP.md`）。
+
+> **Windows 提示**：如果 `python` 命令不存在，尝试 `py -3`；`pip` 不存在则用 `python -m pip install`。
 
 ### Agent 执行顺序
 
