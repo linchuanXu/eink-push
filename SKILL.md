@@ -1,7 +1,7 @@
 ---
 name: eink_push
 description: 推送内容到阅星曈墨水屏（卡片 / 电子书），或拉取书架、书签等阅读数据。
-metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}, "install": [{"id": "uv-playwright", "kind": "uv", "package": "playwright", "bins": ["playwright"], "label": "安装 Playwright（还需在 Skill 目录执行 playwright install chromium）"}, {"id": "npm-marknative", "kind": "node", "package": "marknative", "label": "安装 marknative（电子书路径，需 Node.js ≥ 18）"}]}}
+metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}, "install": [{"id": "npm-marknative", "kind": "node", "package": "marknative", "label": "安装 marknative（电子书路径，需 Node.js ≥ 18）"}]}}
 ---
 
 # 阅星曈 Skill
@@ -19,7 +19,7 @@ metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}, "inst
 | 方式 | 会不会自动装依赖 |
 |------|------------------|
 | **`openclaw skills install` / ClawHub 下载 Skill 目录** | **不会**，只拷贝文件夹，不执行 `pip` / `npm`（官方说明见 `references/openclaw-skill-docs/skills.md` 安全与 ClawHub 章节） |
-| **Gateway / macOS Skills UI 的依赖安装** | 会读取本 Skill frontmatter 里的 `metadata.openclaw.install`（与 [OpenClaw Skills · install](https://docs.openclaw.ai/skills)、`references/openclaw-skill-docs/skills.md` 一致）：已声明 **`uv`→playwright**、**`node`→marknative**。安装器**不会**替你执行 `playwright install chromium`，也**通常不**装 `Pillow` / `requests`，须按下方表格或 `SETUP.md` 补全 |
+| **Gateway / macOS Skills UI 的依赖安装** | 会读取本 Skill frontmatter 里的 `metadata.openclaw.install`（与 [OpenClaw Skills · install](https://docs.openclaw.ai/skills)、`references/openclaw-skill-docs/skills.md` 一致）：仅声明了 **`node`→marknative**（本地库，脚本 `import marknative` 能找到）。`playwright` / `Pillow` / `requests` 无对应 install kind，需按下方表格用 `pip` 安装；`playwright install chromium` 也必须手动执行 |
 
 ### 在哪儿执行
 
@@ -34,7 +34,7 @@ metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}, "inst
 | 卡片、阅读看板、书摘（HTML → 图） | 同上 | 同上 |
 | 电子书（Markdown → XTC） | 另需 **Node.js ≥ 18** | 先完成上表 Python 步骤；再：`npm install marknative` |
 
-> **Gateway / Skills UI 安装器说明**：frontmatter 的 `install` 声明了 `uv→playwright`（产生 `playwright` CLI）和 `node→marknative`（库，无 CLI bin）。安装器**只会**装这两项，**不会**自动装 `Pillow` / `requests`，也**不会**执行 `playwright install chromium`（下载 Chromium 二进制）。无论是否用过 Gateway 安装器，都需要手动执行上表命令补全。
+> **Gateway / Skills UI 安装器说明**：frontmatter 仅声明了 `node→marknative`，供 Gateway 执行 `npm install marknative`。`playwright` 是 Python library（脚本用 `import playwright`），OpenClaw 无 `pip` kind，**无法通过 install spec 自动装**；无论是否用过 Gateway 安装器，都需手动执行上表命令补全。
 
 字体可选：`python {baseDir}/scripts/setup_fonts.py`（见 `references/SETUP.md`）。
 
