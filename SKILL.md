@@ -1,7 +1,7 @@
 ---
 name: eink_push
-description: 推送内容到阅星曈墨水屏（卡片 / 电子书），或拉取书架、书签等阅读数据。
-metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}}}
+description: 推送内容到阅星曈墨水屏（卡片 / 电子书），或拉取书架、书签等阅读数据；首次使用前须完成正文「环境准备」。
+metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}, "install": [{"id": "uv-playwright", "kind": "uv", "package": "playwright", "bins": ["playwright"], "label": "用 uv 安装 Playwright（装后在 {baseDir} 执行 playwright install chromium）"}, {"id": "npm-marknative", "kind": "node", "package": "marknative", "bins": ["node"], "label": "用 npm 安装 marknative（电子书 Markdown→图）"}]}}
 ---
 
 # 阅星曈 Skill
@@ -9,6 +9,37 @@ metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}}}
 推送内容到阅星曈墨水屏，或拉取书架 / 书签数据。
 
 以下所有命令以本文件所在目录为根目录执行（`{baseDir}`）。
+
+---
+
+## 环境准备（装 Skill / 克隆后、首次跑脚本前必做）
+
+### 和 OpenClaw 的关系（避免「只装 Skill、没装依赖」）
+
+| 方式 | 会不会自动装依赖 |
+|------|------------------|
+| **`openclaw skills install` / ClawHub 下载 Skill 目录** | **不会**，只拷贝文件夹，不执行 `pip` / `npm`（官方说明见 `references/openclaw-skill-docs/skills.md` 安全与 ClawHub 章节） |
+| **Gateway / macOS Skills UI 的依赖安装** | 会读取本 Skill frontmatter 里的 `metadata.openclaw.install`（与 [OpenClaw Skills · install](https://docs.openclaw.ai/skills)、`references/openclaw-skill-docs/skills.md` 一致）：已声明 **`uv`→playwright**、**`node`→marknative**。安装器**不会**替你执行 `playwright install chromium`，也**通常不**装 `Pillow` / `requests`，须按下方表格或 `SETUP.md` 补全 |
+
+### 在哪儿执行
+
+**始终在 `{baseDir}`**（含本 `SKILL.md` 的 Skill 根目录）打开终端再执行。  
+常见情况：Skill 在 `.../skills/eink-push/` 或 OpenClaw 管理的副本路径——**以实际加载的 `{baseDir}` 为准**，不要假设等于用户 git clone 的开发目录（详见 `references/SETUP.md`）。
+
+### 依赖清单（按流程）
+
+| 流程 | 需要 | 在 `{baseDir}` 执行的命令 |
+|------|------|---------------------------|
+| 凭证预检、书架 / 书签、推送到设备 | Python 3 + 网络 | `pip install playwright Pillow requests` → `playwright install chromium` |
+| 卡片、阅读看板、书摘（HTML → 图） | 同上 | 同上 |
+| 电子书（Markdown → XTC） | 另需 **Node.js ≥ 18** | 先完成上表 Python 步骤；再在同一目录：`npm install marknative`（另需 `pip install Pillow`，通常已含于上一行） |
+
+字体可选：`python {baseDir}/scripts/setup_fonts.py`（见 `references/SETUP.md`）。
+
+### Agent 执行顺序
+
+1. **第一次**为用户执行本 Skill 任意脚本前：若用户未声明已装环境，**先**在 `{baseDir}` 完成上表对应行的命令（只推卡片 / 查书架 → 只需 Python 链；要电子书 → 再加 Node + `npm install marknative`）。
+2. 装完后可用 `references/SETUP.md` 中的「快速验证」自检；再进入下方「凭证预检」。
 
 ---
 
@@ -278,6 +309,6 @@ python {baseDir}/scripts/render_image.py "output/阅读看板_时间戳.html" --
 |------|------|
 | `[CREDENTIALS_MISSING]` 或退出码 2 | 走凭证预检流程重新收集 |
 | 未找到绑定设备 | 告知用户在阅星曈 App 中绑定设备后重试 |
-| 依赖缺失（`[ERROR]` 开头） | 告知用户按 `{baseDir}/references/SETUP.md` 安装对应依赖后重试 |
+| 依赖缺失（`[ERROR]` 开头） | **Read** `{baseDir}/references/SETUP.md`，在 `{baseDir}` 按「环境准备」与 SETUP 补全依赖后重试 |
 | `skia-canvas` native 模块报错 | 告知用户在 Skill 目录执行 `npm install marknative`；若仍失败见 `{baseDir}/references/SETUP.md` |
 | 其他脚本报错 | 将完整报错原文展示给用户，说明需手动排查 |
