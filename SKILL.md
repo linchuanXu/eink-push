@@ -1,7 +1,7 @@
 ---
 name: eink_push
-description: 推送内容到阅星曈墨水屏（卡片 / 电子书），或拉取书架、书签等阅读数据；首次使用前须完成正文「环境准备」。
-metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}, "install": [{"id": "uv-playwright", "kind": "uv", "package": "playwright", "bins": ["playwright"], "label": "用 uv 安装 Playwright（装后在 {baseDir} 执行 playwright install chromium）"}, {"id": "npm-marknative", "kind": "node", "package": "marknative", "bins": ["node"], "label": "用 npm 安装 marknative（电子书 Markdown→图）"}]}}
+description: 推送内容到阅星曈墨水屏（卡片 / 电子书），或拉取书架、书签等阅读数据。
+metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}, "install": [{"id": "uv-playwright", "kind": "uv", "package": "playwright", "bins": ["playwright"], "label": "安装 Playwright（还需在 Skill 目录执行 playwright install chromium）"}, {"id": "npm-marknative", "kind": "node", "package": "marknative", "label": "安装 marknative（电子书路径，需 Node.js ≥ 18）"}]}}
 ---
 
 # 阅星曈 Skill
@@ -30,9 +30,11 @@ metadata: {"openclaw": {"emoji": "🖤", "requires": {"bins": ["python"]}, "inst
 
 | 流程 | 需要 | 在 `{baseDir}` 执行的命令 |
 |------|------|---------------------------|
-| 凭证预检、书架 / 书签、推送到设备 | Python 3 + 网络 | `pip install playwright Pillow requests` → `playwright install chromium` |
+| 凭证预检、书架 / 书签、推送到设备 | Python 3 + 网络 | `pip install playwright Pillow requests` 然后 `playwright install chromium` |
 | 卡片、阅读看板、书摘（HTML → 图） | 同上 | 同上 |
-| 电子书（Markdown → XTC） | 另需 **Node.js ≥ 18** | 先完成上表 Python 步骤；再在同一目录：`npm install marknative`（另需 `pip install Pillow`，通常已含于上一行） |
+| 电子书（Markdown → XTC） | 另需 **Node.js ≥ 18** | 先完成上表 Python 步骤；再：`npm install marknative` |
+
+> **Gateway / Skills UI 安装器说明**：frontmatter 的 `install` 声明了 `uv→playwright`（产生 `playwright` CLI）和 `node→marknative`（库，无 CLI bin）。安装器**只会**装这两项，**不会**自动装 `Pillow` / `requests`，也**不会**执行 `playwright install chromium`（下载 Chromium 二进制）。无论是否用过 Gateway 安装器，都需要手动执行上表命令补全。
 
 字体可选：`python {baseDir}/scripts/setup_fonts.py`（见 `references/SETUP.md`）。
 
