@@ -1,7 +1,11 @@
 ---
-name: eink_push
-description: 推送内容到阅星曈墨水屏（卡片 / 电子书），或拉取书架、书签等阅读数据。
+name: eink-push
+description: >
+  推送内容到阅星曈墨水屏，或拉取阅读数据（书架、书签、进度）。
+  当用户提到"推一下"、"发到墨水屏"、"发到阅星曈"、"查我的书"、
+  "看看书签"、"做个阅读报告"时使用，即使没有明确说出"卡片"或"电子书"。
 homepage: https://github.com/linchuanXu/eink-push
+compatibility: Requires Python 3 (pip install playwright Pillow requests; playwright install chromium) and Node.js ≥ 18 (npm install marknative). Windows/macOS/Linux supported.
 metadata:
   openclaw:
     emoji: '🖤'
@@ -30,38 +34,11 @@ metadata:
 
 ---
 
-## 环境准备（装 Skill / 克隆后、首次跑脚本前必做）
+## 环境准备
 
-### 和 OpenClaw 的关系（避免「只装 Skill、没装依赖」）
+首次运行前，或遇到依赖缺失报错时：Read `{baseDir}/references/SETUP.md` 并按说明安装依赖。
 
-| 方式 | 会不会自动装依赖 |
-|------|------------------|
-| **`openclaw skills install` / ClawHub 下载 Skill 目录** | **不会**，只拷贝文件夹，不执行 `pip` / `npm`（官方说明见 `references/openclaw-skill-docs/skills.md` 安全与 ClawHub 章节） |
-| **Gateway / macOS Skills UI 的依赖安装** | 会读取本 Skill frontmatter 里的 `metadata.openclaw.install`（与 [OpenClaw Skills · install](https://docs.openclaw.ai/skills)、`references/openclaw-skill-docs/skills.md` 一致）：仅声明了 **`node`→marknative**（本地库，脚本 `import marknative` 能找到）。`playwright` / `Pillow` / `requests` 无对应 install kind，需按下方表格用 `pip` 安装；`playwright install chromium` 也必须手动执行 |
-
-### 在哪儿执行
-
-**始终在 `{baseDir}`**（含本 `SKILL.md` 的 Skill 根目录）打开终端再执行。  
-常见情况：Skill 在 `.../skills/eink-push/` 或 OpenClaw 管理的副本路径——**以实际加载的 `{baseDir}` 为准**，不要假设等于用户 git clone 的开发目录（详见 `references/SETUP.md`）。
-
-### 依赖清单（按流程）
-
-| 流程 | 需要 | 在 `{baseDir}` 执行的命令 |
-|------|------|---------------------------|
-| 凭证预检、书架 / 书签、推送到设备 | Python 3 + 网络 | `pip install playwright Pillow requests` 然后 `playwright install chromium` |
-| 卡片、阅读看板、书摘（HTML → 图） | 同上 | 同上 |
-| 电子书（Markdown → XTC） | 另需 **Node.js ≥ 18** | 先完成上表 Python 步骤；再：`npm install marknative` |
-
-> **Gateway / Skills UI 安装器说明**：frontmatter 仅声明了 `node→marknative`，供 Gateway 执行 `npm install marknative`。`playwright` 是 Python library（脚本用 `import playwright`），OpenClaw 无 `pip` kind，**无法通过 install spec 自动装**；无论是否用过 Gateway 安装器，都需手动执行上表命令补全。
-
-字体可选：`python {baseDir}/scripts/setup_fonts.py`（见 `references/SETUP.md`）。
-
-> **Windows 提示**：如果 `python` 命令不存在，尝试 `py -3`；`pip` 不存在则用 `python -m pip install`。
-
-### Agent 执行顺序
-
-1. **第一次**为用户执行本 Skill 任意脚本前：若用户未声明已装环境，**先**在 `{baseDir}` 完成上表对应行的命令（只推卡片 / 查书架 → 只需 Python 链；要电子书 → 再加 Node + `npm install marknative`）。
-2. 装完后可用 `references/SETUP.md` 中的「快速验证」自检；再进入下方「凭证预检」。
+> **Windows 提示**：`python` 不存在时用 `py -3`；`pip` 不存在时用 `python -m pip`。
 
 ---
 
