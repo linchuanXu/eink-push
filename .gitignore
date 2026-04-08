@@ -10,8 +10,8 @@ output/*.xtch
 output/cover_previews/
 !output/.gitkeep
 
-# Generated render artifacts in references (regenerate with render_image.py)
-references/framework-samples/*.xth
+# References directory (local reference materials only, not part of the project)
+references/
 
 # Credentials (never commit!)
 .credentials.json
