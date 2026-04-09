@@ -64,6 +64,7 @@ python {baseDir}/scripts/push_to_device.py --check-credentials
 | 发到阅星曈 / 推到设备 / 推一下 / 发到墨水屏 | → 按字数分流：≤2000 字走**卡片**，>2000 字走**电子书** |
 | 明确说"卡片 / 简报 / 仪表盘" | → **推送：卡片** |
 | 明确说"电子书 / 长文 / 连续阅读" | → **推送：电子书** |
+|| 明确说「epub / EPUB / epub格式」 | → **推送：EPUB 电子书** |
 | 我的书架 / 阅读进度 / 读了哪些书 | → **D1 查书架** |
 | 书签 / 摘录 / 高亮（指定书名） | → **D2 查书签** |
 | 书签 / 摘录 / 高亮（未指定书） | → D1 → 用户选书 → D2 |
@@ -135,6 +136,38 @@ python {baseDir}/scripts/render_image.py "output/主题_p1_时间戳.html" "outp
 ```bash
 python {baseDir}/scripts/render_book.py "output/文件名.md" --title "标题" --author "龙虾" --push
 ```
+
+→ 成功后说：「已推送到阅星曈，设备上即可接收。」
+
+---
+
+## 推送：EPUB 电子书
+
+**仅当用户明确提到「生成 EPUB」「推 EPUB」「epub 格式」时使用此流程。**
+
+适用于图文混排、需要封面、希望在设备电子书阅读器中阅读的内容。
+
+**第 1 步：整理为 Markdown**
+
+文件命名：`output/{主题词}_{YYYYMMDD-HHMM}.md`，主题词 ≤10 字。
+
+**第 2 步：生成并推送**
+
+→ 说：「正在生成 EPUB 并推送「{标题}」…」
+
+```bash
+# 基础
+python {baseDir}/scripts/epub/render_book_epub.py "output/文件名.md" --title "标题" --author "龙虾" --push
+
+# 带 SVG 封面（推荐）
+python {baseDir}/scripts/epub/render_book_epub.py "output/文件名.md" --title "标题" --author "龙虾" --cover-svg --push
+
+# 带封面 + 副标题
+python {baseDir}/scripts/epub/render_book_epub.py "output/文件名.md" --title "标题" --subtitle "副标题" --author "龙虾" --cover-svg --push
+```
+
+**封面主题**（`--cover-theme`）：tech / business / design / literature / science / personal（自动检测）
+**封面布局**（`--cover-layout`）：minimal（默认）/ classic / modern
 
 → 成功后说：「已推送到阅星曈，设备上即可接收。」
 
@@ -311,3 +344,5 @@ python {baseDir}/scripts/render_image.py "output/阅读看板_时间戳.html" --
 | 依赖缺失（`[ERROR]` 开头） | **Read** `{baseDir}/references/SETUP.md`，在 `{baseDir}` 按「环境准备」与 SETUP 补全依赖后重试 |
 | `skia-canvas` native 模块报错 | 告知用户在 Skill 目录执行 `npm install marknative`；若仍失败见 `{baseDir}/references/SETUP.md` |
 | 其他脚本报错 | 将完整报错原文展示给用户，说明需手动排查 |
+
+
