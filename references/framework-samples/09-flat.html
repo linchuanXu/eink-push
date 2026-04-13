@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>什么是AI · 扁平 · 无框架</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { margin: 0 !important; padding: 0 !important; }
+body { width: 100vw !important; height: 100vh !important; max-width: none !important; min-height: 0 !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; background: #fff; color: #000; font-family: 'MiSans', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+
+/* ── 扁平 Flat Design: 纯色块分区 · 无阴影 · 几何感 · 色块即层级 ── */
+.shell { width: 100%; height: 100%; display: flex; flex-direction: column; }
+
+/* 顶栏：黑色纯色块 */
+.topbar {
+  background: #000; color: #fff;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 20px; flex-shrink: 0;
+  font-size: 20px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.topbar .tag { background: #fff; color: #000; padding: 4px 14px; font-size: 17px; font-weight: 700; letter-spacing: 0; }
+
+/* 标题区：浅灰色块 */
+.hero {
+  background: #e8e8e8;
+  padding: 20px 22px 16px; flex-shrink: 0;
+}
+.hero-kicker { font-size: 17px; font-weight: 700; letter-spacing: 0.26em; color: #555; margin-bottom: 6px; text-transform: uppercase; }
+h1 { font-size: 60px; line-height: 0.98; font-weight: 900; color: #000; letter-spacing: -0.02em; }
+.hero-sub { font-size: 26px; color: #222; margin-top: 10px; font-weight: 600; }
+
+/* 定义区：白底 */
+.def {
+  background: #fff;
+  padding: 16px 22px; flex-shrink: 0;
+}
+.def-label { font-size: 16px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #555; margin-bottom: 8px; }
+.def-text { font-size: 30px; font-weight: 600; line-height: 1.5; color: #000; }
+
+/* 三格行：黑 · 白 · 灰 纯色块 */
+.trio { display: grid; grid-template-columns: 1fr 1fr 1fr; flex-shrink: 0; }
+.trio-cell { padding: 16px 10px; text-align: center; }
+.trio-cell.black { background: #000; color: #fff; }
+.trio-cell.white { background: #fff; color: #000; border-top: 2px solid #ccc; border-bottom: 2px solid #ccc; }
+.trio-cell.gray  { background: #ccc; color: #000; }
+.trio-cell .n   { font-size: 40px; font-weight: 900; line-height: 1; }
+.trio-cell .lbl { font-size: 24px; font-weight: 700; margin-top: 4px; }
+.trio-cell .sub { font-size: 19px; margin-top: 3px; opacity: 0.75; }
+
+/* 要点行：2列纯色块 */
+.notes { display: grid; grid-template-columns: 1fr 1fr; flex: 1; min-height: 0; }
+.note-cell { padding: 14px 16px; display: flex; flex-direction: column; justify-content: center; }
+.note-cell.light { background: #f0f0f0; }
+.note-cell.dark  { background: #222; color: #fff; }
+.note-label { font-size: 15px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 6px; opacity: 0.6; }
+.note-text  { font-size: 26px; font-weight: 600; line-height: 1.45; }
+
+/* 底栏：黑色纯色块 */
+.foot {
+  background: #000; color: #fff; flex-shrink: 0;
+  padding: 10px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 18px; font-weight: 700; letter-spacing: 0.08em;
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <span>知识卡</span>
+    <span class="tag">无框架</span>
+    <span>入门</span>
+  </div>
+  <div class="hero">
+    <div class="hero-kicker">WHAT IS</div>
+    <h1>人工<br>智能</h1>
+    <p class="hero-sub">一屏速览 · 扁平 Flat Design</p>
+  </div>
+  <div class="def">
+    <div class="def-label">一句话定义</div>
+    <p class="def-text">让机器从数据里归纳规律，对新情况能判断、预测或生成内容。</p>
+  </div>
+  <div class="trio">
+    <div class="trio-cell black"><div class="n">01</div><div class="lbl">数据</div><div class="sub">喂例子</div></div>
+    <div class="trio-cell white"><div class="n">02</div><div class="lbl">模型</div><div class="sub">找映射</div></div>
+    <div class="trio-cell gray"><div class="n">03</div><div class="lbl">输出</div><div class="sub">判/猜/写</div></div>
+  </div>
+  <div class="notes">
+    <div class="note-cell light">
+      <div class="note-label">本质</div>
+      <p class="note-text">不是巨型检索库，而是学成的映射函数</p>
+    </div>
+    <div class="note-cell dark">
+      <div class="note-label">提示</div>
+      <p class="note-text">长文连读 → epub，不用 HTML 卡片</p>
+    </div>
+  </div>
+  <div class="foot">
+    <span>Flat Design sample</span>
+    <span>2026-03-28</span>
+  </div>
+</div>
+</body>
+</html>

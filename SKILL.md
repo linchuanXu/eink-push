@@ -1,9 +1,10 @@
 ---
 name: eink-push
 description: >
-  推送内容到阅星曈墨水屏，或拉取阅读数据（书架、书签、进度）。
-  当用户提到"推一下"、"发到墨水屏"、"发到阅星曈"、"查我的书"、
-  "看看书签"、"做个阅读报告"时使用，即使没有明确说出"卡片"或"电子书"。
+  当用户想把内容推送到阅星曈墨水屏设备（卡片简报或长篇电子书）、
+  查询阅星曈书架上的阅读进度或书签摘录、或需要实时联网搜索时使用。
+  即使用户未明确说出"推送""卡片""搜索"，只要意图涉及「发到墨水屏」「查我的书/书签」
+  「查一下最新情况」，也应触发本技能。
 homepage: https://github.com/linchuanXu/eink-push
 compatibility: Requires Python 3 (pip install playwright Pillow requests; playwright install chromium) and Node.js ≥ 18 (npm install marknative). Windows/macOS/Linux supported.
 metadata:
@@ -71,6 +72,7 @@ python {baseDir}/scripts/push_to_device.py --check-credentials
 | 书摘卡片 / 精选摘录 | → **A 书摘卡片** |
 | 整理笔记 / 书签整理成书 | → **B 阅读笔记电子书** |
 | 阅读报告 / 阅读看板 | → **C 阅读看板卡片** |
+| 帮我查一下 / 搜一下 / 最新资讯 / 现在什么情况 / 今天的 XX | → **E 联网搜索调研** |
 
 ### ⚠️ 易混淆
 
@@ -129,6 +131,8 @@ python {baseDir}/scripts/render_image.py "output/主题_p1_时间戳.html" "outp
 
 文件命名：`output/{主题词}_{YYYYMMDD-HHMM}.md`，主题词 ≤10 字。
 
+> ⚠️ **Markdown 排版约束**：禁止使用表格（`|` 语法）。表格在阅星曈设备上渲染异常，请改用列表、加粗标签或缩进文本替代。多用 emoji 作为视觉锚点（如段落开头、小标题旁），能显著提升墨水屏的可读性。
+
 **第 2 步：推送**
 
 → 说：「正在生成并推送「{标题}」…」
@@ -150,6 +154,8 @@ python {baseDir}/scripts/render_book.py "output/文件名.md" --title "标题" -
 **第 1 步：整理为 Markdown**
 
 文件命名：`output/{主题词}_{YYYYMMDD-HHMM}.md`，主题词 ≤10 字。
+
+> ⚠️ **Markdown 排版约束**：禁止使用表格（`|` 语法）。表格在阅星曈设备上渲染异常，请改用列表、加粗标签或缩进文本替代。多用 emoji 作为视觉锚点（如段落开头、小标题旁），能显著提升墨水屏的可读性。
 
 **第 2 步：生成并推送**
 
@@ -320,6 +326,38 @@ python {baseDir}/scripts/render_image.py "output/阅读看板_时间戳.html" --
 
 ---
 
+## E — 联网搜索调研
+
+适用于需要**实时信息**的轻度调研：当天新闻、市场行情、最新发布、事实核查等。
+调用阅星曈服务端的阿里云百炼 qwen 联网搜索接口，返回带引用来源的 AI 回答。
+
+**执行**
+
+```bash
+# 基础搜索
+python {baseDir}/scripts/search_query.py "查询内容"
+
+# 带自定义系统提示词（控制回答风格/格式）
+python {baseDir}/scripts/search_query.py "查询内容" --system-prompt "用简洁中文回答，重点列出关键事实"
+```
+
+**解析 stdout JSON，向用户展示：**
+
+- 主体回答（`answer` / `content` / `result` 字段）
+- 引用来源列表（`citations` / `references` / `sources` 字段），格式：`[序号] 标题  URL`
+- 若字段结构不符预期，将原始 JSON 展示给用户
+
+展示后追加：
+
+```
+---
+要把这份调研结果推送到阅星曈吗？
+• 卡片（写 HTML，适合摘要 / 仪表盘）
+• 电子书（写 Markdown，适合长篇报告）
+```
+
+---
+
 ## 主动询问
 
 **当本次任务产出「可发布型」内容**（报告、摘要、文章、创作、分析）且用户未提推送时，在回复末尾追加：
@@ -331,7 +369,7 @@ python {baseDir}/scripts/render_image.py "output/阅读看板_时间戳.html" --
 • 电子书（写 Markdown，适合长文连续阅读）
 ```
 
-**不追加的情况**：纯问答 / 技术解释 / 操作性任务 / 已在执行推送 / 内容不足 50 字 / 用户已明确拒绝。
+**不追加的情况**：纯问答 / 技术解释 / 操作性任务 / 已在执行推送 / 内容不足 50 字 / 用户已明确拒绝 / 联网搜索调研结果（E 章节已内置提示）。
 
 ---
 

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>什么是AI · 终端风 · 无框架</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { margin: 0 !important; padding: 0 !important; }
+body { width: 100vw !important; height: 100vh !important; max-width: none !important; min-height: 0 !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; background: #0a0a0a; color: #e0e0e0; font-family: 'Cascadia Code', 'Fira Code', 'Consolas', 'Courier New', monospace; }
+
+/* ── 终端/代码 Terminal: 黑底 · 等宽字 · 命令行风 · 技术感 ── */
+.shell { width: 100%; height: 100%; display: flex; flex-direction: column; }
+
+/* 标题栏（模拟窗口标题） */
+.titlebar {
+  background: #2a2a2a; border-bottom: 2px solid #444;
+  display: flex; align-items: center; padding: 8px 14px; gap: 10px; flex-shrink: 0;
+}
+.dot { width: 13px; height: 13px; border-radius: 50%; background: #666; display: inline-block; }
+.dot.active { background: #ccc; }
+.window-title { flex: 1; text-align: center; font-size: 17px; font-weight: 600; color: #aaa; letter-spacing: 0.08em; }
+
+/* 终端内容区 */
+.term { flex: 1; padding: 14px 18px; display: flex; flex-direction: column; gap: 0; overflow: hidden; font-size: 24px; line-height: 1.6; }
+
+/* 提示符行 */
+.prompt { color: #e0e0e0; }
+.prompt .ps1 { color: #ccc; font-weight: 700; }
+.prompt .cmd { color: #fff; font-weight: 600; }
+
+/* 系统输出行 */
+.out { color: #aaa; padding-left: 2px; }
+.out.info { color: #999; }
+.out.ok   { color: #ddd; }
+.out.val  { color: #fff; font-weight: 600; }
+
+/* 空行 */
+.blank { height: 10px; flex-shrink: 0; }
+
+/* 定义块（高亮框） */
+.def-block {
+  margin: 4px 0 4px 2px;
+  border-left: 3px solid #888;
+  padding: 6px 14px;
+  background: #161616;
+  color: #e8e8e8;
+  font-size: 25px;
+  line-height: 1.55;
+}
+
+/* 文件列表行 */
+.ls-row { color: #ccc; padding-left: 2px; }
+.ls-dir { color: #fff; font-weight: 700; }
+
+/* 光标 */
+.cursor { display: inline-block; width: 14px; height: 22px; background: #e0e0e0; vertical-align: text-bottom; animation: none; }
+
+/* 状态栏 */
+.statusbar {
+  background: #1e1e1e; border-top: 2px solid #333;
+  padding: 5px 14px; display: flex; justify-content: space-between;
+  font-size: 17px; color: #666; letter-spacing: 0.08em; flex-shrink: 0;
+}
+.statusbar .branch { color: #aaa; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="titlebar">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="window-title">EINK TERMINAL — v2.0 · 知识卡 · 无框架</span>
+  </div>
+
+  <div class="term">
+    <div class="blank"></div>
+
+    <div class="prompt">
+      <span class="ps1">root@eink:~$</span> <span class="cmd">query --topic "人工智能"</span>
+    </div>
+
+    <div class="blank"></div>
+    <div class="out info">[INFO] 加载知识模块 ai-core ... done</div>
+    <div class="out ok"> [OK]  定义已就绪</div>
+    <div class="blank"></div>
+
+    <div class="out val">» 定义</div>
+    <div class="def-block">让机器从数据里归纳规律，<br>对新情况能判断、预测<br>或生成内容。</div>
+
+    <div class="blank"></div>
+
+    <div class="prompt">
+      <span class="ps1">root@eink:~$</span> <span class="cmd">ls 核心要素/</span>
+    </div>
+    <div class="ls-row">
+      <span class="ls-dir">数据/</span>    <span class="ls-dir">模型/</span>    <span class="ls-dir">输出/</span>
+    </div>
+
+    <div class="blank"></div>
+
+    <div class="prompt">
+      <span class="ps1">root@eink:~$</span> <span class="cmd">echo $WARN</span>
+    </div>
+    <div class="out val">  ≠ 巨型检索库  =  可判断的映射函数</div>
+
+    <div class="blank"></div>
+
+    <div class="prompt">
+      <span class="ps1">root@eink:~$</span> <span class="cursor"></span>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span class="branch">⎇ main</span>
+    <span>Terminal sample · 无框架</span>
+    <span>2026-03-28</span>
+  </div>
+</div>
+</body>
+</html>

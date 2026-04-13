@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>什么是AI · 数据仪表盘 · 无框架</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { margin: 0 !important; padding: 0 !important; }
+body { width: 100vw !important; height: 100vh !important; max-width: none !important; min-height: 0 !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; background: #fff; color: #000; font-family: 'MiSans', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+
+/* ── 数据仪表盘 Dashboard: 大数字 · SVG进度条 · 状态格 ── */
+.shell { width: 100%; height: 100%; display: flex; flex-direction: column; border: 3px solid #000; }
+
+/* 顶栏 */
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 9px 16px; border-bottom: 3px solid #000; flex-shrink: 0; background: #000; color: #fff; }
+.topbar-title { font-size: 22px; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
+.topbar-sub { font-size: 18px; font-weight: 600; opacity: 0.7; }
+
+/* KPI 三格 */
+.kpi-row { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 3px solid #000; flex-shrink: 0; }
+.kpi-cell { padding: 14px 10px 12px; text-align: center; border-right: 2px solid #000; }
+.kpi-cell:last-child { border-right: none; }
+.kpi-cell.inv { background: #000; color: #fff; }
+.kpi-num  { font-size: 44px; font-weight: 900; line-height: 1; letter-spacing: -0.02em; }
+.kpi-unit { font-size: 20px; font-weight: 700; vertical-align: super; }
+.kpi-label{ font-size: 19px; font-weight: 600; margin-top: 4px; opacity: 0.75; }
+
+/* 进度区 */
+.progress-sec { padding: 14px 18px 10px; border-bottom: 3px solid #000; flex-shrink: 0; }
+.prog-title { font-size: 17px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #555; margin-bottom: 10px; }
+.prog-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; }
+.prog-row:last-child { margin-bottom: 0; }
+.prog-name { font-size: 22px; font-weight: 700; min-width: 90px; color: #000; }
+.prog-bar  { flex: 1; height: 20px; background: #e0e0e0; position: relative; }
+.prog-fill { height: 100%; background: #000; }
+.prog-pct  { font-size: 20px; font-weight: 700; min-width: 46px; text-align: right; color: #000; }
+
+/* 状态格 2×2 */
+.status-grid { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 3px solid #000; flex-shrink: 0; }
+.status-cell { padding: 11px 16px; border-right: 2px solid #000; border-bottom: 2px solid #000; display: flex; align-items: center; gap: 12px; }
+.status-cell:nth-child(even) { border-right: none; }
+.status-cell:nth-child(3), .status-cell:nth-child(4) { border-bottom: none; }
+.status-dot { width: 14px; height: 14px; border-radius: 50%; background: #000; flex-shrink: 0; }
+.status-dot.off { background: #ccc; border: 2px solid #999; }
+.status-name { font-size: 24px; font-weight: 700; }
+.status-badge { margin-left: auto; font-size: 18px; font-weight: 700; color: #555; }
+
+/* 底部结论 */
+.conclusion { flex: 1; display: flex; align-items: center; padding: 12px 18px; gap: 14px; min-height: 0; }
+.conc-icon { font-size: 40px; flex-shrink: 0; }
+.conc-text { font-size: 27px; font-weight: 600; line-height: 1.45; color: #000; }
+
+/* 页脚 */
+.foot { border-top: 3px solid #000; padding: 8px 16px; display: flex; justify-content: space-between; font-size: 17px; font-weight: 700; color: #555; letter-spacing: 0.1em; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <span class="topbar-title">AI 知识仪表盘</span>
+    <span class="topbar-sub">DASHBOARD · 无框架</span>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-cell inv">
+      <div class="kpi-num">98<span class="kpi-unit">%</span></div>
+      <div class="kpi-label">识别准确率</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-num">3.2<span class="kpi-unit">B</span></div>
+      <div class="kpi-label">模型参数量</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-num">★4.8</div>
+      <div class="kpi-label">综合评分</div>
+    </div>
+  </div>
+
+  <div class="progress-sec">
+    <div class="prog-title">能力维度</div>
+    <div class="prog-row">
+      <span class="prog-name">语言理解</span>
+      <div class="prog-bar"><div class="prog-fill" style="width:92%"></div></div>
+      <span class="prog-pct">92%</span>
+    </div>
+    <div class="prog-row">
+      <span class="prog-name">代码生成</span>
+      <div class="prog-bar"><div class="prog-fill" style="width:85%"></div></div>
+      <span class="prog-pct">85%</span>
+    </div>
+    <div class="prog-row">
+      <span class="prog-name">安全对齐</span>
+      <div class="prog-bar"><div class="prog-fill" style="width:68%"></div></div>
+      <span class="prog-pct">68%</span>
+    </div>
+  </div>
+
+  <div class="status-grid">
+    <div class="status-cell"><div class="status-dot"></div><span class="status-name">监督学习</span><span class="status-badge">✓ 成熟</span></div>
+    <div class="status-cell"><div class="status-dot"></div><span class="status-name">无监督</span><span class="status-badge">✓ 成熟</span></div>
+    <div class="status-cell"><div class="status-dot"></div><span class="status-name">强化学习</span><span class="status-badge">↑ 进行</span></div>
+    <div class="status-cell"><div class="status-dot off"></div><span class="status-name">AGI</span><span class="status-badge">— 待定</span></div>
+  </div>
+
+  <div class="conclusion">
+    <span class="conc-icon">⟳</span>
+    <p class="conc-text">数据→模型→输出，不是检索库，而是可判断的映射函数。</p>
+  </div>
+
+  <div class="foot">
+    <span>Dashboard sample</span>
+    <span>2026-03-28</span>
+  </div>
+</div>
+</body>
+</html>

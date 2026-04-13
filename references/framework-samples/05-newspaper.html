@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>什么是AI · 报纸排版 · 无框架</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { margin: 0 !important; padding: 0 !important; }
+body { width: 100vw !important; height: 100vh !important; max-width: none !important; min-height: 0 !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; background: #fff; color: #000; font-family: 'Noto Serif SC', 'SimSun', 'Georgia', serif; }
+
+/* ── 报纸排版 Newspaper: 报头 · 跨列大标题 · 双栏正文 · 分隔线 ── */
+.shell { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 10px 12px 8px; }
+
+/* 报头区 */
+.masthead { text-align: center; border-bottom: 4px double #000; border-top: 4px double #000; padding: 6px 0; flex-shrink: 0; margin-bottom: 0; }
+.masthead-name { font-size: 38px; font-weight: 900; letter-spacing: 0.28em; color: #000; line-height: 1; font-family: 'MiSans', 'PingFang SC', sans-serif; }
+.masthead-info { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 17px; color: #444; letter-spacing: 0.06em; border-top: 1px solid #555; padding-top: 3px; }
+
+/* 区块标签行 */
+.section-bar { display: flex; align-items: center; gap: 0; margin: 6px 0 4px; flex-shrink: 0; }
+.section-tag { background: #000; color: #fff; font-family: 'MiSans', sans-serif; font-size: 17px; font-weight: 700; padding: 2px 12px; letter-spacing: 0.12em; }
+.section-rule { flex: 1; height: 2px; background: #000; }
+
+/* 大标题（跨栏） */
+.headline { font-size: 42px; font-weight: 900; line-height: 1.1; color: #000; letter-spacing: -0.01em; font-family: 'MiSans', 'PingFang SC', sans-serif; padding: 6px 0 4px; border-bottom: 2px solid #000; flex-shrink: 0; }
+.deck { font-size: 22px; color: #333; margin-top: 5px; line-height: 1.4; font-style: italic; border-bottom: 1px solid #aaa; padding-bottom: 5px; flex-shrink: 0; }
+
+/* 双栏正文 */
+.body-cols { display: grid; grid-template-columns: 1fr 2px 1fr; gap: 0 10px; flex: 1; min-height: 0; padding-top: 6px; }
+.col-divider { background: #555; width: 2px; }
+
+/* 左栏 */
+.col-byline { font-size: 17px; color: #555; margin-bottom: 6px; font-style: italic; }
+.col-body { font-size: 26px; line-height: 1.55; color: #000; }
+.col-body p { margin-bottom: 6px; }
+.drop-cap::first-letter { font-size: 52px; font-weight: 900; float: left; line-height: 0.8; margin-right: 4px; margin-top: 6px; }
+
+/* 右栏 */
+.sidebar-label { font-size: 17px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #555; border-bottom: 2px solid #555; padding-bottom: 3px; margin-bottom: 8px; }
+.sidebar-item { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start; font-size: 24px; line-height: 1.4; }
+.sidebar-num { font-weight: 900; font-size: 22px; min-width: 24px; color: #000; font-family: 'MiSans', sans-serif; }
+
+/* 底部提示框 */
+.notice { margin-top: 6px; background: #000; color: #fff; padding: 7px 12px; font-size: 20px; font-weight: 600; text-align: center; letter-spacing: 0.04em; flex-shrink: 0; font-family: 'MiSans', sans-serif; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="masthead">
+    <div class="masthead-name">阅 星 曈 晨 报</div>
+    <div class="masthead-info">
+      <span>总第 001 期</span>
+      <span>知识速读 · 墨水屏专刊</span>
+      <span>2026年3月28日</span>
+    </div>
+  </div>
+
+  <div class="section-bar">
+    <span class="section-tag">科技</span>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="headline">机器学得会吗？<br>人工智能全解读</div>
+  <div class="deck">数据、模型与输出——三要素让机器具备「判断」能力</div>
+
+  <div class="body-cols">
+    <div class="left-col">
+      <p class="col-byline">本报记者 · 智识部</p>
+      <p class="col-body drop-cap">人工智能，让机器从数据里归纳规律，对新情况能判断、预测或生成内容。</p>
+      <p class="col-body">它不是一个巨型检索库，而是经由训练形成的、可判断的映射函数。</p>
+      <p class="col-body">流程：数据→模型→输出，三步构成完整的推理链。</p>
+    </div>
+    <div class="col-divider"></div>
+    <div class="right-col">
+      <div class="sidebar-label">三大要素</div>
+      <div class="sidebar-item"><span class="sidebar-num">①</span><span>海量标注数据，提供学习样本</span></div>
+      <div class="sidebar-item"><span class="sidebar-num">②</span><span>可优化的模型，提取统计规律</span></div>
+      <div class="sidebar-item"><span class="sidebar-num">③</span><span>明确目标函数，指引学习方向</span></div>
+      <div class="sidebar-label" style="margin-top:10px">误区提示</div>
+      <div class="sidebar-item"><span class="sidebar-num">✗</span><span>并非在数据库里检索答案</span></div>
+      <div class="sidebar-item"><span class="sidebar-num">✗</span><span>长篇报告请用 epub，勿用卡片</span></div>
+    </div>
+  </div>
+
+  <div class="notice">【编辑提示】连续长文 → epub 承载 · 卡片适合「一屏一主题」</div>
+</div>
+</body>
+</html>
