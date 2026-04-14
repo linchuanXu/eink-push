@@ -97,6 +97,7 @@ python {baseDir}/scripts/push_to_device.py --check-credentials
 | 200–2000 字 | 多张卡片集：每张一主题，宁多勿挤 |
 
 **卡片是截图，不是文章排版。** 长文或连续阅读 → 走电子书。设计规范见 `{baseDir}/references/design-guide.md`。
+风格样本在 `{baseDir}/references/framework-samples/`——通常直接按规范写 HTML 即可，用户明确要求某种风格或需要参考时再查阅。
 
 **第 1 步：写 HTML**
 
@@ -381,6 +382,7 @@ python {baseDir}/scripts/search_query.py "查询内容" --system-prompt "用简�
 | 未找到绑定设备 | 告知用户在阅星曈 App 中绑定设备后重试 |
 | 依赖缺失（`[ERROR]` 开头） | **Read** `{baseDir}/references/SETUP.md`，在 `{baseDir}` 按「环境准备」与 SETUP 补全依赖后重试 |
 | `skia-canvas` native 模块报错 | 告知用户在 Skill 目录执行 `npm install marknative`；若仍失败见 `{baseDir}/references/SETUP.md` |
+| 网络超时 / 推送失败 | Read `{baseDir}/references/TROUBLESHOOTING.md`，按对应错误给出提示 |
 | 其他脚本报错 | 将完整报错原文展示给用户，说明需手动排查 |
 
 
