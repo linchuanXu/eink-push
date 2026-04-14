@@ -43,4 +43,3 @@ output/*.txt
 node_modules/
 output/
 
-skill-refs/
