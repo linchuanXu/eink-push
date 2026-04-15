@@ -408,6 +408,22 @@ def _build_font_css(font_dir: Path) -> str:
     return "\n".join(rules)
 
 
+def _pillow_uniform_scale(png_bytes: bytes, target_w: int, target_h: int) -> bytes:
+    """将源图（已与 target_w×target_h 同比例）等比均匀缩放到目标尺寸，不变形。"""
+    try:
+        from PIL import Image
+        import io
+    except ImportError:
+        print("[ERROR] Pillow 未安装。运行：pip install Pillow")
+        sys.exit(1)
+    img = Image.open(io.BytesIO(png_bytes)).convert("RGB")
+    if img.size != (target_w, target_h):
+        img = img.resize((target_w, target_h), Image.LANCZOS)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
 def screenshot_html(html_path: Path, width: int, height: int, inject_fonts: bool) -> bytes:
     try:
         from playwright.sync_api import sync_playwright
@@ -439,17 +455,32 @@ def screenshot_html(html_path: Path, width: int, height: int, inject_fonts: bool
                 page.wait_for_load_state("networkidle", timeout=15000)
                 page.evaluate("document.fonts.ready")
 
-        # Auto-fit: if content overflows viewport height, zoom to fit.
-        # Works regardless of whether the HTML uses base.html template.
-        page.evaluate("""() => {
-            var body = document.body;
-            var naturalH = body.scrollHeight;
-            var targetH = window.innerHeight;
-            if (naturalH > targetH + 2) {
-                body.style.zoom = String(targetH / naturalH);
-            }
-        }""")
+        # ── 两步渲染 ──────────────────────────────────────────────────────────
+        # Step 1：在原始视口（480×800）测量内容自然高度
+        natural_h = page.evaluate("document.body.scrollHeight")
 
+        if natural_h > height + 2:
+            # Step 2：反推与目标同比例（3:5）的视口
+            #   render_w / natural_h = width / height  →  render_w = natural_h × width / height
+            #   此视口与 480×800 比例相同，截图后可等比均匀缩放，不变形
+            render_w = int(natural_h * width / height)
+            print(f"[INFO] 内容高度 {natural_h}px，调整视口至 {render_w}×{natural_h}（{width}:{height} 比例）…")
+
+            page.set_viewport_size({"width": render_w, "height": natural_h})
+            page.wait_for_timeout(300)  # 等待重排稳定
+
+            # 截取完整视口（render_w × natural_h），与目标同比例
+            png_raw = page.screenshot(
+                full_page=False,
+                clip={"x": 0, "y": 0, "width": render_w, "height": natural_h},
+                type="png",
+            )
+            browser.close()
+            # 等比均匀缩放：scale_x = width/render_w = height/natural_h，无变形
+            print(f"[INFO] 等比缩放 {render_w}×{natural_h} → {width}×{height}")
+            return _pillow_uniform_scale(png_raw, width, height)
+
+        # 内容本身不超高：正常截图，无需缩放
         png_bytes = page.screenshot(
             full_page=False,
             clip={"x": 0, "y": 0, "width": width, "height": height},
