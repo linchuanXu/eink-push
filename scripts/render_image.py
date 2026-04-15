@@ -409,7 +409,8 @@ def _build_font_css(font_dir: Path) -> str:
 
 
 def _pillow_fit(png_bytes: bytes, target_w: int, target_h: int) -> bytes:
-    """将任意尺寸 PNG 缩放到 target_w × target_h（LANCZOS，宽度锁定）。"""
+    """将 PNG 按宽度等比缩放到 target_w，超出 target_h 时从顶部裁剪，不足时底部补白。
+    始终保持内容宽高比，不做非等比拉伸。"""
     try:
         from PIL import Image
         import io
@@ -417,8 +418,23 @@ def _pillow_fit(png_bytes: bytes, target_w: int, target_h: int) -> bytes:
         print("[ERROR] Pillow 未安装。运行：pip install Pillow")
         sys.exit(1)
     img = Image.open(io.BytesIO(png_bytes)).convert("RGB")
-    if img.size != (target_w, target_h):
-        img = img.resize((target_w, target_h), Image.LANCZOS)
+    src_w, src_h = img.size
+
+    # 按宽度等比缩放
+    scale = target_w / src_w
+    scaled_h = int(src_h * scale)
+    if src_w != target_w or src_h != scaled_h:
+        img = img.resize((target_w, scaled_h), Image.LANCZOS)
+
+    if scaled_h > target_h:
+        # 超出：从顶部裁掉多余部分
+        img = img.crop((0, 0, target_w, target_h))
+    elif scaled_h < target_h:
+        # 不足：底部补白
+        canvas = Image.new("RGB", (target_w, target_h), (255, 255, 255))
+        canvas.paste(img, (0, 0))
+        img = canvas
+
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     return buf.getvalue()
