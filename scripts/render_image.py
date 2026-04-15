@@ -408,39 +408,6 @@ def _build_font_css(font_dir: Path) -> str:
     return "\n".join(rules)
 
 
-def _pillow_fit(png_bytes: bytes, target_w: int, target_h: int) -> bytes:
-    """Letterbox：等比缩放到恰好贴合 target_w × target_h，内容居中，剩余补白。
-    按 min(target_w/src_w, target_h/src_h) 缩放，不变形、不裁剪。"""
-    try:
-        from PIL import Image
-        import io
-    except ImportError:
-        print("[ERROR] Pillow 未安装。运行：pip install Pillow")
-        sys.exit(1)
-    img = Image.open(io.BytesIO(png_bytes)).convert("RGB")
-    src_w, src_h = img.size
-
-    scale = min(target_w / src_w, target_h / src_h)
-    new_w = int(src_w * scale)
-    new_h = int(src_h * scale)
-
-    if (src_w, src_h) != (new_w, new_h):
-        img = img.resize((new_w, new_h), Image.LANCZOS)
-
-    if new_w == target_w and new_h == target_h:
-        pass  # 恰好填满，无需补白
-    else:
-        canvas = Image.new("RGB", (target_w, target_h), (255, 255, 255))
-        offset_x = (target_w - new_w) // 2
-        offset_y = (target_h - new_h) // 2
-        canvas.paste(img, (offset_x, offset_y))
-        img = canvas
-
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    return buf.getvalue()
-
-
 def screenshot_html(html_path: Path, width: int, height: int, inject_fonts: bool) -> bytes:
     try:
         from playwright.sync_api import sync_playwright
@@ -472,36 +439,17 @@ def screenshot_html(html_path: Path, width: int, height: int, inject_fonts: bool
                 page.wait_for_load_state("networkidle", timeout=15000)
                 page.evaluate("document.fonts.ready")
 
-        # ── 两步渲染：视口扩宽 + Pillow 缩放 ────────────────────────────────────
-        # Step 1：在原始视口测量自然高度
-        natural_h = page.evaluate("document.body.scrollHeight")
+        # Auto-fit: if content overflows viewport height, zoom to fit.
+        # Works regardless of whether the HTML uses base.html template.
+        page.evaluate("""() => {
+            var body = document.body;
+            var naturalH = body.scrollHeight;
+            var targetH = window.innerHeight;
+            if (naturalH > targetH + 2) {
+                body.style.zoom = String(targetH / naturalH);
+            }
+        }""")
 
-        if natural_h > height + 2:
-            # 文字面积近似守恒：render_w ≈ width × (naturalH / height)
-            # 扩宽视口后文字重排，行数减少，高度自然降低；加少量余量避免临界差一行
-            render_w = min(int(width * natural_h / height) + 24, width * 3)
-            print(f"[INFO] 内容高度 {natural_h}px，扩宽视口 {width}→{render_w}px 触发重排…")
-
-            page.set_viewport_size({"width": render_w, "height": height})
-            page.wait_for_timeout(300)  # 等待重排稳定
-
-            new_h = page.evaluate("document.body.scrollHeight")
-            print(f"[INFO] 重排后高度 {new_h}px → Pillow 缩放至 {width}×{height}")
-
-            # Step 2：截完整页面（可能还略超一点，Pillow 统一收到目标尺寸）
-            if new_h <= height + 2:
-                png_raw = page.screenshot(
-                    full_page=False,
-                    clip={"x": 0, "y": 0, "width": render_w, "height": height},
-                    type="png",
-                )
-            else:
-                png_raw = page.screenshot(full_page=True, type="png")
-
-            browser.close()
-            return _pillow_fit(png_raw, width, height)
-
-        # 内容本身不超高：正常截图，无需任何 CSS 操控
         png_bytes = page.screenshot(
             full_page=False,
             clip={"x": 0, "y": 0, "width": width, "height": height},
