@@ -455,32 +455,42 @@ def screenshot_html(html_path: Path, width: int, height: int, inject_fonts: bool
                 page.wait_for_load_state("networkidle", timeout=15000)
                 page.evaluate("document.fonts.ready")
 
-        # ── 两步渲染 ──────────────────────────────────────────────────────────
+        # ── 两步渲染（overflow 时调整视口比例 + 一次修正） ────────────────────────
         # Step 1：在原始视口（480×800）测量内容自然高度
         natural_h = page.evaluate("document.body.scrollHeight")
 
         if natural_h > height + 2:
-            # Step 2：反推与目标同比例（3:5）的视口
-            #   render_w / natural_h = width / height  →  render_w = natural_h × width / height
-            #   此视口与 480×800 比例相同，截图后可等比均匀缩放，不变形
+            # 目标：找到 render_w 使视口 render_w×render_h 与 width×height 同比例，
+            # 内容在该视口中自然铺满，截图后等比均匀缩放至目标尺寸，不变形。
+            # 初始估算：render_w = natural_h × (width/height)
             render_w = int(natural_h * width / height)
-            print(f"[INFO] 内容高度 {natural_h}px，调整视口至 {render_w}×{natural_h}（{width}:{height} 比例）…")
+            render_h = natural_h
+            print(f"[INFO] 内容高度 {natural_h}px，首次调整视口至 {render_w}×{render_h}…")
 
-            page.set_viewport_size({"width": render_w, "height": natural_h})
-            page.wait_for_timeout(300)  # 等待重排稳定
+            page.set_viewport_size({"width": render_w, "height": render_h})
+            page.wait_for_timeout(300)
 
-            # 截取完整视口（render_w × natural_h），与目标同比例
+            # 一次修正：用重排后的实测高度重新计算 render_w
+            actual_h = page.evaluate("document.body.scrollHeight")
+            if abs(actual_h - render_h) > 10:
+                render_w = int(actual_h * width / height)
+                render_h = actual_h
+                print(f"[INFO] 重排后实测 {actual_h}px，修正视口至 {render_w}×{render_h}…")
+                page.set_viewport_size({"width": render_w, "height": render_h})
+                page.wait_for_timeout(200)
+                render_h = page.evaluate("document.body.scrollHeight")
+
+            # 截取 render_w × render_h（与目标比例一致），等比均匀缩放至 width×height
             png_raw = page.screenshot(
                 full_page=False,
-                clip={"x": 0, "y": 0, "width": render_w, "height": natural_h},
+                clip={"x": 0, "y": 0, "width": render_w, "height": render_h},
                 type="png",
             )
             browser.close()
-            # 等比均匀缩放：scale_x = width/render_w = height/natural_h，无变形
-            print(f"[INFO] 等比缩放 {render_w}×{natural_h} → {width}×{height}")
+            print(f"[INFO] 等比缩放 {render_w}×{render_h} → {width}×{height}")
             return _pillow_uniform_scale(png_raw, width, height)
 
-        # 内容本身不超高：正常截图，无需缩放
+        # 内容不超高（含偏少情况）：正常截图，底部留白由 HTML 自身决定
         png_bytes = page.screenshot(
             full_page=False,
             clip={"x": 0, "y": 0, "width": width, "height": height},
