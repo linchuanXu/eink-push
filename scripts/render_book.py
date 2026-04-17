@@ -15,6 +15,7 @@ render_book.py — Markdown → XTC 翻页集（墨水屏电子书，快刷 1-bi
 import argparse
 import io
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -71,6 +72,91 @@ def _check_marknative():
 _FRONTMATTER_SKIP = {"style"}  # 不展示给读者的纯渲染提示字段
 _YAML_BLOCK_SCALARS = {">", "|", "|-", ">-", ">+", "|+"}
 
+# marknative 的表格在跨页时容易留白 / 报错，列宽又强制等分，墨水屏上几乎必坏。
+# 这里在进入 marknative 之前把 GFM 表格改写成列表，作为 Skill「禁止表格」约束的兜底。
+_FENCE_RE = re.compile(r"^\s*(```+|~~~+)")
+_SEP_CELL_RE = re.compile(r"^:?-{3,}:?$")
+
+
+def _is_table_sep_row(line: str) -> bool:
+    s = line.strip()
+    if "|" not in s or "-" not in s:
+        return False
+    if s.startswith("|"):
+        s = s[1:]
+    if s.endswith("|"):
+        s = s[:-1]
+    cells = [c.strip() for c in s.split("|")]
+    return bool(cells) and all(_SEP_CELL_RE.match(c) for c in cells)
+
+
+def _split_table_row(line: str) -> list[str]:
+    s = line.strip()
+    if s.startswith("|"):
+        s = s[1:]
+    if s.endswith("|"):
+        s = s[:-1]
+    return [c.strip() for c in s.split("|")]
+
+
+def _convert_gfm_tables_to_lists(md_text: str) -> str:
+    """把 GFM 表格改写为 Markdown 列表，跳过 fenced code block 内的内容。
+
+    - `| 列1 | 列2 |` → `- **列1**：值1 ｜ **列2**：值2`
+    - 表头缺失字段时只输出值；空单元格跳过
+    - 无表头（分隔行前不是表格行）不触发
+    """
+    lines = md_text.splitlines()
+    out: list[str] = []
+    i = 0
+    in_fence = False
+    while i < len(lines):
+        line = lines[i]
+
+        m = _FENCE_RE.match(line)
+        if m:
+            in_fence = not in_fence
+            out.append(line)
+            i += 1
+            continue
+        if in_fence:
+            out.append(line)
+            i += 1
+            continue
+
+        # GFM 表格：当前行含 `|`，下一行是分隔行
+        if (
+            "|" in line
+            and i + 1 < len(lines)
+            and _is_table_sep_row(lines[i + 1])
+        ):
+            header = _split_table_row(line)
+            i += 2  # 跳过表头 + 分隔行
+            rows: list[list[str]] = []
+            while i < len(lines) and "|" in lines[i] and lines[i].strip():
+                rows.append(_split_table_row(lines[i]))
+                i += 1
+
+            if rows:
+                if out and out[-1].strip() != "":
+                    out.append("")
+                for row in rows:
+                    pairs: list[str] = []
+                    for idx, val in enumerate(row):
+                        if not val:
+                            continue
+                        label = header[idx].strip() if idx < len(header) else ""
+                        pairs.append(f"**{label}**：{val}" if label else val)
+                    if pairs:
+                        out.append("- " + " ｜ ".join(pairs))
+                out.append("")
+                continue
+
+        out.append(line)
+        i += 1
+
+    return "\n".join(out)
+
 
 def _strip_yaml_quotes(val: str) -> str:
     """去掉 YAML 字符串两端的单/双引号。"""
@@ -80,6 +166,11 @@ def _strip_yaml_quotes(val: str) -> str:
 
 
 def preprocess_markdown(md_text: str) -> str:
+    """处理 Markdown：展开 frontmatter + 把 GFM 表格改写为列表。"""
+    return _convert_gfm_tables_to_lists(_preprocess_frontmatter(md_text))
+
+
+def _preprocess_frontmatter(md_text: str) -> str:
     """将 YAML frontmatter 转换为正文：title → # 标题，其余字段平铺为纯文本。
 
     边界处理：
