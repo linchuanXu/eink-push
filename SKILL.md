@@ -288,8 +288,6 @@ python {baseDir}/scripts/render_image.py "output/书名_摘录_p1_时间戳.html
 ## 下一章节…
 ```
 
-> ⚠️ 同「推送：电子书」的 Markdown 排版约束：禁止使用表格，用列表 / 加粗标签 / 引用块替代。
-
 文件命名：`output/{clean_name}_笔记_{YYYYMMDD-HHMM}.md`
 
 **第 3 步：推送**
