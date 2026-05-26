@@ -22,17 +22,24 @@
 
 🧑 **你：** 安装技能 `https://github.com/linchuanXu/eink-push`，并且引导我登录账号密码，教我怎么使用这个技能
 
-🤖 **AI：** 好的，已安装 eink-push 技能！请提供你的**阅星曈手机号**和**密码**，我来帮你完成配置。
+🤖 **AI：** 好的，已安装 eink-push 技能！我会先检查本地是否已有凭证；如果没有，请提供你的**阅星曈手机号**和**密码**，我来帮你完成配置。
 
 🧑 **你：** 手机号 138xxxxxxxx，密码 xxxxxx
 
-🤖 **AI：** 已保存！以后直接说"发到阅星曈"，我就会把当前内容推送到你的墨水屏设备。
+🤖 **AI：** 已保存并通过结构检查！以后直接说"发到阅星曈"，我就会把当前内容推送到你的墨水屏设备。
 
 ---
 
 ## 配置账号
 
-首次使用时，AI 会提示你输入阅星曈手机号和密码，自动保存到本地 `.credentials.json`（不会上传到仓库）。
+首次使用时，AI 会提示你输入阅星曈手机号和密码。正式安装环境推荐通过环境变量注入凭证；未设置环境变量时，会自动保存到本地 `.credentials.json`（不会上传到仓库）。
+
+环境变量优先级最高：
+
+```powershell
+$env:XTEINK_USERNAME="你的手机号"
+$env:XTEINK_PASSWORD="你的密码"
+```
 
 也可以提前手动创建：
 
@@ -42,6 +49,20 @@
   "password": "你的密码"
 }
 ```
+
+保存后可运行：
+
+```powershell
+python scripts/push_to_device.py --check-credentials
+```
+
+输出 `OK` 表示凭证结构正常。需要实际登录校验时运行：
+
+```powershell
+python scripts/push_to_device.py --check-credentials --auth
+```
+
+输出 `AUTH_OK` 表示账号密码可登录。
 
 ---
 
@@ -70,6 +91,82 @@ AI 会自动判断内容长度，选择合适格式推送。任务结束后若�
 
 ---
 
+## 开发者快速验证
+
+在仓库根目录安装依赖（Python 需 3.10+）：
+
+```powershell
+pip install -r requirements.txt
+playwright install chromium
+npm install marknative
+```
+
+先跑环境预检，缺什么会直接给出修复命令：
+
+```powershell
+python scripts/check_environment.py
+```
+
+检查本机是否存在重复或漂移的安装副本：
+
+```powershell
+python scripts/check_installation.py
+python scripts/check_installation.py --require-installed
+```
+
+检查 git 跟踪 / 未忽略的发布候选内容是否混入凭证、生成产物或本地依赖：
+
+```powershell
+python scripts/check_package.py
+```
+
+预览会同步到本机 Skill 目录的运行文件；默认不会写文件：
+
+```powershell
+python scripts/install_skill.py
+python scripts/install_skill.py --apply
+```
+
+自定义 `--target` 时必须指向名为 `eink-push` 的 Skill 目录，且不能位于当前源码目录内部。
+真实安装副本只同步 runtime 文件；`check_package.py`、`install_skill.py`、
+`smoke_test.py`、`verify.py` 等维护脚本保留在开发仓库中。安装后若电子书路径提示
+`marknative` 缺失，请在实际安装目录运行 `npm install marknative`。
+
+离线验证卡片渲染：
+
+```powershell
+python scripts/render_image.py assets/templates/base.html --preview
+```
+
+离线验证 Markdown 翻页电子书：
+
+```powershell
+"# 测试书`n`n## 第一章`n`n这是测试内容。" | Out-File -Encoding utf8 output/test.md
+python scripts/render_book.py output/test.md --title "测试书" --author "龙虾"
+```
+
+离线验证 EPUB 生成：
+
+```powershell
+python scripts/epub/render_book_epub.py output/test.md --title "测试书" --author "龙虾" --cover-svg
+```
+
+一键运行离线 smoke test（不会推送设备；依赖缺失的路径会显示 SKIP）：
+
+```powershell
+python scripts/smoke_test.py
+```
+
+完整离线验证：
+
+```powershell
+python scripts/verify.py
+```
+
+只有带 `--push` 或直接运行 `scripts/push_to_device.py` 的命令会真实推送到设备。
+
+---
+
 <a name="english"></a>
 
 ## English
@@ -94,17 +191,24 @@ In OpenClaw, just tell the AI:
 
 🧑 **You:** Install skill `https://github.com/linchuanXu/eink-push` and guide me to log in, then show me how to use it
 
-🤖 **AI:** Done! Please share your **Yue Xingtong phone number** and **password** so I can finish setup.
+🤖 **AI:** Done! I will first check whether credentials already exist locally. If they do not, please share your **Yue Xingtong phone number** and **password** so I can finish setup.
 
 🧑 **You:** Phone 138xxxxxxxx, password xxxxxx
 
-🤖 **AI:** Saved! From now on, just say "发到阅星曈" and I'll push your content to the e-ink device.
+🤖 **AI:** Saved and structure-checked! From now on, just say "发到阅星曈" and I'll push your content to the e-ink device.
 
 ---
 
 ## Credentials setup
 
-On first use, the AI will prompt for your Yue Xingtong phone number and password, and save them locally to `.credentials.json` (excluded from git).
+On first use, the AI will prompt for your Yue Xingtong phone number and password. For installed environments, credentials are preferably injected through environment variables. If they are not set, the skill falls back to a local `.credentials.json` file (excluded from git).
+
+Environment variables take precedence:
+
+```powershell
+$env:XTEINK_USERNAME="your_phone_number"
+$env:XTEINK_PASSWORD="your_password"
+```
 
 You can also create the file manually in advance:
 
@@ -114,6 +218,20 @@ You can also create the file manually in advance:
   "password": "your_password"
 }
 ```
+
+After saving it, run:
+
+```powershell
+python scripts/push_to_device.py --check-credentials
+```
+
+`OK` means the local credentials file is well-formed. To verify the account by logging in:
+
+```powershell
+python scripts/push_to_device.py --check-credentials --auth
+```
+
+`AUTH_OK` means the account can log in.
 
 ---
 
@@ -137,3 +255,80 @@ The AI picks the right format automatically. After tasks that produce more than 
 ## Troubleshooting
 
 See [`references/TROUBLESHOOTING.md`](references/TROUBLESHOOTING.md).
+
+---
+
+## Developer quick check
+
+Install dependencies from the repository root. Python 3.10+ is required:
+
+```powershell
+pip install -r requirements.txt
+playwright install chromium
+npm install marknative
+```
+
+Run the environment preflight first. It prints fix commands for missing dependencies:
+
+```powershell
+python scripts/check_environment.py
+```
+
+Check for duplicate or drifted installed copies:
+
+```powershell
+python scripts/check_installation.py
+python scripts/check_installation.py --require-installed
+```
+
+Check tracked and unignored package candidates for credentials, generated artifacts, or local dependencies:
+
+```powershell
+python scripts/check_package.py
+```
+
+Preview the runtime files that would be synced into the local Skill directory. This is dry-run by default:
+
+```powershell
+python scripts/install_skill.py
+python scripts/install_skill.py --apply
+```
+
+When using a custom `--target`, point it at a Skill directory named `eink-push`; it must not live inside this source checkout.
+Installed copies receive runtime files only; maintenance scripts such as `check_package.py`,
+`install_skill.py`, `smoke_test.py`, and `verify.py` stay in the development checkout. If the
+installed copy reports missing `marknative` for book rendering, run `npm install marknative`
+inside the actual installed Skill directory.
+
+Offline card render check:
+
+```powershell
+python scripts/render_image.py assets/templates/base.html --preview
+```
+
+Offline Markdown paged-book check:
+
+```powershell
+"# Test Book`n`n## Chapter One`n`nThis is a test." | Out-File -Encoding utf8 output/test.md
+python scripts/render_book.py output/test.md --title "Test Book" --author "龙虾"
+```
+
+Offline EPUB check:
+
+```powershell
+python scripts/epub/render_book_epub.py output/test.md --title "Test Book" --author "龙虾" --cover-svg
+```
+
+Run the offline smoke test in one command. It never pushes to the device; paths with missing dependencies are shown as SKIP.
+
+```powershell
+python scripts/smoke_test.py
+```
+
+Full offline verification:
+
+```powershell
+python scripts/verify.py
+```
+
+Only commands with `--push`, or direct calls to `scripts/push_to_device.py`, send files to the device.

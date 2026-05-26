@@ -6,10 +6,20 @@
 
 ## 安装依赖
 
-**Python 依赖**（卡片 + 推送路径）：
+先运行环境预检：
 
 ```bash
-pip install playwright Pillow requests
+python scripts/check_environment.py
+```
+
+输出全为 `OK` 时环境已就绪。若出现 `MISSING` 或 `FAIL`，先按对应 `fix:` 命令处理，再重新运行预检。
+
+**Python 依赖**：
+
+> 前提：Python >= 3.10。
+
+```bash
+pip install -r requirements.txt
 playwright install chromium
 ```
 
@@ -57,16 +67,45 @@ render_image.py 按以下优先级自动选择字体：
 所有命令均需在 `eink-push/` 目录下运行：
 
 ```powershell
-# 1. 测试单张卡片渲染
+# 1. 环境预检
+python scripts/check_environment.py
+
+# 2. 测试单张卡片渲染
 python scripts/render_image.py assets/templates/base.html --preview
 
-# 2. 测试电子书生成
+# 3. 测试电子书生成
 "# 测试书`n`n## 第一章`n`n这是测试内容。" | Out-File -Encoding utf8 output/test.md
 python scripts/render_book.py output/test.md --title "测试书" --author "龙虾"
 
-# 3. 真实推送到设备（需网络 + 设备已绑定账号）
+# 4. 测试 EPUB 生成
+python scripts/epub/render_book_epub.py output/test.md --title "测试书" --author "龙虾" --cover-svg
+
+# 5. 实际登录校验（需网络 + 正确账号密码）
+python scripts/push_to_device.py --check-credentials --auth
+
+# 6. 真实推送到设备（需网络 + 设备已绑定账号）
 python scripts/push_to_device.py output/test-brief.xth
 python scripts/push_to_device.py output/test.xtc
 ```
 
 > macOS / Linux 用户：将 `Out-File` 替换为 `echo ... >`，其余命令相同。
+
+如果你是在开发仓库里维护本 Skill，可以继续运行 `python scripts/smoke_test.py`
+和 `python scripts/verify.py`；正式安装副本只包含 runtime 文件，不包含
+`check_package.py`、`install_skill.py`、`smoke_test.py`、`verify.py` 等维护脚本。
+
+## 凭证来源
+
+正式安装环境推荐通过 OpenClaw 配置或系统环境变量注入凭证。脚本读取优先级：
+
+1. `XTEINK_USERNAME` / `XTEINK_PASSWORD`
+2. `YUEXINGTONG_USERNAME` / `YUEXINGTONG_PASSWORD`
+3. `.credentials.json`
+
+PowerShell 临时设置示例：
+
+```powershell
+$env:XTEINK_USERNAME="手机号"
+$env:XTEINK_PASSWORD="密码"
+python scripts/push_to_device.py --check-credentials --auth
+```

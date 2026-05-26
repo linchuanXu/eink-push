@@ -574,6 +574,7 @@ def main():
 
     args = parser.parse_args()
     output = build_epub(args)
+    print(f"OUTPUT:{output}")
 
     if args.push:
         push_script = _SCRIPT_DIR.parent / "push_to_device.py"

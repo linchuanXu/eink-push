@@ -37,13 +37,14 @@ render_image.py — HTML 卡片模板 → 阅星曈设备图片
 """
 
 import argparse
+import io
 import re
 import struct
 import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import List, NamedTuple, Optional, Tuple
+from typing import Any, List, NamedTuple, Tuple
 
 
 # ─── 常量 ────────────────────────────────────────────────────────────────────
@@ -70,12 +71,89 @@ class XtgXthParams(NamedTuple):
     xthT3: int = 213
 
 
+class HtmlLayoutWarning(NamedTuple):
+    code: str
+    message: str
+
+
 def _clamp(v: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, v))
 
 
 def _clamp_i(v: int, lo: int, hi: int) -> int:
     return max(lo, min(hi, v))
+
+
+def assess_html_layout(metrics: dict[str, Any], width: int, height: int) -> list[HtmlLayoutWarning]:
+    """Return human-readable warnings for common e-ink card layout problems."""
+    warnings: list[HtmlLayoutWarning] = []
+    scroll_w = int(metrics.get("scrollWidth") or 0)
+    scroll_h = int(metrics.get("scrollHeight") or 0)
+    text_len = int(metrics.get("textLength") or 0)
+    bg = str(metrics.get("backgroundColor") or "").strip().lower()
+
+    if text_len == 0:
+        warnings.append(HtmlLayoutWarning("empty-text", "页面没有可见文本，请确认卡片内容不是空白。"))
+
+    if scroll_w > width + 2:
+        warnings.append(HtmlLayoutWarning(
+            "horizontal-overflow",
+            f"页面宽度 {scroll_w}px 超出目标宽度 {width}px，可能出现横向裁切。",
+        ))
+
+    if scroll_h > height * 1.35:
+        warnings.append(HtmlLayoutWarning(
+            "heavy-vertical-overflow",
+            f"内容高度 {scroll_h}px 明显超出目标高度 {height}px，将被压缩，建议拆成多张卡片。",
+        ))
+    elif scroll_h > height + 2:
+        warnings.append(HtmlLayoutWarning(
+            "vertical-overflow",
+            f"内容高度 {scroll_h}px 超出目标高度 {height}px，将等比压缩以适配屏幕。",
+        ))
+
+    if bg in ("rgba(0, 0, 0, 0)", "transparent"):
+        warnings.append(HtmlLayoutWarning(
+            "transparent-background",
+            "页面背景为透明，建议显式设置适合墨水屏的纯色背景。",
+        ))
+
+    return warnings
+
+
+def assess_rendered_png(png_bytes: bytes) -> list[HtmlLayoutWarning]:
+    """Return warnings for screenshots that are technically valid but visually blank."""
+    try:
+        from PIL import Image, ImageStat
+    except ImportError:
+        return []
+
+    img = Image.open(io.BytesIO(png_bytes)).convert("L")
+    width, height = img.size
+    total = width * height
+    if total <= 0:
+        return [HtmlLayoutWarning("blank-render", "截图尺寸为空，请检查渲染结果。")]
+
+    hist = img.histogram()
+    near_black = sum(hist[:8])
+    near_white = sum(hist[248:])
+    stdev = float(ImageStat.Stat(img).stddev[0])
+    warnings: list[HtmlLayoutWarning] = []
+
+    dominant_ratio = max(near_black, near_white) / total
+    if dominant_ratio >= 0.995 and stdev < 2.0:
+        tone = "白" if near_white >= near_black else "黑"
+        warnings.append(HtmlLayoutWarning(
+            "blank-render",
+            f"截图几乎全{tone}，可能是空白页、文字未渲染或内容被遮挡。",
+        ))
+    elif stdev < 4.0:
+        warnings.append(HtmlLayoutWarning(
+            "low-contrast-render",
+            "截图灰度变化很小，墨水屏上可能难以辨认；建议提高文字和背景对比度。",
+        ))
+
+    return warnings
 
 
 def _process_gray(rgb: bytes, width: int, height: int, p: XtgXthParams) -> List[int]:
@@ -457,7 +535,21 @@ def screenshot_html(html_path: Path, width: int, height: int, inject_fonts: bool
 
         # ── 两步渲染（overflow 时调整视口比例 + 一次修正） ────────────────────────
         # Step 1：在原始视口（480×800）测量内容自然高度
-        natural_h = page.evaluate("document.body.scrollHeight")
+        layout_metrics = page.evaluate("""() => {
+            const body = document.body;
+            const doc = document.documentElement;
+            const style = getComputedStyle(body);
+            return {
+                scrollWidth: Math.max(body.scrollWidth, doc.scrollWidth),
+                scrollHeight: Math.max(body.scrollHeight, doc.scrollHeight),
+                textLength: (body.innerText || '').trim().length,
+                backgroundColor: style.backgroundColor,
+            };
+        }""")
+        for warning in assess_html_layout(layout_metrics, width, height):
+            print(f"[WARN] {warning.message}")
+
+        natural_h = int(layout_metrics.get("scrollHeight") or height)
 
         if natural_h > height + 2:
             # 目标：找到 render_w 使视口 render_w×render_h 与 width×height 同比例，
@@ -585,6 +677,8 @@ def main():
             inject_fonts=not args.no_fonts,
         )
         print(f"[INFO] {label}截图完成，PNG {len(png_bytes) // 1024} KB")
+        for warning in assess_rendered_png(png_bytes):
+            print(f"[WARN] {warning.message}")
 
         # 单张预览（仅第一张，仅单帧模式）
         if not multi and args.preview:

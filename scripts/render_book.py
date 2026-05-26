@@ -346,6 +346,7 @@ def main():
 
     output = build_book(args.input, args.output, args.title, args.author)
     print(f"[OK] 已生成：{output}")
+    print(f"OUTPUT:{output}")
 
     if args.push:
         push_script = _SCRIPT_DIR / "push_to_device.py"

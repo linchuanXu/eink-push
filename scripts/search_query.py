@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 # /// script
 # dependencies = ["requests"]
 # ///
@@ -21,56 +23,28 @@ DEFAULT_SYSTEM_PROMPT = (
     "并在结尾列出所有引用来源的标题和链接。"
 )
 
-import json
 import sys
 import argparse
+import json
 from pathlib import Path
 
-import requests
+try:
+    import requests
+except ImportError:
+    requests = None
 
-BASE_URL = "https://api-prod.xteink.cn"
+_scripts_dir = str(Path(__file__).parent)
+if _scripts_dir not in sys.path:
+    sys.path.insert(0, _scripts_dir)
+
+from xteink_api import BASE_URL, auth_headers, format_http_error, load_credentials, login  # noqa: E402
+
 HTTP_TIMEOUT = 60
-
-_CRED_FILE = Path(__file__).resolve().parent.parent / ".credentials.json"
-
-
-def load_credentials() -> tuple[str, str]:
-    if not _CRED_FILE.exists():
-        print(f"[CREDENTIALS_MISSING] 凭证文件不存在：{_CRED_FILE}")
-        sys.exit(2)
-    try:
-        creds = json.loads(_CRED_FILE.read_text(encoding="utf-8"))
-    except Exception as e:
-        print(f"[CREDENTIALS_MISSING] 凭证文件损坏（{e}）")
-        sys.exit(2)
-    username = creds.get("username", "").strip()
-    password = creds.get("password", "").strip()
-    if not username or not password:
-        print(f"[CREDENTIALS_MISSING] 凭证文件缺少 username 或 password")
-        sys.exit(2)
-    return username, password
 
 
 def log(msg: str) -> None:
     """进度信息输出到 stderr，不污染 stdout 的 JSON 数据流。"""
     print(msg, file=sys.stderr)
-
-
-def login(session: requests.Session, username: str, password: str) -> str:
-    log("[1/2] 登录中...")
-    res = session.post(
-        f"{BASE_URL}/auth/login",
-        json={"username": username, "password": password},
-        timeout=HTTP_TIMEOUT,
-    )
-    res.raise_for_status()
-    data = res.json()
-    token = data.get("access_token") or data.get("token")
-    if not token:
-        log(f"[ERROR] 登录失败，响应：{data}")
-        sys.exit(1)
-    log("       ✓ 登录成功")
-    return token
 
 
 def search(session: requests.Session, token: str, query: str, system_prompt: str = None) -> dict:
@@ -81,7 +55,7 @@ def search(session: requests.Session, token: str, query: str, system_prompt: str
     res = session.post(
         f"{BASE_URL}/api/v1/search/query",
         json=payload,
-        headers={"Authorization": f"Bearer {token}"},
+        headers=auth_headers(token),
         timeout=HTTP_TIMEOUT,
     )
     res.raise_for_status()
@@ -95,20 +69,34 @@ def main():
     parser.add_argument("--system-prompt", "-s", default=DEFAULT_SYSTEM_PROMPT, help="系统提示词（默认要求详细丰富的回答）")
     args = parser.parse_args()
 
-    username, password = load_credentials()
+    if requests is None:
+        log("[ERROR] requests 未安装。运行：pip install requests")
+        sys.exit(1)
+
+    username, password = load_credentials(error_stream=sys.stderr)
     session = requests.Session()
 
     try:
-        token = login(session, username, password)
+        token = login(
+            session,
+            username,
+            password,
+            timeout=HTTP_TIMEOUT,
+            log=log,
+            step_label="[1/2] 登录中...",
+        )
         data = search(session, token, args.query, args.system_prompt)
     except requests.exceptions.ConnectionError:
         log(f"[ERROR] 无法连接到 {BASE_URL}")
         sys.exit(1)
     except requests.exceptions.HTTPError as e:
-        log(f"[ERROR] HTTP {e.response.status_code}: {e.response.text}")
+        log(f"[ERROR] {format_http_error(e)}")
         sys.exit(1)
     except requests.exceptions.Timeout:
         log("[ERROR] 请求超时（>60s）")
+        sys.exit(1)
+    except Exception as e:
+        log(f"[ERROR] 搜索失败：{e}")
         sys.exit(1)
 
     print(json.dumps(data, ensure_ascii=False))

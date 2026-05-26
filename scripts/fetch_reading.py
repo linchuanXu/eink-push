@@ -33,14 +33,17 @@ import sys
 from pathlib import Path
 from typing import Any
 
-import requests
+try:
+    import requests
+except ImportError:
+    requests = None
 
-# ── 复用 push_to_device 的凭证管理与登录 ───────────────────────────────────────
+# ── 复用阅星曈 API helper ─────────────────────────────────────────────────────
 _scripts_dir = str(Path(__file__).parent)
 if _scripts_dir not in sys.path:
     sys.path.insert(0, _scripts_dir)
 
-from push_to_device import load_credentials, login, BASE_URL, HTTP_TIMEOUT  # noqa: E402
+from xteink_api import BASE_URL, HTTP_TIMEOUT, auth_headers, format_http_error, load_credentials, login  # noqa: E402
 
 
 # ─── 书名清洗 ──────────────────────────────────────────────────────────────────
@@ -68,10 +71,69 @@ def clean_book_name(raw: str) -> str:
     return name.strip()
 
 
+def _pick(data: dict[str, Any], *keys: str, default: Any = None) -> Any:
+    for key in keys:
+        if key in data and data[key] not in (None, ""):
+            return data[key]
+    return default
+
+
+def compact_book(book: dict[str, Any]) -> dict[str, Any]:
+    """Return the fields an agent usually needs to display a book list."""
+    return {
+        "book_name": book.get("book_name", ""),
+        "clean_name": book.get("clean_name") or clean_book_name(book.get("book_name", "")),
+        "progress_percent": _pick(book, "progress_percent", "progress", default=0),
+        "duration_seconds": _pick(book, "duration_seconds", "read_duration", "duration", default=0),
+        "last_uploaded_at": _pick(book, "last_uploaded_at", "updated_at", "last_read_at", default=""),
+        "book_format": _pick(book, "book_format", "format", default=""),
+        "device_id": book.get("device_id", ""),
+    }
+
+
+def compact_bookmark(mark: dict[str, Any]) -> dict[str, Any]:
+    """Return the fields an agent usually needs to display a bookmark list."""
+    return {
+        "book_name": mark.get("book_name", ""),
+        "clean_name": mark.get("clean_name") or clean_book_name(mark.get("book_name", "")),
+        "chapter_title": _pick(mark, "chapter_title", "chapter_name", default=""),
+        "chapter_index": _pick(mark, "chapter_index", "chapter", default=0),
+        "content": mark.get("content", ""),
+        "created_at": _pick(mark, "created_at", "created_time", "updated_at", default=""),
+        "location": _pick(mark, "location", "position", "cfi", default=""),
+    }
+
+
+def apply_output_options(
+    result: dict[str, Any],
+    *,
+    collection_key: str,
+    compact: bool = False,
+    limit: int = 0,
+) -> dict[str, Any]:
+    """Apply --compact and --limit without mutating the original result."""
+    out = dict(result)
+    items = list(result.get(collection_key, []))
+    original_count = len(items)
+    if limit > 0:
+        items = items[:limit]
+    if compact:
+        if collection_key == "books":
+            items = [compact_book(item) for item in items]
+        elif collection_key == "bookmarks":
+            items = [compact_bookmark(item) for item in items]
+    out[collection_key] = items
+    if compact or limit > 0:
+        out["returned"] = len(items)
+        out["available_in_response"] = original_count
+        out["truncated"] = limit > 0 and original_count > len(items)
+    return out
+
+
 # ─── API 调用 ──────────────────────────────────────────────────────────────────
 
 def _auth_headers(token: str) -> dict[str, str]:
-    return {"Authorization": f"Bearer {token}"}
+    return auth_headers(token)
 
 
 def fetch_books(
@@ -224,6 +286,10 @@ def main() -> None:
                          help="格式筛选：epub / txt")
     p_books.add_argument("--page",     type=int, default=1)
     p_books.add_argument("--per-page", type=int, default=20, dest="per_page")
+    p_books.add_argument("--compact",  action="store_true",
+                         help="只输出 Agent 展示常用字段，减少上下文占用")
+    p_books.add_argument("--limit",    type=int, default=0,
+                         help="限制 stdout 中返回的条数（0 表示不限制）")
 
     # ── bookmarks 子命令 ──────────────────────────────────────
     p_marks = sub.add_parser("bookmarks", help="获取书签摘录列表")
@@ -237,13 +303,27 @@ def main() -> None:
     p_marks.add_argument("--per-page",  type=int, default=20, dest="per_page")
     p_marks.add_argument("--all",       action="store_true",
                          help="自动翻页拉取全部书签（忽略 --page）")
+    p_marks.add_argument("--compact",   action="store_true",
+                         help="只输出 Agent 展示常用字段，减少上下文占用")
+    p_marks.add_argument("--limit",     type=int, default=0,
+                         help="限制 stdout 中返回的条数（0 表示不限制）")
 
     args = parser.parse_args()
 
+    if requests is None:
+        print("[ERROR] requests 未安装。运行：pip install requests", file=sys.stderr)
+        sys.exit(1)
+
     try:
-        username, password = load_credentials()
+        username, password = load_credentials(error_stream=sys.stderr)
         session = requests.Session()
-        token = login(session, username, password)
+        token = login(
+            session,
+            username,
+            password,
+            log=lambda msg: print(msg, file=sys.stderr),
+            step_label="[fetch_reading] 登录中...",
+        )
 
         if args.command == "books":
             result = fetch_books(
@@ -253,6 +333,12 @@ def main() -> None:
                 book_format=args.format,
                 page=args.page,
                 per_page=args.per_page,
+            )
+            result = apply_output_options(
+                result,
+                collection_key="books",
+                compact=args.compact,
+                limit=args.limit,
             )
         else:  # bookmarks
             if args.all:
@@ -274,6 +360,12 @@ def main() -> None:
                     page=args.page,
                     per_page=args.per_page,
                 )
+            result = apply_output_options(
+                result,
+                collection_key="bookmarks",
+                compact=args.compact,
+                limit=args.limit,
+            )
 
         print(json.dumps(result, ensure_ascii=False, indent=2))
 
@@ -287,12 +379,7 @@ def main() -> None:
         print("\n✗ 无法连接到服务器，请检查网络连接。", file=sys.stderr)
         sys.exit(1)
     except requests.exceptions.HTTPError as e:
-        status = e.response.status_code if e.response is not None else "?"
-        if status == 401:
-            print("\n✗ 账号或密码错误（401）。运行 push_to_device.py --reset-credentials 重新输入。",
-                  file=sys.stderr)
-        else:
-            print(f"\n✗ 服务器返回错误 {status}：{e}", file=sys.stderr)
+        print(f"\n✗ {format_http_error(e)}", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
         print(f"\n✗ 拉取失败：{e}", file=sys.stderr)

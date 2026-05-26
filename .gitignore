@@ -1,4 +1,6 @@
 # Output files
+.codegraph/
+skill-refs/
 output/*.bmp
 output/*.png
 output/*.jpg
@@ -42,4 +44,3 @@ assets/fonts/*.otf
 output/*.txt
 node_modules/
 output/
-

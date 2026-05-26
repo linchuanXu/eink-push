@@ -1,0 +1,4 @@
+interface:
+  display_name: "阅星曈推送"
+  short_description: "推送内容到阅星曈墨水屏，并整理书架进度与书签摘录卡片"
+  default_prompt: "Use $eink-push 将这段内容整理成阅星曈卡片并推送到我的墨水屏设备。"

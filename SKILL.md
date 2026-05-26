@@ -1,13 +1,14 @@
-﻿---
+---
 name: eink-push
 description: >
-  当用户想把内容推送到阅星曈墨水屏设备（卡片简报或长篇电子书）、
-  查询阅星曈书架上的阅读进度或书签摘录、或需要实时联网搜索时使用。
-  即使用户未明确说出"推送""卡片""搜索"，只要意图涉及「发到墨水屏」「查我的书/书签」
-  「查一下最新情况」，也应触发本技能。
-homepage: https://github.com/linchuanXu/eink-push
-compatibility: Requires Python 3 (pip install playwright Pillow requests; playwright install chromium) and Node.js ≥ 18 (npm install marknative). Windows/macOS/Linux supported.
+  将内容推送到阅星曈/Yue Xingtong 墨水屏设备；生成卡片、翻页图片集、
+  Markdown/EPUB 电子书；查询书架、阅读进度、书签摘录；在阅星曈推送场景中调用联网搜索。
+  用户提到发到墨水屏、阅星曈、书签、书架、阅读进度、EPUB 或把调研结果推送到设备时使用。
 metadata:
+  homepage: https://github.com/linchuanXu/eink-push
+  compatibility: >
+    Requires Python >= 3.10 (pip install -r requirements.txt; playwright install chromium)
+    and Node.js ≥ 18 (npm install marknative). Windows/macOS/Linux supported.
   openclaw:
     emoji: '🖤'
     requires:
@@ -19,9 +20,10 @@ metadata:
         label: 安装 marknative（电子书路径，需 Node.js ≥ 18）
   security:
     credentials_usage: |
-      This skill stores username and password in .credentials.json (written by the user
-      on first setup) and sends them ONLY to the official 阅星曈 API (api-prod.xteink.cn)
-      for authentication. Credentials are never logged, stored elsewhere, or transmitted
+      This skill reads username/password from XTEINK_USERNAME/XTEINK_PASSWORD first,
+      then falls back to .credentials.json (written by the user on first setup). It
+      sends credentials ONLY to the official 阅星曈 API (api-prod.xteink.cn) for
+      authentication. Credentials are never logged, stored elsewhere, or transmitted
       to any other domain.
     allowed_domains:
       - api-prod.xteink.cn
@@ -37,7 +39,13 @@ metadata:
 
 ## 环境准备
 
-首次运行前，或遇到依赖缺失报错时：Read `{baseDir}/references/SETUP.md` 并按说明安装依赖。
+首次运行前，或遇到依赖缺失报错时，先运行：
+
+```bash
+python {baseDir}/scripts/check_environment.py
+```
+
+若输出 `MISSING` 或 `FAIL`，按脚本给出的 `fix:` 命令处理；需要展开说明时 Read `{baseDir}/references/SETUP.md`。
 
 > **Windows 提示**：`python` 不存在时用 `py -3`；`pip` 不存在时用 `python -m pip`。
 
@@ -45,27 +53,43 @@ metadata:
 
 ## 凭证预检（每次操作前必做）
 
+优先读取环境变量 `XTEINK_USERNAME` / `XTEINK_PASSWORD`；未设置时读取 `{baseDir}/.credentials.json`。兼容别名：`YUEXINGTONG_USERNAME` / `YUEXINGTONG_PASSWORD`。
+
 ```bash
 python {baseDir}/scripts/push_to_device.py --check-credentials
 ```
 
 | 输出 | 处理 |
 |------|------|
-| `OK`（凭证早已存在） | 直接继续 |
-| `OK`（**本次刚写入**） | 继续；操作完成后 Read `{baseDir}/references/ONBOARDING-COPY.md`，以自然语言向用户展示 |
+| `OK` | 直接继续 |
+| `OK` + `AUTH_OK`（运行 `--check-credentials --auth` 时） | 结构和账号密码均有效 |
 | `MISSING` | 询问用户手机号和密码，Write 写入 `{baseDir}/.credentials.json`：`{ "username": "手机号", "password": "密码" }` |
-| HTTP 401 | 运行 `--reset-credentials`，重新收集凭证 |
+| `INVALID` | 若提示环境变量只配置一半，要求同时设置用户名和密码；否则告知凭证文件损坏或缺字段，重新收集后覆盖写入 |
+| `AUTH_FAILED: ...` | 按报错处理；401 时运行 `--reset-credentials` 或更新环境变量后重新收集凭证 |
+| HTTP 401 | 运行 `--reset-credentials` 或更新环境变量，重新收集凭证 |
+
+首次写入或覆盖 `.credentials.json` 后，重新运行 `--check-credentials`。若输出 `OK`，Read `{baseDir}/references/ONBOARDING-COPY.md`，用自然语言向用户说明后续可做什么；若用户愿意联网校验，再运行 `--check-credentials --auth`。
 
 ---
 
 ## 意图路由
+
+### 高价值话术
+
+优先覆盖这些典型表达，不要继续堆同义词到 frontmatter：
+
+- “把这段发到阅星曈”
+- “做成墨水屏卡片”
+- “生成 EPUB 发到设备”
+- “看一下我的书架”
+- “整理《书名》的书签”
 
 | 用户说的 | 走哪个流程 |
 |----------|------------|
 | 发到阅星曈 / 推到设备 / 推一下 / 发到墨水屏 | → 按字数分流：≤2000 字走**卡片**，>2000 字走**电子书** |
 | 明确说"卡片 / 简报 / 仪表盘" | → **推送：卡片** |
 | 明确说"电子书 / 长文 / 连续阅读" | → **推送：电子书** |
-|| 明确说「epub / EPUB / epub格式」 | → **推送：EPUB 电子书** |
+| 明确说「epub / EPUB / epub格式」 | → **推送：EPUB 电子书** |
 | 我的书架 / 阅读进度 / 读了哪些书 | → **D1 查书架** |
 | 书签 / 摘录 / 高亮（指定书名） | → **D2 查书签** |
 | 书签 / 摘录 / 高亮（未指定书） | → D1 → 用户选书 → D2 |
@@ -89,34 +113,12 @@ python {baseDir}/scripts/push_to_device.py --check-credentials
 
 ## 推送：卡片
 
-适用于 ≤2000 字的内容。
-
-| 字数 | 形式 |
-|------|------|
-| ≤200 字 | 单张卡片：一屏资讯 / 仪表盘 |
-| 200–2000 字 | 多张卡片集：每张一主题，宁多勿挤 |
-
-**卡片是截图，不是文章排版。** 长文或连续阅读 → 走电子书。设计规范见 `{baseDir}/references/design-guide.md`。
-风格样本在 `{baseDir}/references/framework-samples/`——通常直接按规范写 HTML 即可，用户明确要求某种风格或需要参考时再查阅。
-
-**第 1 步：写 HTML**
-
-| 项目 | 说明 |
-|------|------|
-| 单张文件名 | `output/{主题词}_{YYYYMMDD-HHMM}.html` |
-| 多张文件名 | `output/{主题词}_p1_{时间戳}.html`、`_p2_`… |
-| body 写法 | `width:100vw; height:100vh; overflow:hidden; margin:0; padding:0` |
-| 起点模板 | Read `{baseDir}/assets/templates/base.html` |
-
-**第 2 步：推送**
+适用于 ≤2000 字内容。详细 HTML 写法、拆页规则和设计规范见 `{baseDir}/references/AGENT-WORKFLOWS.md` 与 `{baseDir}/references/design-guide.md`。
 
 → 说：「正在推送「{标题}」…」
 
 ```bash
-# 单张
 python {baseDir}/scripts/render_image.py "output/文件名.html" --push
-
-# 多张
 python {baseDir}/scripts/render_image.py "output/主题_p1_时间戳.html" "output/主题_p2_时间戳.html" --title "标题" --author "龙虾" --push
 ```
 
@@ -126,17 +128,7 @@ python {baseDir}/scripts/render_image.py "output/主题_p1_时间戳.html" "outp
 
 ## 推送：电子书
 
-适用于 >2000 字 / 连续长文 / 多节论述。
-
-**第 1 步：整理为 Markdown**
-
-文件命名：`output/{主题词}_{YYYYMMDD-HHMM}.md`，主题词 ≤10 字。
-
-> ⚠️ **Markdown 排版约束**：禁止使用表格（`|` 语法）。marknative 对表格的跨页分页有缺陷，且列宽强制等分，墨水屏上几乎必坏。请改用列表、加粗标签或缩进文本替代。多用 emoji 作为视觉锚点（如段落开头、小标题旁），能显著提升墨水屏的可读性。
->
-> 脚本侧 `preprocess_markdown` 会把漏网的 GFM 表格自动改写成列表作为兜底，但你仍应主动避免，因为自动转换不如人写的列表结构清晰。
-
-**第 2 步：推送**
+适用于 >2000 字 / 连续长文 / 多节论述。先写 Markdown 到 `output/{主题词}_{YYYYMMDD-HHMM}.md`；不要主动使用表格。详细整理规范见 `{baseDir}/references/AGENT-WORKFLOWS.md`。
 
 → 说：「正在生成并推送「{标题}」…」
 
@@ -150,33 +142,14 @@ python {baseDir}/scripts/render_book.py "output/文件名.md" --title "标题" -
 
 ## 推送：EPUB 电子书
 
-**仅当用户明确提到「生成 EPUB」「推 EPUB」「epub 格式」时使用此流程。**
-
-适用于图文混排、需要封面、希望在设备电子书阅读器中阅读的内容。
-
-**第 1 步：整理为 Markdown**
-
-文件命名：`output/{主题词}_{YYYYMMDD-HHMM}.md`，主题词 ≤10 字。
-
-> ⚠️ **Markdown 排版约束**：禁止使用表格（`|` 语法）。表格在阅星曈设备上渲染异常，请改用列表、加粗标签或缩进文本替代。多用 emoji 作为视觉锚点（如段落开头、小标题旁），能显著提升墨水屏的可读性。
-
-**第 2 步：生成并推送**
+仅当用户明确提到「生成 EPUB」「推 EPUB」「epub 格式」时使用。适用于图文混排、需要封面、希望在设备电子书阅读器中阅读的内容。
 
 → 说：「正在生成 EPUB 并推送「{标题}」…」
 
 ```bash
-# 基础
 python {baseDir}/scripts/epub/render_book_epub.py "output/文件名.md" --title "标题" --author "龙虾" --push
-
-# 带 SVG 封面（推荐）
 python {baseDir}/scripts/epub/render_book_epub.py "output/文件名.md" --title "标题" --author "龙虾" --cover-svg --push
-
-# 带封面 + 副标题
-python {baseDir}/scripts/epub/render_book_epub.py "output/文件名.md" --title "标题" --subtitle "副标题" --author "龙虾" --cover-svg --push
 ```
-
-**封面主题**（`--cover-theme`）：tech / business / design / literature / science / personal（自动检测）
-**封面布局**（`--cover-layout`）：minimal（默认）/ classic / modern
 
 → 成功后说：「已推送到阅星曈，设备上即可接收。」
 
@@ -185,30 +158,10 @@ python {baseDir}/scripts/epub/render_book_epub.py "output/文件名.md" --title 
 ## D1 — 查书架
 
 ```bash
-python {baseDir}/scripts/fetch_reading.py books [--keyword 关键词] [--format epub|txt] [--per-page 50]
+python {baseDir}/scripts/fetch_reading.py books [--keyword 关键词] [--format epub|txt] [--per-page 50] [--compact] [--limit N]
 ```
 
-解析 stdout JSON，向用户展示（使用 `clean_name` 而非 `book_name`，时长转为「X 分钟 / X 小时 Y 分钟」，时间戳转为「M月D日」）：
-
-```
-你的书架（共 N 本）：
-
-1. 悉达多 — 进度 50%，已读 2 分钟
-2. 百年孤独 — 进度 82%，已读 3.5 小时
-3. 人类简史 — 进度 100%，已读 8 小时  ✓ 已读完
-
-最近活跃：悉达多（3月30日同步）
-```
-
-展示后追加：
-
-```
----
-要根据这些数据生成内容推回阅星曈吗？
-• 书摘卡片（精选摘录 → 引言排版）
-• 阅读笔记电子书（所有书签按章节整理）
-• 阅读看板卡片（书架统计 → 仪表盘）
-```
+默认加 `--compact --limit 50`，除非需要完整原始字段。解析 stdout JSON，向用户展示 `clean_name`、进度、已读时长和最近活跃。展示格式和后续生成选项见 `{baseDir}/references/AGENT-WORKFLOWS.md`。
 
 ---
 
@@ -216,49 +169,19 @@ python {baseDir}/scripts/fetch_reading.py books [--keyword 关键词] [--format 
 
 ```bash
 # 指定书（--keyword 传 book_name 原始值，非 clean_name）
-python {baseDir}/scripts/fetch_reading.py bookmarks --keyword "完整book_name原始值" --all
+python {baseDir}/scripts/fetch_reading.py bookmarks --keyword "完整book_name原始值" --all [--compact] [--limit N]
 
 # 全部书签
-python {baseDir}/scripts/fetch_reading.py bookmarks --all
+python {baseDir}/scripts/fetch_reading.py bookmarks --all [--compact] [--limit N]
 ```
 
-已自动过滤「(本章结束)」占位符。向用户展示（字段处理同 D1）：
-
-```
-《百年孤独》的书签（共 12 条）：
-
-家族谱系图（第 1 章）
-  与情人蓄养的牲畜以惊人的速度繁殖，使其成为马孔多首富。
-
-冰块的发明（第 2 章）
-  世界如此新鲜，许多东西尚无名称，提到时不得不用手指点。
-
-……（共 12 条）
-```
-
-展示后追加：
-
-```
----
-要根据这些书签生成内容推回阅星曈吗？
-• 书摘卡片（精选摘录 → 引言排版）
-• 阅读笔记电子书（所有书签按章节整理）
-```
+默认加 `--compact --limit 100`，除非要整理完整笔记。已自动过滤「(本章结束)」占位符。展示字段和后续生成选项见 `{baseDir}/references/AGENT-WORKFLOWS.md`。
 
 ---
 
 ## A — 书摘卡片
 
-**第 1 步：拉取书签**（同 D2）
-
-**第 2 步：AI 挑选摘录，写 HTML**
-
-- 挑选精彩句子 3–8 条，跳过 <15 字或重复的条目
-- 每张卡片 1–3 条，大号引文 + 细体来源（书名 / 章节名）
-- 文件命名：`output/{clean_name}_摘录_p1_{YYYYMMDD-HHMM}.html`、`_p2_`…
-- 设计规范见 `{baseDir}/references/design-guide.md`
-
-**第 3 步：推送**
+拉取书签，挑选 3-8 条精彩摘录，写 HTML 卡片。详细挑选和排版规则见 `{baseDir}/references/AGENT-WORKFLOWS.md`。
 
 → 说：「正在生成《{书名}》书摘卡片并推送…」
 
@@ -272,25 +195,7 @@ python {baseDir}/scripts/render_image.py "output/书名_摘录_p1_时间戳.html
 
 ## B — 阅读笔记电子书
 
-**第 1 步：拉取书签**（同 D2）
-
-**第 2 步：AI 整理为 Markdown**
-
-按 `chapter_index` 升序排列，同章归在同一 `##` 下，`chapter_title` 为空时用「第 N 章」占位：
-
-```markdown
-# 《书名》阅读笔记
-
-## 章节标题
-
-> 摘录原文
-
-## 下一章节…
-```
-
-文件命名：`output/{clean_name}_笔记_{YYYYMMDD-HHMM}.md`
-
-**第 3 步：推送**
+拉取书签，按 `chapter_index` 升序整理为 Markdown。详细规则见 `{baseDir}/references/AGENT-WORKFLOWS.md`。
 
 → 说：「正在整理《{书名}》阅读笔记并推送…」
 
@@ -304,20 +209,7 @@ python {baseDir}/scripts/render_book.py "output/书名_笔记_时间戳.md" --ti
 
 ## C — 阅读看板卡片
 
-**第 1 步：拉取书架**（同 D1）
-
-**第 2 步：AI 统计并写 HTML**
-
-| 维度 | 来源字段 | 说明 |
-|------|----------|------|
-| 正在读 | `progress_percent` 1–99 | |
-| 已读完 | `progress_percent == 100` | |
-| 总时长 | 所有书 `duration_seconds` 之和 | 转为小时 |
-| 最近活跃 | `last_uploaded_at` 排序取前 3–5 | |
-
-版式：仪表盘 / 多栏，突出「正在读」和「总时长」。文件命名：`output/阅读看板_{YYYYMMDD-HHMM}.html`
-
-**第 3 步：推送**
+拉取书架，统计正在读、已读完、总时长、最近活跃并写仪表盘 HTML。详细字段规则见 `{baseDir}/references/AGENT-WORKFLOWS.md`。
 
 → 说：「正在生成阅读看板并推送…」
 
@@ -331,24 +223,14 @@ python {baseDir}/scripts/render_image.py "output/阅读看板_时间戳.html" --
 
 ## E — 联网搜索调研
 
-适用于需要**实时信息**的轻度调研：当天新闻、市场行情、最新发布、事实核查等。
-调用阅星曈服务端的阿里云百炼 qwen 联网搜索接口，返回带引用来源的 AI 回答。
-
-**执行**
+适用于阅星曈场景中的实时资料查询，尤其是用户希望把结果继续推送到设备时。普通泛化搜索优先用通用搜索能力。
 
 ```bash
-# 基础搜索
 python {baseDir}/scripts/search_query.py "查询内容"
-
-# 带自定义系统提示词（控制回答风格/格式）
 python {baseDir}/scripts/search_query.py "查询内容" --system-prompt "用简洁中文回答，重点列出关键事实"
 ```
 
-**解析 stdout JSON，向用户展示：**
-
-- 主体回答（`answer` / `content` / `result` 字段）
-- 引用来源列表（`citations` / `references` / `sources` 字段），格式：`[序号] 标题  URL`
-- 若字段结构不符预期，将原始 JSON 展示给用户
+解析 stdout JSON，展示主体回答和引用来源；字段细节见 `{baseDir}/references/AGENT-WORKFLOWS.md`。
 
 展示后追加：
 
@@ -380,11 +262,9 @@ python {baseDir}/scripts/search_query.py "查询内容" --system-prompt "用简�
 
 | 错误 | 处理 |
 |------|------|
-| `[CREDENTIALS_MISSING]` 或退出码 2 | 走凭证预检流程重新收集 |
+| `[CREDENTIALS_MISSING]` / `[CREDENTIALS_INVALID]` 或退出码 2 | 走凭证预检流程重新收集 |
 | 未找到绑定设备 | 告知用户在阅星曈 App 中绑定设备后重试 |
 | 依赖缺失（`[ERROR]` 开头） | **Read** `{baseDir}/references/SETUP.md`，在 `{baseDir}` 按「环境准备」与 SETUP 补全依赖后重试 |
 | `skia-canvas` native 模块报错 | 告知用户在 Skill 目录执行 `npm install marknative`；若仍失败见 `{baseDir}/references/SETUP.md` |
 | 网络超时 / 推送失败 | Read `{baseDir}/references/TROUBLESHOOTING.md`，按对应错误给出提示 |
 | 其他脚本报错 | 将完整报错原文展示给用户，说明需手动排查 |
-
-

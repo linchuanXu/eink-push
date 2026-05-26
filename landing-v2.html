@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>阅星曈 claw 配置</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background-color: #FAF8F4;
+      color: #1C1917;
+    }
+
+    .grad-text {
+      background: linear-gradient(135deg, #EA580C 0%, #F97316 50%, #D97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Step number ring */
+    .step-num {
+      background: linear-gradient(135deg, #F97316, #EA580C);
+      color: white;
+      box-shadow: 0 4px 12px -4px rgba(234,88,12,0.45);
+    }
+
+    /* Code block */
+    .code-block {
+      background: #1C1917;
+      color: #F5F5F4;
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+    }
+
+    /* Capability tile */
+    .cap-tile {
+      transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .cap-tile:hover {
+      border-color: #F97316;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px -12px rgba(234,88,12,0.25);
+    }
+
+    /* WeChat-like bubbles for scenarios */
+    .u-bubble {
+      background: #95EC69;
+      color: #1a1a1a;
+      border-radius: 8px 8px 2px 8px;
+      padding: 10px 14px;
+      font-size: 13.5px;
+      line-height: 1.65;
+      align-self: flex-end;
+      max-width: 90%;
+    }
+    .ai-bubble {
+      background: #ffffff;
+      border-radius: 8px 8px 8px 2px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      padding: 10px 14px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 90%;
+    }
+
+    .copy-btn {
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+    .copy-btn:active { transform: scale(0.97); }
+
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+    .blink { animation: blink 2.4s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+
+  <!-- ─── HEADER ─────────────────────────────────────────────────────────── -->
+  <header class="bg-white border-b border-stone-200/70">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-base font-bold text-stone-900">阅星曈</span>
+        <span class="text-xs text-stone-400">YuXingTong</span>
+      </div>
+      <a href="https://github.com/linchuanXu/eink-push" class="text-[13px] text-stone-500 hover:text-stone-900 transition-colors">
+        GitHub →
+      </a>
+    </div>
+  </header>
+
+  <!-- ─── HERO + 安装指引 ──────────────────────────────────────────────── -->
+  <section class="px-6 pt-16 pb-20 bg-gradient-to-b from-white to-[#FAF8F4]">
+    <div class="max-w-3xl mx-auto">
+
+      <!-- Title -->
+      <div class="text-center mb-3">
+        <span class="inline-flex items-center gap-2 text-xs text-orange-600 bg-orange-50 border border-orange-200 rounded-full px-3 py-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-orange-500 blink"></span>
+          OpenClaw Skill · 墨水屏推送
+        </span>
+      </div>
+      <h1 class="text-center text-4xl md:text-5xl font-black text-stone-900 mb-4 tracking-tight">
+        阅星曈 <span class="grad-text">claw</span> 配置
+      </h1>
+      <p class="text-center text-stone-500 text-base md:text-lg mb-14">
+        把 AI 产出的内容静静推到你的墨水屏
+      </p>
+
+      <!-- 安装指引 -->
+      <div class="space-y-5">
+
+        <!-- Step 1 -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 md:p-7">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="step-num flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">1</div>
+            <div class="flex-1">
+              <h3 class="text-stone-900 font-bold text-base md:text-lg leading-tight">
+                复制提示词，发给小龙虾以部署阅星曈 skill
+              </h3>
+            </div>
+          </div>
+          <div class="code-block rounded-xl p-4 md:p-5 flex items-start gap-3">
+            <code id="install-text" class="flex-1 text-[13px] md:text-sm leading-relaxed select-all break-all">
+              请安装阅星曈技能 https://github.com/linchuanXu/eink-push
+            </code>
+            <button onclick="copyInstall()" id="copy-btn"
+              class="copy-btn flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap">
+              一键复制
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 md:p-7">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="step-num flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">2</div>
+            <div class="flex-1">
+              <h3 class="text-stone-900 font-bold text-base md:text-lg leading-tight">
+                在阅星曈 App 中绑定设备
+              </h3>
+              <p class="text-stone-500 text-sm mt-1.5 leading-relaxed">
+                首次推送时，小龙虾会询问你的手机号和密码以保存凭证。<br>
+                凭证仅用于调用阅星曈官方 API（<code class="text-xs text-stone-700 bg-stone-100 px-1.5 py-0.5 rounded">api-prod.xteink.cn</code>），不会上传到其他地方。
+              </p>
+            </div>
+          </div>
+          <a href="#" class="inline-flex items-center gap-2 bg-stone-900 hover:bg-stone-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors">
+            下载阅星曈 App
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Quick links -->
+      <div class="mt-8 flex items-center justify-center gap-6 text-[13px] text-stone-400">
+        <a href="#capabilities" class="hover:text-orange-600 transition-colors">核心功能 ↓</a>
+        <span class="text-stone-200">·</span>
+        <a href="#scenarios" class="hover:text-orange-600 transition-colors">使用场景 ↓</a>
+        <span class="text-stone-200">·</span>
+        <a href="https://github.com/linchuanXu/eink-push" class="hover:text-orange-600 transition-colors">开发者文档</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── 核心功能 ───────────────────────────────────────────────────────── -->
+  <section id="capabilities" class="px-6 py-20 bg-white border-t border-stone-200/60">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="text-center mb-12">
+        <p class="text-orange-500 text-xs font-semibold uppercase tracking-[0.2em] mb-3">核心功能</p>
+        <h2 class="text-3xl md:text-4xl font-black text-stone-900 leading-tight">设备 · 云端 · AI 推理</h2>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+        <div class="cap-tile bg-white border border-stone-200 rounded-2xl p-5 text-center">
+          <div class="w-12 h-12 mx-auto bg-orange-50 rounded-xl flex items-center justify-center text-2xl mb-3">📋</div>
+          <div class="font-bold text-stone-900 text-[15px] mb-1">推送卡片</div>
+          <div class="text-xs text-stone-500 leading-relaxed">短内容 / 仪表盘截图</div>
+        </div>
+
+        <div class="cap-tile bg-white border border-stone-200 rounded-2xl p-5 text-center">
+          <div class="w-12 h-12 mx-auto bg-orange-50 rounded-xl flex items-center justify-center text-2xl mb-3">📖</div>
+          <div class="font-bold text-stone-900 text-[15px] mb-1">推送电子书</div>
+          <div class="text-xs text-stone-500 leading-relaxed">长文 Markdown 转电子书</div>
+        </div>
+
+        <div class="cap-tile bg-white border border-stone-200 rounded-2xl p-5 text-center">
+          <div class="w-12 h-12 mx-auto bg-orange-50 rounded-xl flex items-center justify-center text-2xl mb-3">📚</div>
+          <div class="font-bold text-stone-900 text-[15px] mb-1">推送 EPUB</div>
+          <div class="text-xs text-stone-500 leading-relaxed">带封面的图文电子书</div>
+        </div>
+
+        <div class="cap-tile bg-white border border-stone-200 rounded-2xl p-5 text-center">
+          <div class="w-12 h-12 mx-auto bg-orange-50 rounded-xl flex items-center justify-center text-2xl mb-3">🗂️</div>
+          <div class="font-bold text-stone-900 text-[15px] mb-1">查书架</div>
+          <div class="text-xs text-stone-500 leading-relaxed">阅读进度与时长统计</div>
+        </div>
+
+        <div class="cap-tile bg-white border border-stone-200 rounded-2xl p-5 text-center">
+          <div class="w-12 h-12 mx-auto bg-orange-50 rounded-xl flex items-center justify-center text-2xl mb-3">🔖</div>
+          <div class="font-bold text-stone-900 text-[15px] mb-1">查书签</div>
+          <div class="text-xs text-stone-500 leading-relaxed">按书拉取摘录与高亮</div>
+        </div>
+
+        <div class="cap-tile bg-white border border-stone-200 rounded-2xl p-5 text-center">
+          <div class="w-12 h-12 mx-auto bg-orange-50 rounded-xl flex items-center justify-center text-2xl mb-3">🔍</div>
+          <div class="font-bold text-stone-900 text-[15px] mb-1">联网搜索</div>
+          <div class="text-xs text-stone-500 leading-relaxed">实时资讯，带引用来源</div>
+        </div>
+
+      </div>
+
+      <!-- AI 生成模式 (subdued row) -->
+      <div class="mt-10 pt-8 border-t border-stone-100">
+        <p class="text-center text-stone-400 text-xs uppercase tracking-[0.2em] mb-5">基于阅读数据的 AI 生成</p>
+        <div class="flex items-center justify-center gap-3 flex-wrap text-sm">
+          <span class="inline-flex items-center gap-1.5 bg-stone-50 border border-stone-200 rounded-full px-4 py-2 text-stone-700">
+            <span class="text-base">✨</span> 书摘卡片
+          </span>
+          <span class="inline-flex items-center gap-1.5 bg-stone-50 border border-stone-200 rounded-full px-4 py-2 text-stone-700">
+            <span class="text-base">📓</span> 阅读笔记电子书
+          </span>
+          <span class="inline-flex items-center gap-1.5 bg-stone-50 border border-stone-200 rounded-full px-4 py-2 text-stone-700">
+            <span class="text-base">📊</span> 阅读看板卡片
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── 使用场景 ───────────────────────────────────────────────────────── -->
+  <section id="scenarios" class="px-6 py-20 bg-[#FAF8F4]">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="text-center mb-12">
+        <p class="text-orange-500 text-xs font-semibold uppercase tracking-[0.2em] mb-3">使用场景</p>
+        <h2 class="text-3xl md:text-4xl font-black text-stone-900 leading-tight">一句话告诉小龙虾</h2>
+      </div>
+
+      <!-- 推送内容到设备 -->
+      <div class="mb-12">
+        <h3 class="text-stone-700 font-semibold text-base mb-5 flex items-center gap-2">
+          <span class="text-orange-400">+</span> 推送内容到设备
+        </h3>
+        <div class="grid md:grid-cols-3 gap-4">
+
+          <div class="bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">把这篇 8000 字的行业报告摘要一下，推到我的墨水屏。</div>
+            <div class="ai-bubble">龙虾：搞定！已提炼 7 个核心观点生成卡片，推送到阅星曈了。</div>
+          </div>
+
+          <div class="bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">微信收到的这份 PDF 报告，转成 EPUB 推到设备，要带封面。</div>
+            <div class="ai-bubble">龙虾：已生成带封面的 EPUB，推送到阅星曈了。</div>
+          </div>
+
+          <div class="bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">把今天日历整理成卡片推过去，下午要进专注模式。</div>
+            <div class="ai-bubble">龙虾：今日 4 个日程已生成仪表盘卡片，推送完成。</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 阅读管理 -->
+      <div class="mb-12">
+        <h3 class="text-stone-700 font-semibold text-base mb-5 flex items-center gap-2">
+          <span class="text-orange-400">+</span> 阅读管理
+        </h3>
+        <div class="grid md:grid-cols-3 gap-4">
+
+          <div class="bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">我最近读了哪些书，进度怎么样？</div>
+            <div class="ai-bubble">龙虾：书架共 8 本，《人类简史》已读完，《百年孤独》82%，最近活跃是昨天的《悉达多》。</div>
+          </div>
+
+          <div class="bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">把《百年孤独》的书签整理成阅读笔记电子书推回设备。</div>
+            <div class="ai-bubble">龙虾：找到 23 条书签，按章节整理为 EPUB，推送完成。</div>
+          </div>
+
+          <div class="bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">从最近读的书里挑几条精彩摘录做成书摘卡片。</div>
+            <div class="ai-bubble">龙虾：精选 6 条摘录生成 3 张卡片，已推送到阅星曈。</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 主动调研 -->
+      <div>
+        <h3 class="text-stone-700 font-semibold text-base mb-5 flex items-center gap-2">
+          <span class="text-orange-400">+</span> 联网调研 + 推送
+        </h3>
+        <div class="grid md:grid-cols-3 gap-4">
+
+          <div class="bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">查一下 OpenAI 最近发布了什么模型，整理成卡片推到设备。</div>
+            <div class="ai-bubble">龙虾：联网搜索完成，已生成卡片附引用来源，推送到阅星曈了。</div>
+          </div>
+
+          <div class="bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">帮我调研竞品 X 最近的动作，整理成长报告推过去。</div>
+            <div class="ai-bubble">龙虾：调研完成，已写成长篇 Markdown 推送为电子书。</div>
+          </div>
+
+          <div class="bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
+            <div class="u-bubble">睡前帮我准备一份明早的早报，推到设备。</div>
+            <div class="ai-bubble">龙虾：监控了 12 个信息源，筛出 5 条值得读的，附今日 3 个日程，明早可见。</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── 底部 CTA ───────────────────────────────────────────────────────── -->
+  <section class="px-6 py-20 bg-white border-t border-stone-200/60">
+    <div class="max-w-3xl mx-auto text-center">
+      <p class="grad-text font-black text-2xl md:text-3xl mb-3">你在生活，AI 在工作</p>
+      <p class="text-stone-500 text-base mb-10">墨水屏，是 AI 世界和你之间唯一安静的接口。</p>
+
+      <div class="flex items-center justify-center gap-3 flex-wrap">
+        <a href="#" class="inline-flex items-center gap-2 bg-stone-900 hover:bg-stone-700 text-white text-sm font-medium px-6 py-3 rounded-xl transition-colors">
+          下载阅星曈 App
+        </a>
+        <a href="https://github.com/linchuanXu/eink-push" class="inline-flex items-center gap-2 bg-white border border-stone-300 hover:border-stone-900 text-stone-900 text-sm font-medium px-6 py-3 rounded-xl transition-colors">
+          GitHub 源码
+        </a>
+        <a href="https://xiaolongxia.org/" class="inline-flex items-center gap-2 bg-white border border-stone-300 hover:border-stone-900 text-stone-900 text-sm font-medium px-6 py-3 rounded-xl transition-colors">
+          了解 OpenClaw
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─────────────────────────────────────────────────────────── -->
+  <footer class="border-t border-stone-200/60 py-8 px-6 bg-[#FAF8F4]">
+    <div class="max-w-5xl mx-auto flex items-center justify-between text-[13px] text-stone-400 flex-wrap gap-3">
+      <span class="font-semibold text-stone-700">阅星曈 · YuXingTong</span>
+      <span>OpenClaw Skill · 墨水屏推送</span>
+    </div>
+  </footer>
+
+  <script>
+    function copyInstall() {
+      const text = '请安装阅星曈技能 https://github.com/linchuanXu/eink-push';
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-btn');
+        const original = btn.textContent;
+        btn.textContent = '已复制 ✓';
+        btn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+        btn.classList.add('bg-emerald-500');
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.classList.remove('bg-emerald-500');
+          btn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+        }, 1800);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 """
 星曈云文件推送工具
 
@@ -21,55 +23,48 @@
 
 import sys
 import os
-import json
 import hashlib
 import argparse
 import mimetypes
-import requests
 from pathlib import Path
 
-BASE_URL = "https://api-prod.xteink.cn"
-HTTP_TIMEOUT = 30  # 所有 HTTP 请求统一超时（秒）
+try:
+    import requests
+except ImportError:
+    requests = None
 
-# 凭证文件保存在脚本同级父目录（eink-push/.credentials.json），不进 git
-_CRED_FILE = Path(__file__).resolve().parent.parent / ".credentials.json"
+_scripts_dir = str(Path(__file__).parent)
+if _scripts_dir not in sys.path:
+    sys.path.insert(0, _scripts_dir)
+
+from xteink_api import (
+    BASE_URL,
+    HTTP_TIMEOUT,
+    auth_headers,
+    credentials_status,
+    env_credentials_status,
+    extract_devices,
+    format_http_error,
+    load_credentials,
+    login,
+    reset_credentials as _reset_credentials_file,
+    select_default_device,
+)
 
 
 # ─── 凭证管理 ─────────────────────────────────────────────────────────────────
 
-def load_credentials() -> tuple[str, str]:
-    """
-    从 .credentials.json 读取账号密码。
-    文件不存在或字段缺失时打印 [CREDENTIALS_MISSING] 并以退出码 2 退出，
-    由外部调用方（AI 助手）在对话中收集凭证后重试，不做交互式 input()。
-    """
-    if not _CRED_FILE.exists():
-        print(f"[CREDENTIALS_MISSING] 凭证文件不存在：{_CRED_FILE}")
-        sys.exit(2)
-
-    try:
-        creds = json.loads(_CRED_FILE.read_text(encoding="utf-8"))
-    except Exception as e:
-        print(f"[CREDENTIALS_MISSING] 凭证文件损坏（{e}）：{_CRED_FILE}")
-        sys.exit(2)
-
-    username = creds.get("username", "").strip()
-    password = creds.get("password", "").strip()
-
-    if not username or not password:
-        print(f"[CREDENTIALS_MISSING] 凭证文件缺少 username 或 password：{_CRED_FILE}")
-        sys.exit(2)
-
-    return username, password
-
-
 def reset_credentials() -> None:
     """删除凭证文件，AI 助手下次推送前会重新向用户收集账号密码。"""
-    if _CRED_FILE.exists():
-        _CRED_FILE.unlink()
+    if _reset_credentials_file():
         print("[✓] 已清除凭证，下次推送时 AI 助手会重新向你确认账号密码。")
     else:
         print("[!] 未找到凭证文件，无需清除。")
+    env_status, env_detail = env_credentials_status()
+    if env_status == "OK":
+        print("[!] 仍检测到环境变量凭证；如需换号，请同时更新 XTEINK_USERNAME/XTEINK_PASSWORD。")
+    elif env_status == "INVALID":
+        print(f"[!] 环境变量凭证不完整：{env_detail}")
 
 
 # ─── 文件类型映射 ──────────────────────────────────────────────────────────────
@@ -119,57 +114,32 @@ def md5_of_bytes(data: bytes) -> str:
     return hashlib.md5(data).hexdigest()
 
 
-def login(session: requests.Session, username: str, password: str) -> str:
-    print("[1/4] 登录中...")
-    res = session.post(
-        f"{BASE_URL}/auth/login",
-        json={"username": username, "password": password},
-        timeout=HTTP_TIMEOUT,
-    )
-    res.raise_for_status()
-    data = res.json()
-    token = data.get("access_token") or data.get("token")
-    if not token:
-        raise RuntimeError(f"登录失败，响应：{data}")
-    print("      ✓ 登录成功")
-    return token
+def _require_requests() -> None:
+    if requests is None:
+        print("[ERROR] requests 未安装。运行：pip install requests")
+        sys.exit(1)
 
 
 def get_default_device(session: requests.Session, token: str) -> dict:
     print("[2/4] 获取绑定设备...")
-    headers = {"Authorization": f"Bearer {token}"}
     res = session.get(
         f"{BASE_URL}/api/v1/device/binding",
-        headers=headers,
+        headers=auth_headers(token),
         timeout=HTTP_TIMEOUT,
     )
     res.raise_for_status()
     data = res.json()
+    device = select_default_device(extract_devices(data))
 
-    devices = data if isinstance(data, list) else (data.get("data") or data.get("devices") or [])
-    if not devices:
-        raise RuntimeError("未找到绑定设备，请先在 App 中绑定设备")
-
-    selected = next((d for d in devices if d.get("selected")), devices[0])
-    device_id = str(selected.get("device_id") or selected.get("id"))
-    device_type = selected.get("device_type", "ESP32C3")
-    if device_type not in ("ESP32C3", "ESP32C3_X3"):
-        device_type = "ESP32C3"
-
-    print(f"      ✓ 设备 ID={device_id}  类型={device_type}")
-    return {"id": device_id, "type": device_type}
+    print(f"      ✓ 设备 ID={device['id']}  类型={device['type']}")
+    return device
 
 
 def upload_file(session: requests.Session, token: str, device: dict,
                 file_data: bytes, filename: str, content_type: str,
                 file_md5: str, file_size: int, prefix: str) -> str:
     """上传文件到 OSS，返回 download_url。"""
-    auth_headers = {
-        "Authorization":  f"Bearer {token}",
-        "Device-Id":      device["id"],
-        "Device-Type":    device["type"],
-        "Request-Source": "web",
-    }
+    headers = auth_headers(token, device)
 
     print("[3/4] 上传文件...")
     print("      → 获取上传签名")
@@ -182,7 +152,7 @@ def upload_file(session: requests.Session, token: str, device: dict,
             "file_size":    file_size,
             "prefix":       prefix,
         },
-        headers=auth_headers,
+        headers=headers,
         timeout=HTTP_TIMEOUT,
     )
     sig_res.raise_for_status()
@@ -224,7 +194,7 @@ def upload_file(session: requests.Session, token: str, device: dict,
                 "file_md5":     file_md5,
                 "content_type": sign["content_type"],
             },
-            headers=auth_headers,
+            headers=headers,
             timeout=HTTP_TIMEOUT,
         )
     except Exception as e:
@@ -236,12 +206,7 @@ def upload_file(session: requests.Session, token: str, device: dict,
 def push_to_device(session: requests.Session, token: str, device: dict,
                    download_url: str, save_path: str) -> None:
     print("[4/4] 推送到设备...")
-    headers = {
-        "Authorization":  f"Bearer {token}",
-        "Device-Id":      device["id"],
-        "Device-Type":    device["type"],
-        "Request-Source": "web",
-    }
+    headers = auth_headers(token, device)
     res = session.post(
         f"{BASE_URL}/api/v1/device/tasks",
         json={
@@ -274,13 +239,46 @@ def main() -> None:
     parser.add_argument(
         "--check-credentials",
         action="store_true",
-        help="检查凭证文件是否存在，输出 OK 或 MISSING",
+        help="检查凭证文件是否可读取，输出 OK、MISSING 或 INVALID",
+    )
+    parser.add_argument(
+        "--auth",
+        action="store_true",
+        help="与 --check-credentials 配合使用，实际登录验证账号密码，成功输出 AUTH_OK",
     )
     args = parser.parse_args()
 
     # ── 凭证检查模式 ───────────────────────────────────────────
     if args.check_credentials:
-        print("OK" if _CRED_FILE.exists() else "MISSING")
+        status, detail = credentials_status()
+        print(status)
+        if detail:
+            print(detail)
+        if status == "OK" and args.auth:
+            _require_requests()
+            try:
+                username, password = load_credentials()
+                session = requests.Session()
+                login(
+                    session,
+                    username,
+                    password,
+                    log=None,
+                    step_label="",
+                )
+                print("AUTH_OK")
+            except requests.exceptions.Timeout:
+                print(f"AUTH_FAILED: 网络超时（>{HTTP_TIMEOUT}s）")
+                sys.exit(1)
+            except requests.exceptions.ConnectionError:
+                print("AUTH_FAILED: 无法连接到服务器")
+                sys.exit(1)
+            except requests.exceptions.HTTPError as e:
+                print(f"AUTH_FAILED: {format_http_error(e)}")
+                sys.exit(1)
+            except Exception as e:
+                print(f"AUTH_FAILED: {e}")
+                sys.exit(1)
         return
 
     # ── 重置凭证模式 ───────────────────────────────────────────
@@ -292,6 +290,8 @@ def main() -> None:
     if not args.file:
         parser.print_help()
         sys.exit(1)
+
+    _require_requests()
 
     try:
         file_path = args.file
@@ -336,11 +336,7 @@ def main() -> None:
         print("\n✗ 无法连接到服务器，请检查网络连接。")
         sys.exit(1)
     except requests.exceptions.HTTPError as e:
-        status = e.response.status_code if e.response is not None else "?"
-        if status == 401:
-            print(f"\n✗ 账号或密码错误（401）。运行 --reset-credentials 重新输入。")
-        else:
-            print(f"\n✗ 服务器返回错误 {status}：{e}")
+        print(f"\n✗ {format_http_error(e)}")
         sys.exit(1)
     except Exception as e:
         print(f"\n✗ 推送失败：{e}")
