@@ -30,6 +30,37 @@
 
 ---
 
+## 更新
+
+如果你是通过 OpenClaw / Codex 安装的普通用户，直接在对话里说：
+
+> 更新技能 `https://github.com/linchuanXu/eink-push`
+
+更新后让 AI 重新运行一次环境检查：
+
+```powershell
+python scripts/check_environment.py
+```
+
+凭证文件 `.credentials.json`、环境变量和设备绑定不会因为更新仓库文件而被覆盖。
+
+如果你本机有这个 Git 仓库，并且用 `scripts/install_skill.py` 同步到本地 Skill 目录，更新流程是：
+
+```powershell
+git pull
+python scripts/install_skill.py
+python scripts/install_skill.py --apply
+python scripts/check_environment.py
+```
+
+`install_skill.py` 默认是 dry-run，会先显示哪些 runtime 文件将被复制或更新；确认无误后再加 `--apply`。如电子书路径提示 `marknative` 缺失，在实际安装目录运行：
+
+```powershell
+npm install marknative
+```
+
+---
+
 ## 配置账号
 
 首次使用时，AI 会提示你输入阅星曈手机号和密码。正式安装环境推荐通过环境变量注入凭证；未设置环境变量时，会自动保存到本地 `.credentials.json`（不会上传到仓库）。
@@ -196,6 +227,37 @@ In OpenClaw, just tell the AI:
 🧑 **You:** Phone 138xxxxxxxx, password xxxxxx
 
 🤖 **AI:** Saved and structure-checked! From now on, just say "发到阅星曈" and I'll push your content to the e-ink device.
+
+---
+
+## Update
+
+If you installed the skill through OpenClaw / Codex, tell the AI:
+
+> Update skill `https://github.com/linchuanXu/eink-push`
+
+After updating, ask it to run the environment check again:
+
+```powershell
+python scripts/check_environment.py
+```
+
+Your `.credentials.json`, environment variables, and device binding are not overwritten by updating the repository files.
+
+If you keep a local Git checkout and sync it into your local Skill directory with `scripts/install_skill.py`, update with:
+
+```powershell
+git pull
+python scripts/install_skill.py
+python scripts/install_skill.py --apply
+python scripts/check_environment.py
+```
+
+`install_skill.py` is a dry-run by default and prints which runtime files would be copied or updated; rerun with `--apply` to sync them. If book rendering reports missing `marknative`, run this inside the actual installed Skill directory:
+
+```powershell
+npm install marknative
+```
 
 ---
 
