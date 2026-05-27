@@ -1,6 +1,10 @@
 import unittest
 
-from scripts.render_book import _parse_node_version, preprocess_markdown
+from scripts.render_book import (
+    _parse_node_version,
+    convert_markdown_tables_to_text,
+    preprocess_markdown,
+)
 
 
 class NodeVersionTests(unittest.TestCase):
@@ -39,6 +43,14 @@ class PreprocessMarkdownTests(unittest.TestCase):
         md = "```markdown\n| A | B |\n| --- | --- |\n| 1 | 2 |\n```"
 
         self.assertEqual(preprocess_markdown(md), md)
+
+    def test_public_table_converter_matches_preprocess_table_step(self):
+        md = "| 指标 | 数值 |\n| --- | --- |\n| 阅读 | 7h |"
+
+        self.assertEqual(
+            convert_markdown_tables_to_text(md),
+            "- **指标**：阅读 ｜ **数值**：7h\n",
+        )
 
 
 if __name__ == "__main__":

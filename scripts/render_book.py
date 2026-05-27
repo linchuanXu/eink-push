@@ -115,7 +115,7 @@ def _split_table_row(line: str) -> list[str]:
     return [c.strip() for c in s.split("|")]
 
 
-def _convert_gfm_tables_to_lists(md_text: str) -> str:
+def convert_markdown_tables_to_text(md_text: str) -> str:
     """把 GFM 表格改写为 Markdown 列表，跳过 fenced code block 内的内容。
 
     - `| 列1 | 列2 |` → `- **列1**：值1 ｜ **列2**：值2`
@@ -183,7 +183,7 @@ def _strip_yaml_quotes(val: str) -> str:
 
 def preprocess_markdown(md_text: str) -> str:
     """处理 Markdown：展开 frontmatter + 把 GFM 表格改写为列表。"""
-    return _convert_gfm_tables_to_lists(_preprocess_frontmatter(md_text))
+    return convert_markdown_tables_to_text(_preprocess_frontmatter(md_text))
 
 
 def _preprocess_frontmatter(md_text: str) -> str:

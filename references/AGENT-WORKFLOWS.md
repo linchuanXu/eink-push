@@ -33,6 +33,8 @@ python scripts/render_image.py "output/主题_p1_时间戳.html" "output/主题_
 
 预览策略：开发调试或排障时可加 `--preview` 生成 `.preview.png`；正式 Skill 推送命令默认不带 `--preview`，避免 `output/` 长期堆积预览图。
 
+小屏门禁：正式 `--push` 会阻止明显缩小、横向溢出或有效字号过小的卡片，避免把“电脑上勉强可看、设备上很难受”的结果推到设备。触发门禁时应拆页、减少单页内容或增大字号；只有兼容旧稿时才加 `--allow-shrink`。
+
 ---
 
 ## 推送 Markdown 电子书
@@ -43,7 +45,7 @@ Markdown 要点：
 
 - 文件名：`output/{主题词}_{YYYYMMDD-HHMM}.md`，主题词 ≤10 字。
 - 禁止主动写 GFM 表格；改用列表、加粗标签或缩进文本。
-- `render_book.py` 会兜底把表格转为列表，但人工组织的列表更清晰。
+- `render_book.py` 和 EPUB 渲染器都会兜底把 GFM 表格转为文本列表，但人工组织的列表更清晰。
 
 命令：
 

@@ -35,6 +35,9 @@ from ebooklib import epub
 import markdown
 
 _SCRIPT_DIR = Path(__file__).parent
+sys.path.insert(0, str(_SCRIPT_DIR.parent))
+from render_book import convert_markdown_tables_to_text
+
 COVER_THEMES = ("tech", "business", "design", "literature", "science", "personal")
 COVER_LAYOUTS = ("minimal", "classic", "modern")
 
@@ -88,10 +91,6 @@ code {
     border-radius: 3px;
 }
 pre code { background: none; padding: 0; }
-table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
-th, td { border: 1px solid #ddd; padding: 0.5em; text-align: left; }
-th { background-color: #0066cc; color: white; font-weight: bold; }
-tbody tr:nth-child(even) { background-color: #f8f9fa; }
 ul, ol { margin: 0.5em 0 1em 1.5em; padding: 0; }
 li { margin: 0.3em 0; }
 .codehilite span[style*="border: 1px solid #FF0000"] { border: none !important; }
@@ -465,6 +464,7 @@ _MD_EXT_CONFIG = {'codehilite': {'noclasses': True, 'pygments_style': 'default'}
 
 
 def md_to_html(text):
+    text = convert_markdown_tables_to_text(text)
     return markdown.markdown(text, extensions=_MD_EXTENSIONS, extension_configs=_MD_EXT_CONFIG)
 
 

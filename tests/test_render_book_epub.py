@@ -8,6 +8,7 @@ from PIL import Image
 from scripts.epub.render_book_epub import (
     download_image,
     embed_images,
+    md_to_html,
     split_chapters,
     strip_leading_heading,
     validate_epub_options,
@@ -83,6 +84,16 @@ class EpubOptionValidationTests(unittest.TestCase):
 
         self.assertIn("--image-quality 必须在 1..100 之间", errors)
         self.assertIn("--image-width 必须大于 0", errors)
+
+
+class MarkdownTableTests(unittest.TestCase):
+    def test_md_to_html_no_longer_depends_on_table_rendering(self):
+        md = "| 项目 | 建议 |\n| --- | --- |\n| 字号 | 32px |"
+
+        html = md_to_html(md)
+
+        self.assertNotIn("<table>", html)
+        self.assertIn("<strong>项目</strong>：字号", html)
 
 
 if __name__ == "__main__":

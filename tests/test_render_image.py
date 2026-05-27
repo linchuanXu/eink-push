@@ -10,6 +10,8 @@ from scripts.render_image import (
     assess_rendered_png,
     encode_xtc,
     encode_xtch,
+    HtmlLayoutWarning,
+    should_block_push,
     validate_render_options,
     XtgXthParams,
 )
@@ -29,6 +31,7 @@ class HtmlLayoutAssessmentTests(unittest.TestCase):
                     "scrollHeight": 800,
                     "textLength": 20,
                     "backgroundColor": "rgb(255, 255, 255)",
+                    "minFontPx": 30,
                 },
                 480,
                 800,
@@ -43,6 +46,7 @@ class HtmlLayoutAssessmentTests(unittest.TestCase):
                 "scrollHeight": 1200,
                 "textLength": 0,
                 "backgroundColor": "rgba(0, 0, 0, 0)",
+                "minFontPx": 20,
             },
             480,
             800,
@@ -56,6 +60,44 @@ class HtmlLayoutAssessmentTests(unittest.TestCase):
                 "heavy-vertical-overflow",
                 "transparent-background",
             ],
+        )
+
+    def test_detects_small_font_when_text_is_present(self):
+        warnings = assess_html_layout(
+            {
+                "scrollWidth": 480,
+                "scrollHeight": 800,
+                "textLength": 20,
+                "backgroundColor": "rgb(255, 255, 255)",
+                "minFontPx": 18,
+            },
+            480,
+            800,
+        )
+
+        self.assertEqual([w.code for w in warnings], ["small-font"])
+
+    def test_push_gate_blocks_only_dangerous_layouts(self):
+        self.assertFalse(should_block_push([]))
+        self.assertFalse(
+            should_block_push(
+                [HtmlLayoutWarning("vertical-overflow", "minor overflow")]
+            )
+        )
+        warnings = assess_html_layout(
+            {
+                "scrollWidth": 640,
+                "scrollHeight": 800,
+                "textLength": 20,
+                "backgroundColor": "rgb(255, 255, 255)",
+                "minFontPx": 30,
+            },
+            480,
+            800,
+        )
+        self.assertTrue(should_block_push(warnings))
+        self.assertTrue(
+            should_block_push([HtmlLayoutWarning("small-font", "font too small")])
         )
 
 

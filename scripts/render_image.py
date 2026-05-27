@@ -113,6 +113,7 @@ def assess_html_layout(metrics: dict[str, Any], width: int, height: int) -> list
     scroll_h = int(metrics.get("scrollHeight") or 0)
     text_len = int(metrics.get("textLength") or 0)
     bg = str(metrics.get("backgroundColor") or "").strip().lower()
+    min_font_px = float(metrics.get("minFontPx") or 0)
 
     if text_len == 0:
         warnings.append(HtmlLayoutWarning("empty-text", "页面没有可见文本，请确认卡片内容不是空白。"))
@@ -140,7 +141,24 @@ def assess_html_layout(metrics: dict[str, Any], width: int, height: int) -> list
             "页面背景为透明，建议显式设置适合墨水屏的纯色背景。",
         ))
 
+    if text_len > 0 and 0 < min_font_px < 24:
+        warnings.append(HtmlLayoutWarning(
+            "small-font",
+            f"检测到最小文字约 {min_font_px:.0f}px，三四寸墨水屏上可能偏小；建议正文不低于 30px。",
+        ))
+
     return warnings
+
+
+def should_block_push(warnings: list[HtmlLayoutWarning]) -> bool:
+    """Return True when layout warnings indicate output is unsafe for direct push."""
+    blocking_codes = {
+        "horizontal-overflow",
+        "heavy-vertical-overflow",
+        "small-font",
+        "small-effective-font",
+    }
+    return any(w.code in blocking_codes for w in warnings)
 
 
 def assess_rendered_png(png_bytes: bytes) -> list[HtmlLayoutWarning]:
@@ -533,7 +551,13 @@ def _pillow_uniform_scale(png_bytes: bytes, target_w: int, target_h: int) -> byt
     return buf.getvalue()
 
 
-def screenshot_html(html_path: Path, width: int, height: int, inject_fonts: bool) -> bytes:
+def screenshot_html(
+    html_path: Path,
+    width: int,
+    height: int,
+    inject_fonts: bool,
+    strict_layout: bool = False,
+) -> bytes:
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
@@ -573,17 +597,57 @@ def screenshot_html(html_path: Path, width: int, height: int, inject_fonts: bool
             const body = document.body;
             const doc = document.documentElement;
             const style = getComputedStyle(body);
+            const textFonts = [];
+            const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
+            let node = walker.nextNode();
+            while (node) {
+                if (node.nodeValue && node.nodeValue.trim()) {
+                    const parent = node.parentElement;
+                    if (parent) {
+                        const rect = parent.getBoundingClientRect();
+                        const nodeStyle = getComputedStyle(parent);
+                        if (
+                            rect.width > 0 && rect.height > 0 &&
+                            nodeStyle.visibility !== 'hidden' &&
+                            nodeStyle.display !== 'none'
+                        ) {
+                            const px = parseFloat(nodeStyle.fontSize);
+                            if (Number.isFinite(px)) textFonts.push(px);
+                        }
+                    }
+                }
+                node = walker.nextNode();
+            }
             return {
                 scrollWidth: Math.max(body.scrollWidth, doc.scrollWidth),
                 scrollHeight: Math.max(body.scrollHeight, doc.scrollHeight),
                 textLength: (body.innerText || '').trim().length,
                 backgroundColor: style.backgroundColor,
+                minFontPx: textFonts.length ? Math.min(...textFonts) : 0,
             };
         }""")
-        for warning in assess_html_layout(layout_metrics, width, height):
+        layout_warnings = assess_html_layout(layout_metrics, width, height)
+        for warning in layout_warnings:
             print(f"[WARN] {warning.message}")
 
         natural_h = int(layout_metrics.get("scrollHeight") or height)
+        min_font_px = float(layout_metrics.get("minFontPx") or 0)
+
+        if natural_h > height + 2:
+            scale = height / natural_h
+            if scale < 0.92:
+                effective_font = min_font_px * scale if min_font_px else 0
+                warning = HtmlLayoutWarning(
+                    "small-effective-font",
+                    f"内容会被缩放到 {scale:.0%}，最小有效字号约 {effective_font:.0f}px；小屏设备建议拆页。",
+                )
+                layout_warnings.append(warning)
+                print(f"[WARN] {warning.message}")
+
+        if strict_layout and should_block_push(layout_warnings):
+            browser.close()
+            print("[ERROR] 版式未通过小屏可读性检查：请拆页、增大字号或减少单页内容后再推送。")
+            sys.exit(1)
 
         if natural_h > height + 2:
             # 目标：找到 render_w 使视口 render_w×render_h 与 width×height 同比例，
@@ -648,6 +712,11 @@ def main():
                         help="额外输出 PNG 预览图（仅单张有效）")
     parser.add_argument("--no-fonts", action="store_true", help="跳过本地字体注入")
     parser.add_argument("--push", action="store_true", help="渲染完成后立即推送到设备")
+    parser.add_argument(
+        "--allow-shrink",
+        action="store_true",
+        help="即使版式需要明显缩小也允许 --push；默认推送会启用小屏可读性门禁",
+    )
 
     # 图像调整
     parser.add_argument("--brightness", type=int,   default=0,   metavar="N")
@@ -712,6 +781,7 @@ def main():
             width=args.width,
             height=args.height,
             inject_fonts=not args.no_fonts,
+            strict_layout=args.push and not args.allow_shrink,
         )
         print(f"[INFO] {label}截图完成，PNG {len(png_bytes) // 1024} KB")
         for warning in assess_rendered_png(png_bytes):
