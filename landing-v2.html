@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>阅星曈 Skill 安装配置</title>
-  <meta name="description" content="eink-push 最新安装配置页：环境预检、凭证校验、首次推送、书架书签查询和常见问题。">
+  <title>阅星曈 Skill 配置 - 第一次连上，以后就只管发过去</title>
+  <meta name="description" content="第一次把阅星曈 Skill 配好：检查环境、连上账号、试一次推送。配好以后，之后只要说一句“发到阅星曈”就够了。">
   <style>
     :root {
       color-scheme: light;
@@ -458,13 +458,13 @@
     <div class="shell topbar-inner">
       <a class="brand" href="landing.html">
         <strong>阅星曈 Skill</strong>
-        <span>安装配置</span>
+        <span>第一次配置</span>
       </a>
       <nav class="top-links">
-        <a href="#steps">步骤</a>
-        <a href="#checks">检查</a>
-        <a href="#commands">命令</a>
-        <a class="pill-link" href="landing.html">介绍页</a>
+        <a href="#steps">怎么开始</a>
+        <a href="#checks">出了问题看这里</a>
+        <a href="#commands">你可以这样说</a>
+        <a class="pill-link" href="landing.html">返回介绍页</a>
       </nav>
     </div>
   </header>
@@ -472,34 +472,34 @@
   <main class="shell">
     <section class="hero">
       <div class="hero-copy">
-        <span class="eyebrow">OpenClaw Skill Setup</span>
-        <h1>把阅星曈接到你的 AI 工作流。</h1>
-        <p class="lede">这页只解决一件事：让最新的 eink-push skill 稳稳跑起来。安装、环境、凭证、首次推送、书架书签查询，都按当前脚本的真实行为写。</p>
+        <span class="eyebrow">第一次使用，从这里开始</span>
+        <h1>第一次连上，以后就只管发过去。</h1>
+        <p class="lede">这页不是写给开发者的说明书，而是给第一次使用的人看的。跟着走完一遍，后面无论是发卡片、发电子书，还是整理书签，都会自然很多。</p>
         <div class="hero-actions">
-          <a class="btn" href="#steps">开始配置</a>
-          <a class="btn light" href="https://github.com/linchuanXu/eink-push">GitHub 仓库</a>
+          <a class="btn" href="#steps">现在开始</a>
+          <a class="btn light" href="landing.html">先看看介绍</a>
         </div>
       </div>
       <aside class="terminal" aria-label="常用命令">
         <div class="terminal-head">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-          <span style="margin-left:8px">eink-push quick start</span>
+          <span style="margin-left:8px">第一次使用时，你大概会用到这些</span>
         </div>
         <div class="terminal-body">
           <div class="cmd">
-            <div class="cmd-label"><span>安装提示词</span><button class="copy-mini" data-copy-target="cmdInstall">复制</button></div>
-            <code id="cmdInstall">安装技能 https://github.com/linchuanXu/eink-push，并引导我完成阅星曈账号配置</code>
+            <div class="cmd-label"><span>先安装</span><button class="copy-mini" data-copy-target="cmdInstall">复制</button></div>
+            <code id="cmdInstall">安装技能 https://github.com/linchuanXu/eink-push，并带我完成阅星曈配置</code>
           </div>
           <div class="cmd">
-            <div class="cmd-label"><span>环境预检</span><button class="copy-mini" data-copy-target="cmdEnv">复制</button></div>
+            <div class="cmd-label"><span>看看环境是否齐了</span><button class="copy-mini" data-copy-target="cmdEnv">复制</button></div>
             <code id="cmdEnv">python scripts/check_environment.py</code>
           </div>
           <div class="cmd">
-            <div class="cmd-label"><span>凭证检查</span><button class="copy-mini" data-copy-target="cmdCred">复制</button></div>
+            <div class="cmd-label"><span>确认账号能连上</span><button class="copy-mini" data-copy-target="cmdCred">复制</button></div>
             <code id="cmdCred">python scripts/push_to_device.py --check-credentials</code>
           </div>
           <div class="cmd">
-            <div class="cmd-label"><span>完整离线验证</span><button class="copy-mini" data-copy-target="cmdVerify">复制</button></div>
+            <div class="cmd-label"><span>想完整检查一遍</span><button class="copy-mini" data-copy-target="cmdVerify">复制</button></div>
             <code id="cmdVerify">python scripts/verify.py</code>
           </div>
         </div>
@@ -509,28 +509,28 @@
     <section id="steps" class="section">
       <div class="section-head">
         <div>
-          <p class="kicker">Setup Flow</p>
-          <h2>四步完成首次使用。</h2>
+          <p class="kicker">怎么开始</p>
+          <h2>第一次用，跟着这四步走就够了。</h2>
         </div>
-        <p>用户真正会卡住的地方通常不是“不会用”，而是依赖、凭证和设备绑定。这里按当前 skill 的推荐路径排好顺序。</p>
+        <p>真正容易卡住的，通常不是“不会说”，而是设备、账号和环境还没连起来。所以这页只做一件事：帮你顺顺地把第一步走完。</p>
       </div>
 
       <div class="steps">
         <article class="step">
           <div>
-            <h3>在 OpenClaw 中安装或更新 skill</h3>
-            <p>把提示词发给小龙虾。已经安装过也可以用同一句更新到最新版本。</p>
+            <h3>先把 skill 装好</h3>
+            <p>把这句话发给小龙虾。已经装过的话，用同一句也能更新到最新版。</p>
             <div class="command-line">
-              <code id="installLine">安装技能 https://github.com/linchuanXu/eink-push，并引导我完成阅星曈账号配置</code>
-              <button data-copy-target="installLine">复制</button>
+              <code id="installLine">安装技能 https://github.com/linchuanXu/eink-push，并带我完成阅星曈配置</code>
+              <button data-copy-target="installLine">复制这句话</button>
             </div>
           </div>
         </article>
 
         <article class="step">
           <div>
-            <h3>检查本地运行环境</h3>
-            <p>首次运行前先跑预检。出现 <span class="inline-code">MISSING</span> 或 <span class="inline-code">FAIL</span> 时，按脚本输出的 <span class="inline-code">fix:</span> 命令处理。</p>
+            <h3>先看看本地环境齐不齐</h3>
+            <p>第一次运行前先检查一遍。如果缺了东西，脚本会直接告诉你该补什么。</p>
             <div class="command-line">
               <code id="envLine">python scripts/check_environment.py</code>
               <button data-copy-target="envLine">复制</button>
@@ -540,8 +540,8 @@
 
         <article class="step">
           <div>
-            <h3>准备阅星曈账号凭证</h3>
-            <p>推荐用环境变量；未设置时 skill 会读取本地 <span class="inline-code">.credentials.json</span>。凭证只发往 <span class="inline-code">api-prod.xteink.cn</span>。</p>
+            <h3>把阅星曈账号连上</h3>
+            <p>推荐用环境变量；如果没配，也可以读取本地 <span class="inline-code">.credentials.json</span>。账号只会发往官方接口 <span class="inline-code">api-prod.xteink.cn</span>。</p>
             <div class="command-line">
               <code id="credLine">python scripts/push_to_device.py --check-credentials --auth</code>
               <button data-copy-target="credLine">复制</button>
@@ -551,10 +551,10 @@
 
         <article class="step">
           <div>
-            <h3>完成一次真实动作</h3>
-            <p>先从简单句开始：推送一段文字、查询书架，或整理一本书的书签。设备需要先在阅星曈 App 中绑定到同一账号。</p>
+            <h3>试一次真的发过去</h3>
+            <p>先从一句最简单的话开始。比如发一段文字，或者看看最近读到哪里。设备需要先在阅星曈 App 中绑定到同一账号。</p>
             <div class="command-line">
-              <code id="firstAsk">把这段内容做成墨水屏卡片，推到阅星曈。</code>
+              <code id="firstAsk">把这段内容发到阅星曈，做成卡片。</code>
               <button data-copy-target="firstAsk">复制</button>
             </div>
           </div>
@@ -565,42 +565,42 @@
     <section id="checks" class="section">
       <div class="section-head">
         <div>
-          <p class="kicker">Checks</p>
-          <h2>看输出就知道下一步。</h2>
+          <p class="kicker">如果卡在这里</p>
+          <h2>看一眼输出，通常就知道下一步该做什么。</h2>
         </div>
-        <p>最新脚本把常见失败变成了可处理的状态。不要猜，按输出做。</p>
+        <p>不用猜。现在常见问题基本都会变成清楚的状态提示，按提示处理就行。</p>
       </div>
 
       <div class="matrix">
         <div class="row">
-          <div class="cell">看到的输出</div>
-          <div class="cell">含义</div>
-          <div class="cell">下一步</div>
+          <div class="cell">看到什么</div>
+          <div class="cell">这是什么意思</div>
+          <div class="cell">接下来做什么</div>
         </div>
         <div class="row">
           <div class="cell" data-label="看到的输出"><span class="inline-code">OK</span></div>
-          <div class="cell" data-label="含义">凭证结构或环境检查通过。</div>
-          <div class="cell" data-label="下一步">继续推送或查询阅读数据。</div>
+          <div class="cell" data-label="这是什么意思">环境或凭证检查已经通过。</div>
+          <div class="cell" data-label="接下来做什么">可以继续发内容，或者查看书架和书签。</div>
         </div>
         <div class="row">
           <div class="cell" data-label="看到的输出"><span class="inline-code">AUTH_OK</span></div>
-          <div class="cell" data-label="含义">账号密码已通过真实登录校验。</div>
-          <div class="cell" data-label="下一步">可以执行真实推送。</div>
+          <div class="cell" data-label="这是什么意思">账号密码已经能真实登录。</div>
+          <div class="cell" data-label="接下来做什么">现在就可以开始真实推送。</div>
         </div>
         <div class="row">
           <div class="cell" data-label="看到的输出"><span class="inline-code">MISSING</span></div>
-          <div class="cell" data-label="含义">没有找到环境变量或本地凭证文件。</div>
-          <div class="cell" data-label="下一步">提供手机号和密码，或设置环境变量。</div>
+          <div class="cell" data-label="这是什么意思">还没有找到可用的账号配置。</div>
+          <div class="cell" data-label="接下来做什么">补上手机号和密码，或者设置环境变量。</div>
         </div>
         <div class="row">
           <div class="cell" data-label="看到的输出"><span class="inline-code">INVALID</span></div>
-          <div class="cell" data-label="含义">环境变量只配置了一半，或凭证文件缺字段/损坏。</div>
-          <div class="cell" data-label="下一步">同时补齐用户名和密码，再重跑检查。</div>
+          <div class="cell" data-label="这是什么意思">账号信息不完整，或者本地凭证文件有问题。</div>
+          <div class="cell" data-label="接下来做什么">把用户名和密码都补齐，然后再检查一次。</div>
         </div>
         <div class="row">
           <div class="cell" data-label="看到的输出"><span class="inline-code">AUTH_FAILED</span></div>
-          <div class="cell" data-label="含义">真实登录失败，可能是密码错误或网络问题。</div>
-          <div class="cell" data-label="下一步">401 时重置凭证；超时则检查网络后重试。</div>
+          <div class="cell" data-label="这是什么意思">登录没成功，常见原因是密码不对，或者网络暂时不通。</div>
+          <div class="cell" data-label="接下来做什么">401 时重新确认账号密码；超时就检查网络后再试。</div>
         </div>
       </div>
     </section>
@@ -608,42 +608,42 @@
     <section id="commands" class="section">
       <div class="section-head">
         <div>
-          <p class="kicker">What To Say</p>
-          <h2>这些说法适配当前版本。</h2>
+          <p class="kicker">你可以这样说</p>
+          <h2>你不需要学命令，像平时说话就行。</h2>
         </div>
-        <p>刻意避免过度承诺。PDF OCR、日历同步、漫画裁边等不是当前 skill 的核心脚本能力，这页不再把它们写成已上线功能。</p>
+        <p>这页是给用户看的，所以示例也尽量像真正在聊天里会说的话，而不是像在写技术文档。</p>
       </div>
 
       <div class="grid-3">
         <article class="card">
           <span class="badge">卡片</span>
-          <h3>短内容推送</h3>
-          <p>“把这段发到阅星曈”“做成墨水屏卡片”“生成阅读看板卡片”。适合摘要、清单、仪表盘和精选摘录。</p>
+          <h3>短内容发过去</h3>
+          <p>“把这段发到阅星曈”“做成卡片”。适合摘要、清单、精选摘录和一眼能看完的内容。</p>
         </article>
         <article class="card">
           <span class="badge blue">电子书</span>
-          <h3>长文连续阅读</h3>
-          <p>“整理成电子书发过去”“把书签整理成阅读笔记”。默认走 Markdown 翻页电子书，适合长内容。</p>
+          <h3>长内容慢慢读</h3>
+          <p>“整理成电子书发过去”“把书签整理成阅读笔记”。适合需要连续读下去的长内容。</p>
         </article>
         <article class="card">
           <span class="badge amber">EPUB</span>
-          <h3>明确 EPUB 才触发</h3>
-          <p>“生成 EPUB 发到设备”“推 EPUB，要带封面”。适合图文混排和设备电子书阅读器。</p>
+          <h3>想要 EPUB 就直接说</h3>
+          <p>“生成 EPUB 发到设备”“带封面”。明确说出来，它就会按 EPUB 准备。</p>
         </article>
         <article class="card">
           <span class="badge">书架</span>
-          <h3>阅读进度</h3>
-          <p>“看一下我的书架”“我最近读了哪些书”。默认 compact 输出，展示书名、进度、时长和最近活跃。</p>
+          <h3>看看最近读到哪了</h3>
+          <p>“看一下我的书架”“我最近读了哪些书”。会优先把常看的信息整理出来。</p>
         </article>
         <article class="card">
           <span class="badge blue">书签</span>
-          <h3>摘录整理</h3>
-          <p>“整理《书名》的书签”“挑几条精彩摘录做成卡片”。未指定书名时先查书架再选择。</p>
+          <h3>把书签整理一下</h3>
+          <p>“整理《书名》的书签”“挑几条喜欢的摘录做成卡片”。适合回顾和复习。</p>
         </article>
         <article class="card">
           <span class="badge amber">调研</span>
-          <h3>搜索后推送</h3>
-          <p>“查一下最新资料，整理成卡片/电子书”。阅星曈推送场景中可联网搜索，并保留引用来源。</p>
+          <h3>查完再发过去</h3>
+          <p>“查一下最新资料，整理成卡片或电子书”。调研结果会带上来源，再整理后发送。</p>
         </article>
       </div>
     </section>
@@ -651,36 +651,36 @@
     <section class="section">
       <div class="section-head">
         <div>
-          <p class="kicker">Runtime Notes</p>
-          <h2>依赖和同步也有兜底。</h2>
+          <p class="kicker">补充说明</p>
+          <h2>如果你想更稳一点，这几项也值得知道。</h2>
         </div>
-        <p>开发仓库和实际安装副本可能不一致。最新版本的安装审计已经会比较 runtime 文件，而不只是比较 frontmatter。</p>
+        <p>平时不用记住这些，但遇到更新、迁移或排查问题时，会很有用。</p>
       </div>
       <div class="grid-3">
         <article class="card">
           <span class="badge">环境</span>
-          <h3>Python 与 Node</h3>
-          <p>Python 需要 3.10+。Markdown 翻页电子书路径需要 Node.js 18+ 和 <span class="inline-code">npm install marknative</span>。</p>
+          <h3>环境要求</h3>
+          <p>Python 需要 3.10+。如果要生成 Markdown 翻页电子书，还需要 Node.js 18+ 和 <span class="inline-code">npm install marknative</span>。</p>
         </article>
         <article class="card">
           <span class="badge blue">验证</span>
-          <h3>离线 smoke</h3>
-          <p><span class="inline-code">python scripts/smoke_test.py</span> 会验证卡片、Markdown 电子书和 EPUB 渲染，不会推送设备。</p>
+          <h3>先离线试一遍</h3>
+          <p><span class="inline-code">python scripts/smoke_test.py</span> 会先检查卡片、电子书和 EPUB 渲染，不会真的发到设备。</p>
         </article>
         <article class="card">
           <span class="badge amber">同步</span>
-          <h3>安装漂移审计</h3>
-          <p><span class="inline-code">python scripts/check_installation.py</span> 会提示安装副本是否和源码 runtime 文件不一致。</p>
+          <h3>确认装的是最新版本</h3>
+          <p><span class="inline-code">python scripts/check_installation.py</span> 会提示你当前安装的版本和源码有没有不一致。</p>
         </article>
       </div>
-      <p class="notice" style="margin-top:18px">真实推送前，确保设备已经在阅星曈 App 中绑定到同一账号。未绑定设备时，skill 会提示先绑定设备再重试。</p>
+      <p class="notice" style="margin-top:18px">如果发不过去，先确认设备已经在阅星曈 App 中绑定到同一个账号。大多数“怎么没到设备上”的问题，都是卡在这里。</p>
     </section>
   </main>
 
   <footer class="footer">
     <div class="shell footer-inner">
-      <span>阅星曈 Skill 安装配置</span>
-      <span>凭证只用于 api-prod.xteink.cn · 不提交到仓库</span>
+      <span>阅星曈 Skill 配置页</span>
+      <span>第一次连上，以后就只管发过去</span>
     </div>
   </footer>
 

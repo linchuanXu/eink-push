@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>阅星曈 Skill - 把 AI 内容推到墨水屏</title>
-  <meta name="description" content="eink-push 是面向阅星曈墨水屏设备的 OpenClaw Skill，可推送卡片、Markdown 电子书、EPUB，并查询书架、阅读进度和书签摘录。">
+  <title>阅星曈 Skill - 把值得读的内容留在墨水屏上</title>
+  <meta name="description" content="把 AI 整理好的内容送到阅星曈：短的做成卡片，长的变成电子书，书签和阅读进度也能重新整理成可读内容。">
   <style>
     :root {
       color-scheme: light;
@@ -485,13 +485,13 @@
     <div class="nav-inner">
       <a class="brand" href="#">
         <strong>阅星曈 Skill</strong>
-        <span>eink-push for OpenClaw</span>
+        <span>把内容送到墨水屏</span>
       </a>
       <div class="nav-links">
-        <a href="#workflow">能力</a>
-        <a href="#examples">话术</a>
-        <a href="#security">安全</a>
-        <a class="nav-cta" href="landing-v2.html">安装配置</a>
+        <a href="#workflow">怎么用</a>
+        <a href="#examples">你可以这样说</a>
+        <a href="#security">开始使用</a>
+        <a class="nav-cta" href="landing-v2.html">去配置</a>
       </div>
     </div>
   </nav>
@@ -506,35 +506,35 @@
         <img src="references/framework-samples/05-newspaper.preview.png" alt="">
       </div>
       <div class="hero-content">
-        <span class="eyebrow">推送、阅读、书签、调研，一条 skill 串起来</span>
-        <h1>把 AI 做好的内容，送到你的墨水屏。</h1>
-        <p class="hero-lede">eink-push 面向阅星曈/Yue Xingtong 设备。它能把短内容做成卡片，把长内容做成 Markdown 翻页电子书；当你明确需要 EPUB 时，也能生成带封面的 EPUB。它还能查询书架、阅读进度和书签摘录，把阅读数据重新整理成可读内容。</p>
+        <span class="eyebrow">写完、整理好、发过去，接下来就适合慢慢读</span>
+        <h1>把值得读的内容，留在你的墨水屏上。</h1>
+        <p class="hero-lede">不管是一段摘要、一篇长文，还是一本书里的书签摘录，eink-push 都能替你整理好，再发到阅星曈。短内容适合做成卡片，长内容适合安静地翻页阅读；当你明确需要 EPUB 时，它也会准备好一份带封面的电子书。</p>
         <div class="install-box">
-          <code id="installText">安装技能 https://github.com/linchuanXu/eink-push，并引导我完成阅星曈账号配置</code>
-          <button class="btn btn-primary" type="button" data-copy-target="installText">复制安装提示</button>
+          <code id="installText">安装技能 https://github.com/linchuanXu/eink-push，并带我完成阅星曈配置</code>
+          <button class="btn btn-primary" type="button" data-copy-target="installText">复制这句话</button>
         </div>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="landing-v2.html">查看安装配置</a>
-          <a class="btn" style="border-color:rgba(255,255,255,.36);color:#fff;background:transparent" href="#workflow">看能力边界</a>
+          <a class="btn btn-primary" href="landing-v2.html">开始配置</a>
+          <a class="btn" style="border-color:rgba(255,255,255,.36);color:#fff;background:transparent" href="#workflow">看看能做什么</a>
         </div>
-        <p class="hero-note">凭证优先读取环境变量；本地文件只作为 fallback。请求只发往官方域名 api-prod.xteink.cn。</p>
+        <p class="hero-note">第一次配好后，之后只要说一句“发到阅星曈”就够了。</p>
       </div>
     </section>
 
     <section id="workflow" class="section">
       <div class="section-head">
         <div>
-          <p class="kicker">Current Skill</p>
-          <h2>最新能力，按真实流程拆开。</h2>
+          <p class="kicker">能做什么</p>
+          <h2>内容到了这里，会变成更适合阅读的样子。</h2>
         </div>
-        <p>这版页面不再混入日历、漫画、PDF OCR 等未由当前 skill 直接承诺的能力。核心只讲已经在脚本和 SKILL.md 中落地的工作流。</p>
+        <p>这不是一个泛泛的“发送工具”。它更像一个安静的整理环节，帮你把要读的内容放到更适合阅读的地方。</p>
       </div>
 
       <div class="workflow">
         <article class="tile">
           <div class="tile-mark">A</div>
-          <h3>推送卡片</h3>
-          <p>短内容、摘要、仪表盘、书摘卡片走 HTML 渲染，再推送为单张或多张墨水屏图片。</p>
+          <h3>短内容变卡片</h3>
+          <p>一句摘要、一页清单、一组摘录，都会被整理成适合在墨水屏上一眼看完的卡片。</p>
           <div class="tag-row">
             <span class="tag">≤2000 字</span>
             <span class="tag">render_image.py</span>
@@ -542,8 +542,8 @@
         </article>
         <article class="tile">
           <div class="tile-mark">B</div>
-          <h3>翻页电子书</h3>
-          <p>长文、报告、阅读笔记优先写 Markdown，渲染为适合设备翻页阅读的电子书文件。</p>
+          <h3>长内容适合翻页读</h3>
+          <p>文章、报告、阅读笔记会被整理成适合连续阅读的电子书，不用在聊天记录里来回翻。</p>
           <div class="tag-row">
             <span class="tag">&gt;2000 字</span>
             <span class="tag">render_book.py</span>
@@ -551,8 +551,8 @@
         </article>
         <article class="tile">
           <div class="tile-mark">C</div>
-          <h3>EPUB 电子书</h3>
-          <p>只有当用户明确说 EPUB 时启用；适合图文混排、封面、设备电子书阅读器场景。</p>
+          <h3>想要 EPUB 也可以</h3>
+          <p>当你明确说要 EPUB，它会准备一份更完整的电子书版本，适合收藏、导入和慢慢读。</p>
           <div class="tag-row">
             <span class="tag">明确触发</span>
             <span class="tag">cover-svg</span>
@@ -560,8 +560,8 @@
         </article>
         <article class="tile">
           <div class="tile-mark">D</div>
-          <h3>阅读数据回流</h3>
-          <p>查书架、进度、书签和摘录，再生成书摘卡片、阅读笔记电子书或阅读看板。</p>
+          <h3>书签也能重新整理</h3>
+          <p>书架、进度、书签和摘录，不只是拿来查看，也可以继续变成卡片、笔记和阅读小结。</p>
           <div class="tag-row">
             <span class="tag">fetch_reading.py</span>
             <span class="tag">compact 输出</span>
@@ -573,23 +573,23 @@
     <section class="section section-tight">
       <div class="split">
         <div class="panel">
-          <p class="kicker">Decision Route</p>
-          <h2>一句话之后，skill 会先判断形式。</h2>
+          <p class="kicker">怎么发送</p>
+          <h2>你只管说想读什么，它会帮你选更合适的形式。</h2>
           <ul class="list">
-            <li><span class="index">1</span><span><strong>发到阅星曈</strong>：按字数走卡片或 Markdown 翻页电子书。</span></li>
-            <li><span class="index">2</span><span><strong>明确说卡片</strong>：生成 HTML 卡片并推送。</span></li>
-            <li><span class="index">3</span><span><strong>明确说电子书</strong>：整理 Markdown 并推送。</span></li>
-            <li><span class="index">4</span><span><strong>明确说 EPUB</strong>：生成 EPUB，必要时带封面。</span></li>
+            <li><span class="index">1</span><span><strong>直接说发到阅星曈</strong>：它会根据内容长短，自动决定做成卡片还是电子书。</span></li>
+            <li><span class="index">2</span><span><strong>如果你更想一眼看完</strong>：可以直接说“做成卡片”。</span></li>
+            <li><span class="index">3</span><span><strong>如果你想慢慢读</strong>：可以直接说“整理成电子书”。</span></li>
+            <li><span class="index">4</span><span><strong>如果你要 EPUB</strong>：只要明确说出来，它就会按 EPUB 准备。</span></li>
           </ul>
         </div>
         <div class="panel panel-dark">
-          <p class="kicker" style="color:#9cd5ad">Quality Pass</p>
-          <h2>最新脚本把粗糙处收紧了。</h2>
+          <p class="kicker" style="color:#e5b7a2">为什么用起来更顺</p>
+          <h2>用起来会更顺，是因为细节已经提前收好了。</h2>
           <ul class="list">
-            <li><span class="index">OK</span><span><strong>参数早校验</strong>：尺寸、Gamma、图片质量、分页参数会给出清楚错误。</span></li>
-            <li><span class="index">OK</span><span><strong>安装审计更完整</strong>：会检查 runtime 文件是否和源码漂移。</span></li>
-            <li><span class="index">OK</span><span><strong>EPUB 更顺</strong>：保留前言正文，避免重复章节标题。</span></li>
-            <li><span class="index">OK</span><span><strong>测试边界明确</strong>：pytest 只收集本仓库测试。</span></li>
+            <li><span class="index">OK</span><span><strong>出错时更容易看懂</strong>：尺寸、分页、图片参数有问题，会直接告诉你该怎么改。</span></li>
+            <li><span class="index">OK</span><span><strong>安装更新更踏实</strong>：会检查你本地实际在跑的版本是不是最新。</span></li>
+            <li><span class="index">OK</span><span><strong>EPUB 阅读体验更顺</strong>：前言正文能保留下来，章节标题也不会重复。</span></li>
+            <li><span class="index">OK</span><span><strong>日常使用更稳定</strong>：关键路径都补了测试，首次配置和后续更新都更省心。</span></li>
           </ul>
         </div>
       </div>
@@ -598,36 +598,36 @@
     <section id="examples" class="section">
       <div class="section-head">
         <div>
-          <p class="kicker">Examples</p>
-          <h2>这些话术会落到明确流程。</h2>
+          <p class="kicker">你可以这样说</p>
+          <h2>像平时说话一样说，就够了。</h2>
         </div>
-        <p>页面上的示例只覆盖当前 skill 明确支持的动作：推送、书架、书签、阅读产物和联网调研。</p>
+        <p>这两页是给用户看的，所以示例也尽量像真实会说出口的话，而不是像在调用命令。</p>
       </div>
 
       <div class="command-grid">
         <article class="command">
-          <div class="bubble">把这段内容做成墨水屏卡片，推到阅星曈。</div>
-          <p>适合短摘要、结论、清单、看板。多页会打包为翻页图片集。</p>
+          <div class="bubble">把这段内容发到阅星曈，做成卡片。</div>
+          <p>适合摘要、结论、清单和一眼能看完的小内容。</p>
         </article>
         <article class="command">
-          <div class="bubble">整理《百年孤独》的书签，做成阅读笔记电子书。</div>
-          <p>先拉取书签，再按章节整理为 Markdown 翻页电子书。</p>
+          <div class="bubble">把《百年孤独》的书签整理一下，发成一本阅读笔记。</div>
+          <p>书签会被重新排好，变成更适合从头读到尾的一份笔记。</p>
         </article>
         <article class="command">
-          <div class="bubble">生成 EPUB 发到设备，要带封面。</div>
-          <p>只有明确提到 EPUB 时才走 EPUB 生成路径。</p>
+          <div class="bubble">把这篇文章做成 EPUB 发过去，带封面。</div>
+          <p>你明确说要 EPUB 时，它就会准备这一版。</p>
         </article>
         <article class="command">
-          <div class="bubble">看一下我的书架和最近阅读进度。</div>
-          <p>默认使用 compact 输出，减少上下文占用，只展示常用字段。</p>
+          <div class="bubble">看看我最近读到哪了。</div>
+          <p>会优先把你真正关心的书名、进度和最近阅读状态整理出来。</p>
         </article>
         <article class="command">
-          <div class="bubble">把最近书签挑 6 条精彩摘录做成卡片。</div>
-          <p>适合复习、回顾、摘录分享和设备端轻阅读。</p>
+          <div class="bubble">从最近书签里挑几条最喜欢的，做成卡片。</div>
+          <p>适合回顾、复习，也适合留一组值得反复看的摘录。</p>
         </article>
         <article class="command">
-          <div class="bubble">查一下这个主题的最新资料，整理后推到设备。</div>
-          <p>阅星曈推送场景中可调用联网搜索，并保留引用来源。</p>
+          <div class="bubble">帮我查一下这个主题，整理好以后发到阅星曈。</div>
+          <p>调研结果会保留来源，再整理成适合阅读的内容发过去。</p>
         </article>
       </div>
     </section>
@@ -636,23 +636,23 @@
       <div class="section section-tight">
         <div class="section-head">
           <div>
-            <p class="kicker">Setup & Safety</p>
-            <h2>安装、凭证和环境都讲清楚。</h2>
-          </div>
-          <p>真正影响体验的不是功能列表，而是首次使用时能不能顺利跑起来。最新 skill 内置环境预检、凭证结构检查、安装漂移审计和离线 smoke test。</p>
+          <p class="kicker">开始使用</p>
+          <h2>第一次配好，后面就会轻很多。</h2>
+        </div>
+          <p>第一次使用最重要的不是记住命令，而是顺利连上设备。环境预检、凭证检查和安装核对，都是为了把这一步变简单。</p>
         </div>
         <div class="security-grid">
           <div>
-            <h3>环境预检</h3>
-            <p>运行 `python scripts/check_environment.py`，缺依赖时直接给出 fix 命令。</p>
+            <h3>先看环境好不好</h3>
+            <p>运行 `python scripts/check_environment.py`，缺什么会直接告诉你怎么补。</p>
           </div>
           <div>
-            <h3>凭证来源</h3>
-            <p>优先 `XTEINK_USERNAME` / `XTEINK_PASSWORD`，再兼容 `YUEXINGTONG_*`，最后 fallback 到 `.credentials.json`。</p>
+            <h3>账号怎么读</h3>
+            <p>优先读环境变量，也兼容本地凭证文件。已经配过一次，后面通常不用再管。</p>
           </div>
           <div>
-            <h3>官方域名</h3>
-            <p>凭证只用于阅星曈官方 API：`api-prod.xteink.cn`。不会写入仓库，也不会传给其他域名。</p>
+            <h3>只连官方接口</h3>
+            <p>凭证只用于阅星曈官方 API：`api-prod.xteink.cn`，不会被写进仓库。</p>
           </div>
         </div>
       </div>
@@ -660,12 +660,12 @@
 
     <section class="cta">
       <div class="section-tight" style="padding-top:0;padding-bottom:0">
-        <p class="kicker">Ready</p>
-        <h2>让 AI 的产出，有一个安静的落点。</h2>
-        <p>如果你已经安装了 skill，直接说“发到阅星曈”就行。首次使用从安装配置页开始，会更稳。</p>
+        <p class="kicker">现在开始</p>
+        <h2>把你想留下来的内容，发到更适合阅读的地方。</h2>
+        <p>配好以后，很多事都会变得很简单。写完、整理好、发过去，然后在墨水屏上慢慢读。</p>
         <div class="hero-actions" style="justify-content:center">
-          <a class="btn btn-secondary" href="landing-v2.html">打开安装配置页</a>
-          <a class="btn btn-outline" href="https://github.com/linchuanXu/eink-push">查看 GitHub</a>
+          <a class="btn btn-secondary" href="landing-v2.html">去完成配置</a>
+          <a class="btn btn-outline" href="https://github.com/linchuanXu/eink-push">查看项目</a>
         </div>
       </div>
     </section>
@@ -673,8 +673,8 @@
 
   <footer>
     <div class="footer-inner">
-      <span>阅星曈 Skill · eink-push</span>
-      <span>Python >= 3.10 · Node.js >= 18 · Windows/macOS/Linux</span>
+      <span>阅星曈 Skill</span>
+      <span>把内容送到墨水屏，再慢慢读</span>
     </div>
   </footer>
 
