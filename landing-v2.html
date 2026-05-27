@@ -80,10 +80,10 @@
       border: 1px solid var(--line-strong);
       border-radius: 8px;
       padding: 9px 12px;
-      color: #fff7ef;
-      background: var(--accent-deep);
+      color: var(--accent-deep);
+      background: rgba(255, 251, 245, 0.86);
       font-weight: 800;
-      box-shadow: 0 10px 28px rgba(138, 69, 47, 0.18);
+      box-shadow: 0 10px 28px rgba(138, 69, 47, 0.08);
     }
 
     .hero {
@@ -143,7 +143,7 @@
       padding: 0 15px;
       font-weight: 900;
       cursor: pointer;
-      background: var(--ink);
+      background: var(--accent-deep);
       color: #fffaf3;
       white-space: nowrap;
     }
@@ -158,24 +158,24 @@
     }
 
     .terminal {
-      border: 1px solid rgba(255, 241, 224, 0.08);
+      border: 1px solid var(--line);
       border-radius: 8px;
       background:
-        radial-gradient(circle at top right, rgba(182, 95, 70, 0.18), transparent 36%),
-        linear-gradient(160deg, #1b1512 0%, #231916 100%);
-      color: #f4ece3;
+        radial-gradient(circle at top right, rgba(182, 95, 70, 0.1), transparent 36%),
+        linear-gradient(160deg, #fffaf3 0%, #f4e8da 100%);
+      color: var(--ink);
       min-height: 390px;
       overflow: hidden;
-      box-shadow: 0 30px 80px rgba(38, 24, 18, 0.2);
+      box-shadow: var(--shadow);
     }
     .terminal-head {
       display: flex;
       align-items: center;
       gap: 8px;
       min-height: 42px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid var(--line);
       padding: 0 14px;
-      color: #d4c3b5;
+      color: var(--muted);
       font-size: 12px;
     }
     .dot {
@@ -192,30 +192,30 @@
       gap: 14px;
     }
     .cmd {
-      border: 1px solid rgba(255, 245, 235, 0.12);
+      border: 1px solid rgba(84, 63, 47, 0.12);
       border-radius: 8px;
-      background: rgba(255, 250, 243, 0.05);
+      background: rgba(255, 251, 245, 0.78);
       padding: 14px;
     }
     .cmd-label {
       display: flex;
       justify-content: space-between;
       gap: 12px;
-      color: #d2c2b6;
+      color: var(--muted);
       font-size: 12px;
       margin-bottom: 8px;
     }
     .cmd code {
       display: block;
-      color: #fff7ef;
+      color: var(--ink);
       font-size: 13px;
       line-height: 1.55;
       overflow-wrap: anywhere;
     }
     .copy-mini {
-      border: 1px solid rgba(255, 245, 235, 0.24);
-      background: transparent;
-      color: #fff5ea;
+      border: 1px solid var(--line-strong);
+      background: rgba(255, 251, 245, 0.9);
+      color: var(--accent-deep);
       border-radius: 8px;
       min-width: 58px;
       height: 28px;
