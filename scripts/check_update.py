@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import re
 import sys
@@ -16,7 +17,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 SKILL_FILE = ROOT / "SKILL.md"
 LATEST_SKILL_URL = (
-    "https://raw.githubusercontent.com/linchuanXu/eink-push/master/SKILL.md"
+    "https://api.github.com/repos/linchuanXu/eink-push/contents/SKILL.md?ref=master"
 )
 
 OK = "OK"
@@ -90,7 +91,15 @@ def fetch_latest_version(url: str = LATEST_SKILL_URL, timeout: int = 8) -> str |
     )
     with urllib.request.urlopen(req, timeout=timeout) as response:
         data = response.read(256 * 1024)
-    return extract_skill_version(data.decode("utf-8", errors="replace"))
+    text = data.decode("utf-8", errors="replace")
+
+    if response.headers.get("Content-Type", "").startswith("application/json"):
+        payload = json.loads(text)
+        encoded = str(payload.get("content") or "")
+        if payload.get("encoding") == "base64" and encoded:
+            text = base64.b64decode(encoded).decode("utf-8", errors="replace")
+
+    return extract_skill_version(text)
 
 
 def default_update_commands() -> list[str]:

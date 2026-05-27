@@ -2,6 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from email.message import Message
 
 from scripts.check_update import (
     FAIL,
@@ -11,6 +12,7 @@ from scripts.check_update import (
     check_update,
     compare_versions,
     extract_skill_version,
+    fetch_latest_version,
     parse_version_tuple,
 )
 
@@ -72,6 +74,27 @@ class UpdateCheckTests(unittest.TestCase):
         result = check_update(skill_file=local)
 
         self.assertEqual(result.status, FAIL)
+
+
+class FetchLatestVersionTests(unittest.TestCase):
+    def test_decodes_github_contents_api_response(self):
+        class FakeResponse:
+            headers = Message()
+
+            def __enter__(self):
+                self.headers["Content-Type"] = "application/json; charset=utf-8"
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self, _size):
+                return (
+                    b'{"encoding":"base64","content":"LS0tCnZlcnNpb246IDEuMi4zCi0tLQo="}'
+                )
+
+        with patch("urllib.request.urlopen", return_value=FakeResponse()):
+            self.assertEqual(fetch_latest_version("https://example.test"), "1.2.3")
 
 
 if __name__ == "__main__":
