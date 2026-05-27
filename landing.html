@@ -8,19 +8,20 @@
   <style>
     :root {
       color-scheme: light;
-      --paper: #f7f3eb;
-      --paper-deep: #efe5d8;
-      --surface: rgba(255, 251, 245, 0.92);
-      --surface-strong: #fffaf3;
-      --ink: #171412;
-      --muted: #655c55;
-      --line: rgba(84, 63, 47, 0.14);
-      --line-strong: rgba(84, 63, 47, 0.28);
-      --accent: #b65f46;
-      --accent-deep: #8a452f;
-      --sage: #436157;
-      --gold: #936f39;
-      --shadow: 0 24px 70px rgba(43, 30, 21, 0.1);
+      --paper: #faf9f5;
+      --paper-deep: #f5f0e8;
+      --surface: #faf9f5;
+      --surface-strong: #efe9de;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --muted: #6c6a64;
+      --line: #e6dfd8;
+      --line-strong: #d8cec1;
+      --accent: #cc785c;
+      --accent-deep: #a9583e;
+      --sage: #5db8a6;
+      --gold: #e8a55a;
+      --shadow: 0 1px 3px rgba(20, 20, 19, 0.08);
     }
 
     * { box-sizing: border-box; }
@@ -28,9 +29,9 @@
     body {
       margin: 0;
       background:
-        radial-gradient(circle at top left, rgba(182, 95, 70, 0.08), transparent 26%),
-        radial-gradient(circle at top right, rgba(67, 97, 87, 0.08), transparent 22%),
-        linear-gradient(180deg, #fbf8f2 0%, var(--paper) 44%, #f4ede3 100%);
+        radial-gradient(circle at top left, rgba(204, 120, 92, 0.08), transparent 26%),
+        radial-gradient(circle at top right, rgba(93, 184, 166, 0.06), transparent 22%),
+        linear-gradient(180deg, var(--paper) 0%, #f7f2ea 52%, var(--paper-deep) 100%);
       color: var(--ink);
       font-family: "Avenir Next", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -44,7 +45,7 @@
       top: 0;
       z-index: 20;
       border-bottom: 1px solid rgba(84, 63, 47, 0.08);
-      background: rgba(251, 248, 242, 0.84);
+      background: rgba(250, 249, 245, 0.9);
       backdrop-filter: blur(16px);
     }
     .nav-inner {
@@ -64,8 +65,8 @@
     }
     .brand strong {
       font-size: 18px;
-      font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
-      font-weight: 700;
+      font-family: "Cormorant Garamond", Georgia, "Times New Roman", "Noto Serif SC", serif;
+      font-weight: 500;
       letter-spacing: 0.01em;
     }
     .brand span { color: var(--muted); font-size: 12px; white-space: nowrap; }
@@ -78,12 +79,12 @@
     }
     .nav-links a:hover { color: var(--ink); }
     .nav-cta {
-      color: #fff7f0;
-      background: var(--accent-deep);
+      color: #ffffff;
+      background: var(--accent);
       border-radius: 8px;
       padding: 10px 14px;
       font-weight: 700;
-      box-shadow: 0 10px 30px rgba(138, 69, 47, 0.18);
+      box-shadow: var(--shadow);
     }
 
     .hero {
@@ -94,9 +95,9 @@
       align-items: center;
       border-bottom: 1px solid var(--line);
       background:
-        radial-gradient(circle at 18% 18%, rgba(182, 95, 70, 0.14), transparent 30%),
-        radial-gradient(circle at 78% 0%, rgba(147, 111, 57, 0.13), transparent 26%),
-        linear-gradient(135deg, #fff9f1 0%, #f7efe4 56%, #efe2d2 100%);
+        radial-gradient(circle at 18% 18%, rgba(204, 120, 92, 0.12), transparent 30%),
+        radial-gradient(circle at 78% 0%, rgba(232, 165, 90, 0.12), transparent 26%),
+        linear-gradient(135deg, var(--paper) 0%, #f6f0e7 56%, #efe9de 100%);
     }
     .hero-media {
       position: absolute;
@@ -163,8 +164,8 @@
       font-size: clamp(44px, 9vw, 92px);
       line-height: 0.96;
       letter-spacing: 0;
-      font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
-      font-weight: 700;
+      font-family: "Cormorant Garamond", Georgia, "Times New Roman", "Noto Serif SC", serif;
+      font-weight: 500;
     }
     .hero-lede {
       max-width: 640px;
@@ -206,9 +207,9 @@
       white-space: nowrap;
     }
     .btn-primary {
-      background: #f0dfd4;
-      color: #2c1d18;
-      box-shadow: 0 12px 30px rgba(182, 95, 70, 0.16);
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: var(--shadow);
     }
     .btn-secondary { background: var(--accent-deep); color: #fffaf3; }
     .btn-outline { background: transparent; color: var(--ink); border-color: var(--line-strong); }
@@ -251,8 +252,8 @@
       font-size: clamp(30px, 5vw, 54px);
       line-height: 1.05;
       letter-spacing: 0;
-      font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
-      font-weight: 700;
+      font-family: "Cormorant Garamond", Georgia, "Times New Roman", "Noto Serif SC", serif;
+      font-weight: 500;
     }
     .section-head p,
     .muted {
@@ -269,11 +270,10 @@
     .tile {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: var(--surface);
+      background: var(--surface-strong);
       padding: 22px;
       min-height: 228px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
     }
     .tile:hover { border-color: var(--line-strong); }
     .tile-mark {
@@ -282,14 +282,14 @@
       border-radius: 8px;
       display: grid;
       place-items: center;
-      background: #f4e0d6;
+      background: #e6dfd8;
       color: var(--accent-deep);
       font-weight: 900;
       margin-bottom: 18px;
     }
-    .tile:nth-child(2) .tile-mark { background: #e4ece8; color: var(--sage); }
-    .tile:nth-child(3) .tile-mark { background: #f1e6cf; color: var(--gold); }
-    .tile:nth-child(4) .tile-mark { background: #eee6dc; color: #57483d; }
+    .tile:nth-child(2) .tile-mark { background: #e6f2ee; color: #3d8274; }
+    .tile:nth-child(3) .tile-mark { background: #f4e8d7; color: #946229; }
+    .tile:nth-child(4) .tile-mark { background: #e8e0d2; color: #3d3d3a; }
     .tile h3 {
       margin: 0 0 10px;
       font-size: 19px;
@@ -324,14 +324,14 @@
     .panel {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: var(--surface-strong);
+      background: var(--surface);
       padding: 28px;
       box-shadow: var(--shadow);
     }
     .panel-dark {
       background:
         radial-gradient(circle at top right, rgba(182, 95, 70, 0.1), transparent 34%),
-        linear-gradient(160deg, #fff7ef 0%, #f3e6d7 100%);
+        linear-gradient(160deg, #faf9f5 0%, #efe9de 100%);
       color: var(--ink);
       border-color: var(--line);
     }
@@ -372,7 +372,7 @@
     .command {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: rgba(255, 251, 245, 0.82);
+      background: var(--surface-strong);
       padding: 18px;
       min-height: 164px;
       box-shadow: var(--shadow);
@@ -384,7 +384,7 @@
       margin: 10px 0 0;
     }
     .bubble {
-      background: #f2e7dd;
+      background: #efe9de;
       border: 1px solid rgba(182, 95, 70, 0.18);
       border-radius: 8px;
       padding: 12px;

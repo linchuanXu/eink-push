@@ -8,19 +8,20 @@
   <style>
     :root {
       color-scheme: light;
-      --paper: #f7f3eb;
-      --surface: rgba(255, 251, 245, 0.94);
-      --surface-strong: #fffaf3;
-      --ink: #171412;
-      --muted: #655c55;
-      --line: rgba(84, 63, 47, 0.14);
-      --line-strong: rgba(84, 63, 47, 0.28);
-      --accent: #b65f46;
-      --accent-deep: #8a452f;
-      --sage: #476457;
-      --gold: #936f39;
+      --paper: #faf9f5;
+      --surface: #faf9f5;
+      --surface-strong: #efe9de;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --muted: #6c6a64;
+      --line: #e6dfd8;
+      --line-strong: #d8cec1;
+      --accent: #cc785c;
+      --accent-deep: #a9583e;
+      --sage: #5db8a6;
+      --gold: #e8a55a;
       --red: #9f3a34;
-      --shadow: 0 24px 72px rgba(43, 30, 21, 0.1);
+      --shadow: 0 1px 3px rgba(20, 20, 19, 0.08);
     }
 
     * { box-sizing: border-box; }
@@ -28,9 +29,9 @@
     body {
       margin: 0;
       background:
-        radial-gradient(circle at top left, rgba(182, 95, 70, 0.08), transparent 24%),
-        radial-gradient(circle at top right, rgba(71, 100, 87, 0.07), transparent 22%),
-        linear-gradient(180deg, #fbf8f2 0%, var(--paper) 52%, #f4ede3 100%);
+        radial-gradient(circle at top left, rgba(204, 120, 92, 0.08), transparent 24%),
+        radial-gradient(circle at top right, rgba(93, 184, 166, 0.06), transparent 22%),
+        linear-gradient(180deg, var(--paper) 0%, #f7f2ea 52%, #f5f0e8 100%);
       color: var(--ink);
       font-family: "Avenir Next", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -44,7 +45,7 @@
     }
     .topbar {
       border-bottom: 1px solid var(--line);
-      background: rgba(251, 248, 242, 0.84);
+      background: rgba(250, 249, 245, 0.9);
       position: sticky;
       top: 0;
       z-index: 10;
@@ -64,8 +65,8 @@
     }
     .brand strong {
       font-size: 18px;
-      font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
-      font-weight: 700;
+      font-family: "Cormorant Garamond", Georgia, "Times New Roman", "Noto Serif SC", serif;
+      font-weight: 500;
     }
     .brand span { color: var(--muted); font-size: 12px; }
     .top-links {
@@ -117,8 +118,8 @@
       font-size: clamp(40px, 7vw, 72px);
       line-height: 0.96;
       letter-spacing: 0;
-      font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
-      font-weight: 700;
+      font-family: "Cormorant Garamond", Georgia, "Times New Roman", "Noto Serif SC", serif;
+      font-weight: 500;
     }
     .lede {
       color: var(--muted);
@@ -143,7 +144,7 @@
       padding: 0 15px;
       font-weight: 900;
       cursor: pointer;
-      background: var(--accent-deep);
+      background: var(--accent);
       color: #fffaf3;
       white-space: nowrap;
     }
@@ -161,8 +162,8 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       background:
-        radial-gradient(circle at top right, rgba(182, 95, 70, 0.1), transparent 36%),
-        linear-gradient(160deg, #fffaf3 0%, #f4e8da 100%);
+        radial-gradient(circle at top right, rgba(204, 120, 92, 0.1), transparent 36%),
+        linear-gradient(160deg, #faf9f5 0%, #efe9de 100%);
       color: var(--ink);
       min-height: 390px;
       overflow: hidden;
@@ -194,7 +195,7 @@
     .cmd {
       border: 1px solid rgba(84, 63, 47, 0.12);
       border-radius: 8px;
-      background: rgba(255, 251, 245, 0.78);
+      background: rgba(250, 249, 245, 0.82);
       padding: 14px;
     }
     .cmd-label {
@@ -248,8 +249,8 @@
       font-size: clamp(28px, 4.8vw, 46px);
       line-height: 1.08;
       letter-spacing: 0;
-      font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
-      font-weight: 700;
+      font-family: "Cormorant Garamond", Georgia, "Times New Roman", "Noto Serif SC", serif;
+      font-weight: 500;
     }
     .section-head p,
     .muted {
@@ -270,7 +271,7 @@
       gap: 16px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: var(--surface);
+      background: var(--surface-strong);
       padding: 18px;
       box-shadow: var(--shadow);
     }
@@ -297,7 +298,7 @@
     .inline-code {
       display: inline;
       border-radius: 6px;
-      background: #f2e7dd;
+      background: #efe9de;
       border: 1px solid var(--line);
       padding: 2px 5px;
       color: #333833;
@@ -310,7 +311,7 @@
       align-items: center;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: rgba(255, 251, 245, 0.82);
+      background: rgba(250, 249, 245, 0.82);
       padding: 10px;
       margin-top: 10px;
     }
@@ -322,7 +323,7 @@
     .command-line button {
       border: 1px solid var(--line-strong);
       border-radius: 8px;
-      background: rgba(255, 251, 245, 0.84);
+      background: rgba(250, 249, 245, 0.9);
       color: var(--ink);
       min-height: 32px;
       padding: 0 10px;
@@ -338,7 +339,7 @@
     .card {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: var(--surface);
+      background: var(--surface-strong);
       padding: 20px;
       min-height: 180px;
       box-shadow: var(--shadow);
@@ -381,7 +382,7 @@
     }
     .row:first-child {
       border-top: 0;
-      background: #f0e5d8;
+      background: #e8e0d2;
       color: #40342c;
       font-weight: 900;
     }
