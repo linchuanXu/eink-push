@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>阅星曈 Skill - 把值得读的内容留在墨水屏上</title>
-  <meta name="description" content="把 AI 整理好的内容送到阅星曈：短的做成卡片，长的变成电子书，书签和阅读进度也能重新整理成可读内容。">
+  <title>阅星曈 Skill - 把内容放到墨水屏上阅读</title>
+  <meta name="description" content="把摘要、长文、书签和调研资料整理成适合阅星曈阅读的卡片或电子书。">
   <style>
     :root {
       color-scheme: light;
@@ -506,18 +506,18 @@
         <img src="references/framework-samples/05-newspaper.preview.png" alt="">
       </div>
       <div class="hero-content">
-        <span class="eyebrow">写完、整理好、发过去，接下来就适合慢慢读</span>
-        <h1>把值得读的内容，留在你的墨水屏上。</h1>
-        <p class="hero-lede">不管是一段摘要、一篇长文，还是一本书里的书签摘录，eink-push 都能替你整理好，再发到阅星曈。短内容适合做成卡片，长内容适合安静地翻页阅读；当你明确需要 EPUB 时，它也会准备好一份带封面的电子书。</p>
+        <span class="eyebrow">重要内容，可以换一种更安静的读法</span>
+        <h1>把内容放到墨水屏上阅读。</h1>
+        <p class="hero-lede">把聊天里整理好的摘要、长文、书签或调研资料，转成适合阅星曈阅读的卡片和电子书。短内容清爽呈现，长内容按页阅读；需要 EPUB 时，也可以生成带封面的版本。</p>
         <div class="install-box">
-          <code id="installText">安装技能 https://github.com/linchuanXu/eink-push，并带我完成阅星曈配置</code>
+          <code id="installText">安装技能 https://github.com/linchuanXu/eink-push，并帮我配置阅星曈账号</code>
           <button class="btn btn-primary" type="button" data-copy-target="installText">复制这句话</button>
         </div>
         <div class="hero-actions">
           <a class="btn btn-primary" href="landing-v2.html">开始配置</a>
           <a class="btn" style="border-color:rgba(255,255,255,.36);color:#fff;background:transparent" href="#workflow">看看能做什么</a>
         </div>
-        <p class="hero-note">第一次配好后，之后只要说一句“发到阅星曈”就够了。</p>
+        <p class="hero-note">配置完成后，可以直接让 AI 把内容发送到阅星曈。</p>
       </div>
     </section>
 
@@ -525,16 +525,16 @@
       <div class="section-head">
         <div>
           <p class="kicker">能做什么</p>
-          <h2>内容到了这里，会变成更适合阅读的样子。</h2>
+          <h2>整理好的内容，可以有更适合阅读的形式。</h2>
         </div>
-        <p>这不是一个泛泛的“发送工具”。它更像一个安静的整理环节，帮你把要读的内容放到更适合阅读的地方。</p>
+        <p>它负责把内容从聊天和文档里取出来，整理成适合墨水屏阅读的形态。短的清楚，长的连贯，书签也能重新组织。</p>
       </div>
 
       <div class="workflow">
         <article class="tile">
           <div class="tile-mark">A</div>
           <h3>短内容变卡片</h3>
-          <p>一句摘要、一页清单、一组摘录，都会被整理成适合在墨水屏上一眼看完的卡片。</p>
+          <p>摘要、清单、结论和摘录会被整理成清爽的卡片，适合在墨水屏上快速查看。</p>
           <div class="tag-row">
             <span class="tag">≤2000 字</span>
             <span class="tag">render_image.py</span>
@@ -543,7 +543,7 @@
         <article class="tile">
           <div class="tile-mark">B</div>
           <h3>长内容适合翻页读</h3>
-          <p>文章、报告、阅读笔记会被整理成适合连续阅读的电子书，不用在聊天记录里来回翻。</p>
+          <p>文章、报告和阅读笔记会被整理成适合连续阅读的电子书，页面更稳定，也更容易回看。</p>
           <div class="tag-row">
             <span class="tag">&gt;2000 字</span>
             <span class="tag">render_book.py</span>
@@ -552,7 +552,7 @@
         <article class="tile">
           <div class="tile-mark">C</div>
           <h3>想要 EPUB 也可以</h3>
-          <p>当你明确说要 EPUB，它会准备一份更完整的电子书版本，适合收藏、导入和慢慢读。</p>
+          <p>明确需要 EPUB 时，会生成更完整的电子书版本，适合收藏、导入和长期阅读。</p>
           <div class="tag-row">
             <span class="tag">明确触发</span>
             <span class="tag">cover-svg</span>
@@ -561,7 +561,7 @@
         <article class="tile">
           <div class="tile-mark">D</div>
           <h3>书签也能重新整理</h3>
-          <p>书架、进度、书签和摘录，不只是拿来查看，也可以继续变成卡片、笔记和阅读小结。</p>
+          <p>书架、进度、书签和摘录可以重新整理成卡片、笔记或阅读小结。</p>
           <div class="tag-row">
             <span class="tag">fetch_reading.py</span>
             <span class="tag">compact 输出</span>
@@ -574,22 +574,22 @@
       <div class="split">
         <div class="panel">
           <p class="kicker">怎么发送</p>
-          <h2>你只管说想读什么，它会帮你选更合适的形式。</h2>
+          <h2>说清楚要读什么，剩下的是格式选择。</h2>
           <ul class="list">
-            <li><span class="index">1</span><span><strong>直接说发到阅星曈</strong>：它会根据内容长短，自动决定做成卡片还是电子书。</span></li>
-            <li><span class="index">2</span><span><strong>如果你更想一眼看完</strong>：可以直接说“做成卡片”。</span></li>
-            <li><span class="index">3</span><span><strong>如果你想慢慢读</strong>：可以直接说“整理成电子书”。</span></li>
-            <li><span class="index">4</span><span><strong>如果你要 EPUB</strong>：只要明确说出来，它就会按 EPUB 准备。</span></li>
+            <li><span class="index">1</span><span><strong>发送到阅星曈</strong>：会根据内容长短，选择卡片或电子书。</span></li>
+            <li><span class="index">2</span><span><strong>做成卡片</strong>：适合摘要、清单和摘录这类短内容。</span></li>
+            <li><span class="index">3</span><span><strong>整理成电子书</strong>：适合文章、报告和阅读笔记。</span></li>
+            <li><span class="index">4</span><span><strong>生成 EPUB</strong>：明确提出 EPUB 时，会按 EPUB 文件准备。</span></li>
           </ul>
         </div>
         <div class="panel panel-dark">
           <p class="kicker" style="color:#e5b7a2">为什么用起来更顺</p>
-          <h2>用起来会更顺，是因为细节已经提前收好了。</h2>
+          <h2>体验上的细节，也已经一起处理。</h2>
           <ul class="list">
-            <li><span class="index">OK</span><span><strong>出错时更容易看懂</strong>：尺寸、分页、图片参数有问题，会直接告诉你该怎么改。</span></li>
-            <li><span class="index">OK</span><span><strong>安装更新更踏实</strong>：会检查你本地实际在跑的版本是不是最新。</span></li>
-            <li><span class="index">OK</span><span><strong>EPUB 阅读体验更顺</strong>：前言正文能保留下来，章节标题也不会重复。</span></li>
-            <li><span class="index">OK</span><span><strong>日常使用更稳定</strong>：关键路径都补了测试，首次配置和后续更新都更省心。</span></li>
+            <li><span class="index">OK</span><span><strong>错误提示更清楚</strong>：尺寸、分页、图片参数有问题时，会给出可处理的提示。</span></li>
+            <li><span class="index">OK</span><span><strong>安装状态可检查</strong>：可以确认本地实际运行的版本是否和源码一致。</span></li>
+            <li><span class="index">OK</span><span><strong>EPUB 排版更稳</strong>：保留前言正文，避免重复章节标题。</span></li>
+            <li><span class="index">OK</span><span><strong>关键路径有测试</strong>：卡片、电子书、EPUB 和安装检查都有覆盖。</span></li>
           </ul>
         </div>
       </div>
@@ -599,35 +599,35 @@
       <div class="section-head">
         <div>
           <p class="kicker">你可以这样说</p>
-          <h2>像平时说话一样说，就够了。</h2>
+          <h2>常见的几种用法。</h2>
         </div>
-        <p>这两页是给用户看的，所以示例也尽量像真实会说出口的话，而不是像在调用命令。</p>
+        <p>这些例子对应当前版本已经支持的能力：发送卡片、生成电子书、整理书签、查看阅读进度，以及搜索后整理。</p>
       </div>
 
       <div class="command-grid">
         <article class="command">
-          <div class="bubble">把这段内容发到阅星曈，做成卡片。</div>
-          <p>适合摘要、结论、清单和一眼能看完的小内容。</p>
+          <div class="bubble">把这段内容做成卡片，发送到阅星曈。</div>
+          <p>适合摘要、结论、清单和短摘录。</p>
         </article>
         <article class="command">
-          <div class="bubble">把《百年孤独》的书签整理一下，发成一本阅读笔记。</div>
-          <p>书签会被重新排好，变成更适合从头读到尾的一份笔记。</p>
+          <div class="bubble">整理《百年孤独》的书签，做成一份阅读笔记。</div>
+          <p>书签会按阅读顺序重新组织，便于回看和复习。</p>
         </article>
         <article class="command">
-          <div class="bubble">把这篇文章做成 EPUB 发过去，带封面。</div>
-          <p>你明确说要 EPUB 时，它就会准备这一版。</p>
+          <div class="bubble">把这篇文章生成 EPUB，带封面。</div>
+          <p>明确提出 EPUB 时，会生成对应文件。</p>
         </article>
         <article class="command">
           <div class="bubble">看看我最近读到哪了。</div>
-          <p>会优先把你真正关心的书名、进度和最近阅读状态整理出来。</p>
+          <p>会整理书名、进度和最近阅读状态。</p>
         </article>
         <article class="command">
-          <div class="bubble">从最近书签里挑几条最喜欢的，做成卡片。</div>
-          <p>适合回顾、复习，也适合留一组值得反复看的摘录。</p>
+          <div class="bubble">从最近书签里挑几条摘录，做成卡片。</div>
+          <p>适合回顾、复习，也适合保留一组重点摘录。</p>
         </article>
         <article class="command">
-          <div class="bubble">帮我查一下这个主题，整理好以后发到阅星曈。</div>
-          <p>调研结果会保留来源，再整理成适合阅读的内容发过去。</p>
+          <div class="bubble">查一下这个主题，整理成适合阅星曈阅读的内容。</div>
+          <p>调研结果会保留来源，再整理成适合阅读的版本。</p>
         </article>
       </div>
     </section>
@@ -636,19 +636,19 @@
       <div class="section section-tight">
         <div class="section-head">
           <div>
-          <p class="kicker">开始使用</p>
-          <h2>第一次配好，后面就会轻很多。</h2>
-        </div>
-          <p>第一次使用最重要的不是记住命令，而是顺利连上设备。环境预检、凭证检查和安装核对，都是为了把这一步变简单。</p>
+            <p class="kicker">开始使用</p>
+            <h2>先完成一次配置。</h2>
+          </div>
+          <p>第一次使用需要确认本地环境、账号凭证和设备绑定。确认完成后，就可以把内容发送到阅星曈。</p>
         </div>
         <div class="security-grid">
           <div>
-            <h3>先看环境好不好</h3>
+            <h3>检查本地环境</h3>
             <p>运行 `python scripts/check_environment.py`，缺什么会直接告诉你怎么补。</p>
           </div>
           <div>
-            <h3>账号怎么读</h3>
-            <p>优先读环境变量，也兼容本地凭证文件。已经配过一次，后面通常不用再管。</p>
+            <h3>配置账号凭证</h3>
+            <p>优先读取环境变量，也兼容本地凭证文件。凭证不会写入仓库。</p>
           </div>
           <div>
             <h3>只连官方接口</h3>
@@ -661,8 +661,8 @@
     <section class="cta">
       <div class="section-tight" style="padding-top:0;padding-bottom:0">
         <p class="kicker">现在开始</p>
-        <h2>把你想留下来的内容，发到更适合阅读的地方。</h2>
-        <p>配好以后，很多事都会变得很简单。写完、整理好、发过去，然后在墨水屏上慢慢读。</p>
+        <h2>把内容整理好，再放到墨水屏上阅读。</h2>
+        <p>摘要、长文、书签和调研资料，都可以变成更适合阅星曈阅读的形式。</p>
         <div class="hero-actions" style="justify-content:center">
           <a class="btn btn-secondary" href="landing-v2.html">去完成配置</a>
           <a class="btn btn-outline" href="https://github.com/linchuanXu/eink-push">查看项目</a>
@@ -674,7 +674,7 @@
   <footer>
     <div class="footer-inner">
       <span>阅星曈 Skill</span>
-      <span>把内容送到墨水屏，再慢慢读</span>
+      <span>把内容整理成适合墨水屏阅读的样子</span>
     </div>
   </footer>
 
