@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>阅星曈 Skill 配置 - 让内容可以发送到墨水屏</title>
-  <meta name="description" content="完成阅星曈 Skill 的初次配置：检查环境、配置账号、确认设备绑定，并发送一张测试卡片。">
+  <title>阅星曈 Skill 配置</title>
+  <meta name="description" content="完成阅星曈 Skill 配置：安装、检查环境、配置账号、确认设备绑定，并发送一张测试卡片。">
   <style>
     :root {
       color-scheme: light;
@@ -463,7 +463,7 @@
       <nav class="top-links">
         <a href="#steps">配置步骤</a>
         <a href="#checks">状态说明</a>
-        <a href="#commands">你可以这样说</a>
+        <a href="#commands">常用说法</a>
         <a class="pill-link" href="landing.html">返回介绍页</a>
       </nav>
     </div>
@@ -472,18 +472,18 @@
   <main class="shell">
     <section class="hero">
       <div class="hero-copy">
-        <span class="eyebrow">初次配置</span>
-        <h1>让内容可以发送到阅星曈。</h1>
-        <p class="lede">完成一次配置后，AI 就能把摘要、长文、书签和调研资料整理成适合墨水屏阅读的形式。这里按初次使用的顺序，帮你确认环境、账号和设备。</p>
+        <span class="eyebrow">配置阅星曈 Skill</span>
+        <h1>连接账号与设备。</h1>
+        <p class="lede">完成配置后，可以把摘要、长文、书签和调研资料发送到阅星曈。短内容生成卡片，长内容生成电子书，阅读进度和书签也可以继续整理。</p>
         <div class="hero-actions">
-          <a class="btn" href="#steps">现在开始</a>
-          <a class="btn light" href="landing.html">先看看介绍</a>
+          <a class="btn" href="#steps">开始配置</a>
+          <a class="btn light" href="landing.html">查看介绍</a>
         </div>
       </div>
       <aside class="terminal" aria-label="常用命令">
         <div class="terminal-head">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-          <span style="margin-left:8px">初次配置会用到的命令</span>
+          <span style="margin-left:8px">配置命令</span>
         </div>
         <div class="terminal-body">
           <div class="cmd">
@@ -510,7 +510,7 @@
       <div class="section-head">
         <div>
           <p class="kicker">配置步骤</p>
-          <h2>四步完成初次配置。</h2>
+          <h2>四步完成配置。</h2>
         </div>
         <p>配置的关键是三件事：本地环境可用、账号凭证正确、设备已绑定到同一账号。确认完成后，再发送一张测试卡片。</p>
       </div>
@@ -518,7 +518,7 @@
       <div class="steps">
         <article class="step">
           <div>
-            <h3>安装或更新 skill</h3>
+            <h3>安装 Skill</h3>
             <p>在 OpenClaw 中发送这句话。已经安装过时，也可以用同一句更新到最新版本。</p>
             <div class="command-line">
               <code id="installLine">安装技能 https://github.com/linchuanXu/eink-push，并帮我配置阅星曈账号</code>
@@ -540,7 +540,7 @@
 
         <article class="step">
           <div>
-            <h3>配置阅星曈账号</h3>
+            <h3>配置账号</h3>
             <p>推荐使用环境变量；也可以读取本地 <span class="inline-code">.credentials.json</span>。账号信息只会用于官方接口 <span class="inline-code">api-prod.xteink.cn</span>。</p>
             <div class="command-line">
               <code id="credLine">python scripts/push_to_device.py --check-credentials --auth</code>
@@ -551,7 +551,7 @@
 
         <article class="step">
           <div>
-            <h3>发送一张测试卡片</h3>
+            <h3>测试发送</h3>
             <p>可以先从一段短内容开始。发送前，请确认设备已经在阅星曈 App 中绑定到同一账号。</p>
             <div class="command-line">
               <code id="firstAsk">把这段内容做成卡片，发送到阅星曈。</code>
@@ -608,8 +608,8 @@
     <section id="commands" class="section">
       <div class="section-head">
         <div>
-          <p class="kicker">你可以这样说</p>
-          <h2>常见用法。</h2>
+          <p class="kicker">常用说法</p>
+          <h2>常见入口。</h2>
         </div>
         <p>下面这些表达都能对应到当前版本已经支持的能力。</p>
       </div>
@@ -617,17 +617,17 @@
       <div class="grid-3">
         <article class="card">
           <span class="badge">卡片</span>
-          <h3>短内容卡片</h3>
+          <h3>内容卡片</h3>
           <p>“把这段做成卡片，发送到阅星曈”。适合摘要、清单和精选摘录。</p>
         </article>
         <article class="card">
           <span class="badge blue">电子书</span>
-          <h3>长内容电子书</h3>
+          <h3>翻页电子书</h3>
           <p>“整理成电子书”“把书签整理成阅读笔记”。适合需要连续阅读的内容。</p>
         </article>
         <article class="card">
           <span class="badge amber">EPUB</span>
-          <h3>想要 EPUB 就直接说</h3>
+          <h3>EPUB</h3>
           <p>“生成 EPUB”“带封面”。明确提出 EPUB 时，会按 EPUB 文件准备。</p>
         </article>
         <article class="card">
@@ -664,7 +664,7 @@
         </article>
         <article class="card">
           <span class="badge blue">验证</span>
-          <h3>先离线试一遍</h3>
+          <h3>离线检查</h3>
           <p><span class="inline-code">python scripts/smoke_test.py</span> 会检查卡片、电子书和 EPUB 渲染，不会发送到设备。</p>
         </article>
         <article class="card">

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>阅星曈 Skill - 把内容放到墨水屏上阅读</title>
+  <title>阅星曈 Skill - 内容发送到墨水屏</title>
   <meta name="description" content="把摘要、长文、书签和调研资料整理成适合阅星曈阅读的卡片或电子书。">
   <style>
     :root {
@@ -485,13 +485,13 @@
     <div class="nav-inner">
       <a class="brand" href="#">
         <strong>阅星曈 Skill</strong>
-        <span>把内容送到墨水屏</span>
+        <span>内容发送到墨水屏</span>
       </a>
       <div class="nav-links">
-        <a href="#workflow">怎么用</a>
-        <a href="#examples">你可以这样说</a>
-        <a href="#security">开始使用</a>
-        <a class="nav-cta" href="landing-v2.html">去配置</a>
+        <a href="#workflow">功能</a>
+        <a href="#examples">常用说法</a>
+        <a href="#security">配置</a>
+        <a class="nav-cta" href="landing-v2.html">开始配置</a>
       </div>
     </div>
   </nav>
@@ -506,16 +506,16 @@
         <img src="references/framework-samples/05-newspaper.preview.png" alt="">
       </div>
       <div class="hero-content">
-        <span class="eyebrow">重要内容，可以换一种更安静的读法</span>
-        <h1>把内容放到墨水屏上阅读。</h1>
-        <p class="hero-lede">把聊天里整理好的摘要、长文、书签或调研资料，转成适合阅星曈阅读的卡片和电子书。短内容清爽呈现，长内容按页阅读；需要 EPUB 时，也可以生成带封面的版本。</p>
+        <span class="eyebrow">摘要、长文、书签，都可以在墨水屏上读</span>
+        <h1>阅星曈 Skill</h1>
+        <p class="hero-lede">把整理好的内容发送到阅星曈。短内容生成卡片，长内容生成电子书；书签、摘录和阅读进度，也可以继续整理成适合回看的内容。</p>
         <div class="install-box">
           <code id="installText">安装技能 https://github.com/linchuanXu/eink-push，并帮我配置阅星曈账号</code>
           <button class="btn btn-primary" type="button" data-copy-target="installText">复制这句话</button>
         </div>
         <div class="hero-actions">
           <a class="btn btn-primary" href="landing-v2.html">开始配置</a>
-          <a class="btn" style="border-color:rgba(255,255,255,.36);color:#fff;background:transparent" href="#workflow">看看能做什么</a>
+          <a class="btn" style="border-color:rgba(255,255,255,.36);color:#fff;background:transparent" href="#workflow">查看功能</a>
         </div>
         <p class="hero-note">配置完成后，可以直接让 AI 把内容发送到阅星曈。</p>
       </div>
@@ -524,17 +524,17 @@
     <section id="workflow" class="section">
       <div class="section-head">
         <div>
-          <p class="kicker">能做什么</p>
-          <h2>整理好的内容，可以有更适合阅读的形式。</h2>
+          <p class="kicker">功能</p>
+          <h2>内容发送前，先整理成适合阅读的形式。</h2>
         </div>
-        <p>它负责把内容从聊天和文档里取出来，整理成适合墨水屏阅读的形态。短的清楚，长的连贯，书签也能重新组织。</p>
+        <p>页面保留最直接的入口：卡片、电子书、EPUB、书签和阅读进度。</p>
       </div>
 
       <div class="workflow">
         <article class="tile">
           <div class="tile-mark">A</div>
-          <h3>短内容变卡片</h3>
-          <p>摘要、清单、结论和摘录会被整理成清爽的卡片，适合在墨水屏上快速查看。</p>
+          <h3>内容卡片</h3>
+          <p>摘要、清单、结论和摘录，整理成适合墨水屏查看的卡片。</p>
           <div class="tag-row">
             <span class="tag">≤2000 字</span>
             <span class="tag">render_image.py</span>
@@ -542,8 +542,8 @@
         </article>
         <article class="tile">
           <div class="tile-mark">B</div>
-          <h3>长内容适合翻页读</h3>
-          <p>文章、报告和阅读笔记会被整理成适合连续阅读的电子书，页面更稳定，也更容易回看。</p>
+          <h3>翻页电子书</h3>
+          <p>文章、报告和阅读笔记，整理成适合连续阅读的电子书。</p>
           <div class="tag-row">
             <span class="tag">&gt;2000 字</span>
             <span class="tag">render_book.py</span>
@@ -551,8 +551,8 @@
         </article>
         <article class="tile">
           <div class="tile-mark">C</div>
-          <h3>想要 EPUB 也可以</h3>
-          <p>明确需要 EPUB 时，会生成更完整的电子书版本，适合收藏、导入和长期阅读。</p>
+          <h3>EPUB</h3>
+          <p>明确需要 EPUB 时，生成带封面的电子书文件。</p>
           <div class="tag-row">
             <span class="tag">明确触发</span>
             <span class="tag">cover-svg</span>
@@ -560,8 +560,8 @@
         </article>
         <article class="tile">
           <div class="tile-mark">D</div>
-          <h3>书签也能重新整理</h3>
-          <p>书架、进度、书签和摘录可以重新整理成卡片、笔记或阅读小结。</p>
+          <h3>书签与进度</h3>
+          <p>书架、进度、书签和摘录，可以整理成卡片、笔记或阅读小结。</p>
           <div class="tag-row">
             <span class="tag">fetch_reading.py</span>
             <span class="tag">compact 输出</span>
@@ -573,8 +573,8 @@
     <section class="section section-tight">
       <div class="split">
         <div class="panel">
-          <p class="kicker">怎么发送</p>
-          <h2>说清楚要读什么，剩下的是格式选择。</h2>
+          <p class="kicker">发送方式</p>
+          <h2>按内容选择阅读形式。</h2>
           <ul class="list">
             <li><span class="index">1</span><span><strong>发送到阅星曈</strong>：会根据内容长短，选择卡片或电子书。</span></li>
             <li><span class="index">2</span><span><strong>做成卡片</strong>：适合摘要、清单和摘录这类短内容。</span></li>
@@ -583,8 +583,8 @@
           </ul>
         </div>
         <div class="panel panel-dark">
-          <p class="kicker" style="color:#e5b7a2">为什么用起来更顺</p>
-          <h2>体验上的细节，也已经一起处理。</h2>
+          <p class="kicker" style="color:#e5b7a2">体验优化</p>
+          <h2>配置、渲染和排版都有检查。</h2>
           <ul class="list">
             <li><span class="index">OK</span><span><strong>错误提示更清楚</strong>：尺寸、分页、图片参数有问题时，会给出可处理的提示。</span></li>
             <li><span class="index">OK</span><span><strong>安装状态可检查</strong>：可以确认本地实际运行的版本是否和源码一致。</span></li>
@@ -598,10 +598,10 @@
     <section id="examples" class="section">
       <div class="section-head">
         <div>
-          <p class="kicker">你可以这样说</p>
-          <h2>常见的几种用法。</h2>
+          <p class="kicker">常用说法</p>
+          <h2>几种常见入口。</h2>
         </div>
-        <p>这些例子对应当前版本已经支持的能力：发送卡片、生成电子书、整理书签、查看阅读进度，以及搜索后整理。</p>
+        <p>这里保留用户能直接理解的动作：发送卡片、生成电子书、整理书签、查看阅读进度，以及搜索后整理。</p>
       </div>
 
       <div class="command-grid">
@@ -636,8 +636,8 @@
       <div class="section section-tight">
         <div class="section-head">
           <div>
-            <p class="kicker">开始使用</p>
-            <h2>先完成一次配置。</h2>
+            <p class="kicker">配置</p>
+            <h2>先完成账号和设备配置。</h2>
           </div>
           <p>第一次使用需要确认本地环境、账号凭证和设备绑定。确认完成后，就可以把内容发送到阅星曈。</p>
         </div>
@@ -660,9 +660,9 @@
 
     <section class="cta">
       <div class="section-tight" style="padding-top:0;padding-bottom:0">
-        <p class="kicker">现在开始</p>
-        <h2>把内容整理好，再放到墨水屏上阅读。</h2>
-        <p>摘要、长文、书签和调研资料，都可以变成更适合阅星曈阅读的形式。</p>
+        <p class="kicker">开始使用</p>
+        <h2>把内容发送到阅星曈。</h2>
+        <p>摘要、长文、书签和调研资料，都可以整理成适合墨水屏阅读的形式。</p>
         <div class="hero-actions" style="justify-content:center">
           <a class="btn btn-secondary" href="landing-v2.html">去完成配置</a>
           <a class="btn btn-outline" href="https://github.com/linchuanXu/eink-push">查看项目</a>
@@ -674,7 +674,7 @@
   <footer>
     <div class="footer-inner">
       <span>阅星曈 Skill</span>
-      <span>把内容整理成适合墨水屏阅读的样子</span>
+      <span>卡片 · 电子书 · 书签 · 阅读进度</span>
     </div>
   </footer>
 
