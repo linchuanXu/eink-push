@@ -10,6 +10,8 @@ from scripts.render_image import (
     assess_rendered_png,
     encode_xtc,
     encode_xtch,
+    validate_render_options,
+    XtgXthParams,
 )
 
 
@@ -81,7 +83,35 @@ class RenderedPngAssessmentTests(unittest.TestCase):
         self.assertEqual(assess_rendered_png(self.make_png(pixels)), [])
 
 
+class RenderOptionValidationTests(unittest.TestCase):
+    def test_valid_defaults_pass(self):
+        self.assertEqual(validate_render_options(480, 800, XtgXthParams()), [])
+
+    def test_rejects_values_that_would_render_badly_or_crash(self):
+        errors = validate_render_options(
+            0,
+            -1,
+            XtgXthParams(
+                brightness=101,
+                contrast=-101,
+                gamma=0,
+                sharpen=101,
+                dither=-1,
+                threshold=300,
+            ),
+        )
+
+        self.assertIn("--width 必须大于 0", errors)
+        self.assertIn("--height 必须大于 0", errors)
+        self.assertIn("--gamma 必须在 0.4..2.5 之间", errors)
+        self.assertIn("--threshold 必须在 0..255 之间", errors)
+
+
 class ContainerEncodingTests(unittest.TestCase):
+    def test_container_requires_at_least_one_page(self):
+        with self.assertRaisesRegex(ValueError, "至少需要 1 个页面"):
+            encode_xtc([])
+
     def test_xtc_header_and_index_offsets_without_metadata(self):
         page1 = fake_page(width=10, height=8, payload=b"abc")
         page2 = fake_page(width=12, height=9, payload=b"defg")
@@ -118,6 +148,17 @@ class ContainerEncodingTests(unittest.TestCase):
         self.assertEqual(meta_offset, _HEADER_SIZE)
         self.assertEqual(index_offset, _HEADER_SIZE + _META_SIZE)
         self.assertEqual(data_offset, _HEADER_SIZE + _META_SIZE + _INDEX_ENTRY)
+
+    def test_metadata_truncation_preserves_utf8_boundaries(self):
+        page = fake_page()
+
+        data = encode_xtch([page], title="标题" * 100, author="作者" * 100)
+        meta = data[_HEADER_SIZE:_HEADER_SIZE + _META_SIZE]
+        title = meta[:128].split(b"\x00", 1)[0]
+        author = meta[128:192].split(b"\x00", 1)[0]
+
+        title.decode("utf-8")
+        author.decode("utf-8")
 
 
 if __name__ == "__main__":

@@ -166,6 +166,11 @@ def upload_file(session: requests.Session, token: str, device: dict,
         print("      ✓ 秒传命中，跳过 OSS 上传")
         return sign["download_url"]
 
+    required_fields = ("host", "content_type", "download_url")
+    missing_fields = [field for field in required_fields if not sign.get(field)]
+    if missing_fields:
+        raise RuntimeError("上传签名响应缺少字段：" + ", ".join(missing_fields))
+
     print("      → 上传到 OSS")
     oss_res = requests.post(
         sign["host"],
@@ -179,6 +184,7 @@ def upload_file(session: requests.Session, token: str, device: dict,
         },
         timeout=HTTP_TIMEOUT,
     )
+    oss_res.raise_for_status()
     if oss_res.text and "<Error>" in oss_res.text:
         raise RuntimeError(f"OSS 上传失败：{oss_res.text}")
     print("      ✓ OSS 上传完成")

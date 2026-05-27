@@ -84,6 +84,28 @@ def _clamp_i(v: int, lo: int, hi: int) -> int:
     return max(lo, min(hi, v))
 
 
+def validate_render_options(width: int, height: int, params: XtgXthParams) -> list[str]:
+    """Return CLI validation errors for render dimensions and image tuning params."""
+    errors: list[str] = []
+    if width <= 0:
+        errors.append("--width 必须大于 0")
+    if height <= 0:
+        errors.append("--height 必须大于 0")
+    if not -100 <= params.brightness <= 100:
+        errors.append("--brightness 必须在 -100..100 之间")
+    if not -100 <= params.contrast <= 100:
+        errors.append("--contrast 必须在 -100..100 之间")
+    if not 0.4 <= params.gamma <= 2.5:
+        errors.append("--gamma 必须在 0.4..2.5 之间")
+    if not 0 <= params.sharpen <= 100:
+        errors.append("--sharpen 必须在 0..100 之间")
+    if not 0 <= params.dither <= 100:
+        errors.append("--dither-pct 必须在 0..100 之间")
+    if not 0 <= params.threshold <= 255:
+        errors.append("--threshold 必须在 0..255 之间")
+    return errors
+
+
 def assess_html_layout(metrics: dict[str, Any], width: int, height: int) -> list[HtmlLayoutWarning]:
     """Return human-readable warnings for common e-ink card layout problems."""
     warnings: list[HtmlLayoutWarning] = []
@@ -380,6 +402,9 @@ def _encode_xtc_xtch(
     title  : 容器元数据标题（可选）
     author : 容器元数据作者（可选）
     """
+    if not pages:
+        raise ValueError("至少需要 1 个页面才能生成翻页容器")
+
     page_count   = len(pages)
     has_metadata = 1 if (title or author) else 0
 
@@ -408,6 +433,12 @@ def _encode_xtc_xtch(
     if has_metadata:
         def _enc_str(s: str, size: int) -> bytes:
             b = s.encode("utf-8")[:size - 1]
+            while b:
+                try:
+                    b.decode("utf-8")
+                    break
+                except UnicodeDecodeError:
+                    b = b[:-1]
             return b + b"\x00" * (size - len(b))
 
         meta_bytes = (
@@ -527,11 +558,14 @@ def screenshot_html(html_path: Path, width: int, height: int, inject_fonts: bool
                 print(f"[INFO] 使用本地字体：{html_path.name}")
             else:
                 print(f"[INFO] 从 Google Fonts CDN 加载字体：{html_path.name}")
-                page.add_style_tag(content="""
-                    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap');
-                """)
-                page.wait_for_load_state("networkidle", timeout=15000)
-                page.evaluate("document.fonts.ready")
+                try:
+                    page.add_style_tag(content="""
+                        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap');
+                    """)
+                    page.wait_for_load_state("networkidle", timeout=15000)
+                    page.evaluate("document.fonts.ready")
+                except Exception as exc:
+                    print(f"[WARN] Google Fonts 加载失败，改用系统字体：{exc}")
 
         # ── 两步渲染（overflow 时调整视口比例 + 一次修正） ────────────────────────
         # Step 1：在原始视口（480×800）测量内容自然高度
@@ -645,6 +679,9 @@ def main():
         invert=args.invert,
         threshold=args.threshold,
     )
+    validation_errors = validate_render_options(args.width, args.height, params)
+    if validation_errors:
+        parser.error("; ".join(validation_errors))
 
     # 确定输出路径
     if multi:

@@ -1,6 +1,13 @@
 import unittest
 
-from scripts.render_book import preprocess_markdown
+from scripts.render_book import _parse_node_version, preprocess_markdown
+
+
+class NodeVersionTests(unittest.TestCase):
+    def test_parse_node_version(self):
+        self.assertEqual(_parse_node_version("v22.19.0"), (22, 19, 0))
+        self.assertEqual(_parse_node_version("18"), (18, 0, 0))
+        self.assertIsNone(_parse_node_version("not node"))
 
 
 class PreprocessMarkdownTests(unittest.TestCase):

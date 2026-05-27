@@ -1,6 +1,13 @@
 import unittest
 
-from scripts.fetch_reading import apply_output_options, clean_book_name, compact_book, compact_bookmark
+from scripts.fetch_reading import (
+    _positive_int,
+    apply_output_options,
+    clean_book_name,
+    compact_book,
+    compact_bookmark,
+    validate_fetch_options,
+)
 
 
 class CleanBookNameTests(unittest.TestCase):
@@ -70,6 +77,23 @@ class CompactOutputTests(unittest.TestCase):
 
         self.assertEqual(out["returned"], 1)
         self.assertFalse(out["truncated"])
+
+
+class FetchOptionValidationTests(unittest.TestCase):
+    def test_positive_int_parses_api_pagination_values(self):
+        self.assertEqual(_positive_int("3"), 3)
+        self.assertEqual(_positive_int("bad", default=2), 2)
+        self.assertEqual(_positive_int(0, default=2), 2)
+
+    def test_valid_options_pass(self):
+        self.assertEqual(validate_fetch_options(page=1, per_page=20, limit=0), [])
+
+    def test_invalid_options_are_reported(self):
+        errors = validate_fetch_options(page=0, per_page=-1, limit=-2)
+
+        self.assertIn("--page 必须大于 0", errors)
+        self.assertIn("--per-page 必须大于 0", errors)
+        self.assertIn("--limit 必须大于或等于 0", errors)
 
 
 if __name__ == "__main__":

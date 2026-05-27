@@ -78,6 +78,26 @@ def _pick(data: dict[str, Any], *keys: str, default: Any = None) -> Any:
     return default
 
 
+def _positive_int(value: Any, default: int = 1) -> int:
+    try:
+        number = int(value)
+    except (TypeError, ValueError):
+        return default
+    return number if number > 0 else default
+
+
+def validate_fetch_options(page: int, per_page: int, limit: int) -> list[str]:
+    """Return CLI validation errors for reading-data pagination options."""
+    errors: list[str] = []
+    if page <= 0:
+        errors.append("--page 必须大于 0")
+    if per_page <= 0:
+        errors.append("--per-page 必须大于 0")
+    if limit < 0:
+        errors.append("--limit 必须大于或等于 0")
+    return errors
+
+
 def compact_book(book: dict[str, Any]) -> dict[str, Any]:
     """Return the fields an agent usually needs to display a book list."""
     return {
@@ -246,7 +266,7 @@ def fetch_bookmarks_all(
             per_page=per_page,
         )
         all_marks.extend(data.get("bookmarks", []))
-        total_pages = data.get("pages", 1)
+        total_pages = _positive_int(data.get("pages"), default=1)
         total = data.get("total", len(all_marks))
         print(
             f"[fetch_reading] 书签第 {page}/{total_pages} 页，"
@@ -309,6 +329,11 @@ def main() -> None:
                          help="限制 stdout 中返回的条数（0 表示不限制）")
 
     args = parser.parse_args()
+
+    page_for_validation = 1 if args.command == "bookmarks" and args.all else args.page
+    option_errors = validate_fetch_options(page_for_validation, args.per_page, args.limit)
+    if option_errors:
+        parser.error("; ".join(option_errors))
 
     if requests is None:
         print("[ERROR] requests 未安装。运行：pip install requests", file=sys.stderr)

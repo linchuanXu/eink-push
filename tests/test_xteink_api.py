@@ -34,6 +34,15 @@ class CredentialsStatusTests(unittest.TestCase):
             ("u", "p"),
         )
 
+    def test_complete_alias_pair_wins_over_partial_primary_pair(self):
+        status, detail = env_credentials_status({
+            "XTEINK_USERNAME": "partial",
+            "YUEXINGTONG_USERNAME": "u",
+            "YUEXINGTONG_PASSWORD": "p",
+        })
+
+        self.assertEqual((status, detail), ("OK", ""))
+
     def test_partial_env_credentials_are_invalid(self):
         status, detail = env_credentials_status({"XTEINK_USERNAME": "u"})
         self.assertEqual(status, "INVALID")
@@ -165,6 +174,15 @@ class FormatHttpErrorTests(unittest.TestCase):
         err.response = type("Response", (), {"status_code": 500, "text": "boom"})()
 
         self.assertEqual(format_http_error(err), "服务器返回错误 500：boom")
+
+    def test_long_response_text_is_truncated(self):
+        err = Exception("server error")
+        err.response = type("Response", (), {"status_code": 500, "text": "x" * 600})()
+
+        message = format_http_error(err)
+
+        self.assertLess(len(message), 560)
+        self.assertTrue(message.endswith("..."))
 
 
 if __name__ == "__main__":

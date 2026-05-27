@@ -164,7 +164,7 @@ def apply_install_plan(source_root: Path, plan: InstallPlan) -> None:
         shutil.copy2(source, destination)
 
 
-def print_human(plan: InstallPlan, *, applied: bool) -> None:
+def print_human(plan: InstallPlan, *, applied: bool, applied_plan: InstallPlan | None = None) -> None:
     mode = "applied" if applied else "dry-run"
     print(f"[{plan.status}] eink-push install plan ({mode})")
     print(f"Target: {plan.target}")
@@ -172,6 +172,11 @@ def print_human(plan: InstallPlan, *, applied: bool) -> None:
         for issue in plan.audit_issues:
             print(f"[ISSUE] {issue}")
         return
+    if applied_plan:
+        print(
+            f"Applied: {len(applied_plan.copy_files)} copied, "
+            f"{len(applied_plan.update_files)} updated"
+        )
     print(f"Copy: {len(plan.copy_files)}")
     print(f"Update: {len(plan.update_files)}")
     print(f"Unchanged: {len(plan.unchanged_files)}")
@@ -194,16 +199,21 @@ def main() -> int:
     args = parser.parse_args()
 
     plan = build_install_plan(ROOT, args.target)
+    applied_plan: InstallPlan | None = None
     if args.apply and plan.status == "OK":
+        applied_plan = plan
         apply_install_plan(ROOT, plan)
         plan = build_install_plan(ROOT, args.target)
 
     if args.json:
         data = plan.as_dict()
         data["applied"] = args.apply and plan.status == "OK"
+        if applied_plan:
+            data["applied_copy_files"] = applied_plan.copy_files
+            data["applied_update_files"] = applied_plan.update_files
         print(json.dumps(data, ensure_ascii=False, indent=2))
     else:
-        print_human(plan, applied=args.apply and plan.status == "OK")
+        print_human(plan, applied=args.apply and plan.status == "OK", applied_plan=applied_plan)
 
     return 1 if plan.status == "FAIL" else 0
 

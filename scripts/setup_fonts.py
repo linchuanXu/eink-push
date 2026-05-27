@@ -17,7 +17,6 @@ setup_fonts.py — 一键下载字体到 assets/fonts/
 
 from __future__ import annotations
 
-import hashlib
 import re
 import sys
 from pathlib import Path

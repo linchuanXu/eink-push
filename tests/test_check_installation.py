@@ -126,6 +126,21 @@ class InstallationAuditTests(unittest.TestCase):
         self.assertTrue(any("SKILL.md differs" in issue for issue in issues))
         self.assertTrue(any("openai.yaml differs" in issue for issue in issues))
 
+    def test_audit_reports_runtime_file_drift(self):
+        with tempfile.TemporaryDirectory() as target_tmp:
+            installed = Path(target_tmp) / "eink-push"
+            installed.mkdir()
+            (installed / "SKILL.md").write_text("different runtime", encoding="utf-8")
+            records = [
+                self.make_record(ROOT),
+                self.make_record(installed),
+            ]
+
+            status, issues = audit(records, runtime_files=["SKILL.md"])
+
+        self.assertEqual(status, "FAIL")
+        self.assertTrue(any("runtime files differ" in issue for issue in issues))
+
 
 if __name__ == "__main__":
     unittest.main()

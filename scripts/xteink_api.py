@@ -37,16 +37,19 @@ def credentials_from_env(env: Mapping[str, str] | None = None) -> tuple[str, str
 def env_credentials_status(env: Mapping[str, str] | None = None) -> tuple[str, str]:
     """Return (status, detail) for supported credential env vars."""
     values = env if env is not None else os.environ
+    partial_pairs: list[str] = []
     for username_key, password_key in ENV_CREDENTIAL_PAIRS:
         username_present = bool(values.get(username_key, "").strip())
         password_present = bool(values.get(password_key, "").strip())
         if username_present and password_present:
             return "OK", ""
         if username_present or password_present:
-            return (
-                "INVALID",
-                f"环境变量 {username_key}/{password_key} 必须同时设置",
-            )
+            partial_pairs.append(f"{username_key}/{password_key}")
+    if partial_pairs:
+        return (
+            "INVALID",
+            "环境变量 " + "、".join(partial_pairs) + " 必须同时设置",
+        )
     return "MISSING", "未设置 XTEINK_USERNAME/XTEINK_PASSWORD 环境变量"
 
 
@@ -210,6 +213,8 @@ def format_http_error(error: Exception) -> str:
         return "账号或密码错误（401）。运行 --reset-credentials 或更新环境变量后重新输入。"
 
     if text:
+        if len(text) > 500:
+            text = text[:500].rstrip() + "..."
         return f"服务器返回错误 {status}：{text}"
 
     return f"服务器返回错误 {status}：{error}"

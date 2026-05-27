@@ -2,7 +2,26 @@ import unittest
 from io import StringIO
 from unittest.mock import patch
 
-from scripts.push_to_device import _resolve_file_meta, reset_credentials
+from scripts.push_to_device import _resolve_file_meta, reset_credentials, upload_file
+
+
+class FakeJsonResponse:
+    def __init__(self, payload):
+        self.payload = payload
+
+    def raise_for_status(self):
+        return None
+
+    def json(self):
+        return self.payload
+
+
+class FakeSession:
+    def __init__(self, payload):
+        self.payload = payload
+
+    def post(self, *args, **kwargs):
+        return FakeJsonResponse(self.payload)
 
 
 class ResolveFileMetaTests(unittest.TestCase):
@@ -48,6 +67,60 @@ class ResetCredentialsTests(unittest.TestCase):
             reset_credentials()
 
         self.assertIn("环境变量凭证不完整", stdout.getvalue())
+
+
+class UploadFileTests(unittest.TestCase):
+    def test_upload_signature_requires_oss_fields(self):
+        session = FakeSession({"success": True, "host": "https://oss.example"})
+
+        with (
+            patch("sys.stdout", new_callable=StringIO),
+            self.assertRaisesRegex(RuntimeError, "download_url"),
+        ):
+            upload_file(
+                session,
+                "token",
+                {"id": "dev", "type": "ESP32C3"},
+                b"data",
+                "card.xth",
+                "application/octet-stream",
+                "md5",
+                4,
+                "uploads/image",
+            )
+
+    def test_oss_http_status_is_checked(self):
+        session = FakeSession({
+            "success": True,
+            "host": "https://oss.example",
+            "content_type": "application/octet-stream",
+            "download_url": "https://download.example/card.xth",
+        })
+        oss_response = type(
+            "OssResponse",
+            (),
+            {
+                "text": "",
+                "raise_for_status": lambda self: (_ for _ in ()).throw(RuntimeError("oss failed")),
+            },
+        )()
+
+        with (
+            patch("sys.stdout", new_callable=StringIO),
+            patch("scripts.push_to_device.requests.post", return_value=oss_response),
+            self.assertRaisesRegex(RuntimeError, "oss failed"),
+        ):
+            upload_file(
+                session,
+                "token",
+                {"id": "dev", "type": "ESP32C3"},
+                b"data",
+                "card.xth",
+                "application/octet-stream",
+                "md5",
+                4,
+                "uploads/image",
+            )
 
 
 if __name__ == "__main__":

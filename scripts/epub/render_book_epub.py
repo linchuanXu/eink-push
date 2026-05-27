@@ -17,6 +17,7 @@ render_book_epub.py — Markdown → EPUB 电子书（阅星曈推送）
 """
 
 import argparse
+import atexit
 import hashlib
 import html as html_module
 import io
@@ -26,6 +27,7 @@ import subprocess
 import sys
 import tempfile
 import urllib.request
+from urllib.parse import unquote, urlparse
 from pathlib import Path
 
 from PIL import Image
@@ -33,6 +35,8 @@ from ebooklib import epub
 import markdown
 
 _SCRIPT_DIR = Path(__file__).parent
+COVER_THEMES = ("tech", "business", "design", "literature", "science", "personal")
+COVER_LAYOUTS = ("minimal", "classic", "modern")
 
 # ─── CSS ──────────────────────────────────────────────────────────────────────
 
@@ -122,14 +126,18 @@ def _close_svg_browser():
         _svg_playwright = None
 
 
+atexit.register(_close_svg_browser)
+
+
 def convert_svg_to_png(svg_data, width=480):
     """Convert SVG bytes to PNG using a shared Playwright browser instance."""
     browser = _get_svg_browser()
     if not browser:
         return None
+    svg_path = png_path = None
     try:
         tmp_dir = tempfile.gettempdir()
-        tag = hash(svg_data) & 0xFFFFFFFF
+        tag = hashlib.sha256(svg_data).hexdigest()[:12]
         svg_path = os.path.join(tmp_dir, f"epub_svg_{tag}.svg")
         png_path = os.path.join(tmp_dir, f"epub_svg_{tag}.png")
 
@@ -159,18 +167,30 @@ def convert_svg_to_png(svg_data, width=480):
         with open(png_path, 'rb') as f:
             png_data = f.read()
 
-        try:
-            os.unlink(svg_path)
-            os.unlink(png_path)
-        except OSError:
-            pass
         return png_data
     except Exception as e:
         print(f"  Warning: SVG conversion failed: {e}")
         return None
+    finally:
+        for path in (svg_path, png_path):
+            if path:
+                try:
+                    os.unlink(path)
+                except OSError:
+                    pass
 
 
 # ─── 图片压缩 ──────────────────────────────────────────────────────────────────
+
+def validate_epub_options(image_quality, image_width):
+    """Return CLI validation errors for EPUB image options."""
+    errors = []
+    if not 1 <= image_quality <= 100:
+        errors.append("--image-quality 必须在 1..100 之间")
+    if image_width <= 0:
+        errors.append("--image-width 必须大于 0")
+    return errors
+
 
 def compress_image(img_data, target_width=480, jpeg_quality=88):
     """Compress image (bytes or file path) to JPEG. Returns bytes or None."""
@@ -201,7 +221,25 @@ def compress_image(img_data, target_width=480, jpeg_quality=88):
 
 # ─── 图片下载 ──────────────────────────────────────────────────────────────────
 
-def download_image(url, timeout=15):
+def _is_remote_url(url):
+    return urlparse(url).scheme in {"http", "https"}
+
+
+def _resolve_local_image_path(url, base_dir=None):
+    parsed = urlparse(url)
+    if parsed.scheme == "file":
+        path_text = unquote(parsed.path)
+        if os.name == "nt" and re.match(r"^/[A-Za-z]:", path_text):
+            path_text = path_text[1:]
+        return Path(path_text)
+
+    path = Path(unquote(url))
+    if path.is_absolute():
+        return path
+    return Path(base_dir or Path.cwd()) / path
+
+
+def download_image(url, timeout=15, base_dir=None):
     """Download image from URL or local path, auto-converting SVG to PNG."""
     try:
         if url.startswith('blob:') or url.startswith('data:'):
@@ -209,12 +247,17 @@ def download_image(url, timeout=15):
 
         url_lower = url.split('?')[0].lower()
         is_svg_url = url_lower.endswith('.svg')
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+            'Accept': 'image/png, image/jpeg, image/webp, image/svg+xml, image/*'
+        }
 
-        if url.startswith('/') or url.startswith('./') or url.startswith('../'):
-            if not os.path.exists(url):
-                print(f"  Warning: Local file not found: {url}")
+        if not _is_remote_url(url):
+            local_path = _resolve_local_image_path(url, base_dir)
+            if not local_path.exists():
+                print(f"  Warning: Local file not found: {local_path}")
                 return None
-            with open(url, 'rb') as f:
+            with open(local_path, 'rb') as f:
                 data = f.read()
             content_type = ''
         else:
@@ -225,10 +268,6 @@ def download_image(url, timeout=15):
                 clean_url = re.sub(r'/format/webp', '', clean_url)
                 clean_url = re.sub(r'/resize,w_\d+', '/resize,w_1000', clean_url)
 
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-                'Accept': 'image/png, image/jpeg, image/webp, image/svg+xml, image/*'
-            }
             req = urllib.request.Request(clean_url, headers=headers)
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 content_type = resp.headers.get('Content-Type', '')
@@ -275,7 +314,7 @@ def download_image(url, timeout=15):
 
 # ─── 图片嵌入 ──────────────────────────────────────────────────────────────────
 
-def embed_images(markdown_text, book, image_width=480, jpeg_quality=88):
+def embed_images(markdown_text, book, image_width=480, jpeg_quality=88, base_dir=None):
     """Download all images in markdown, embed in EPUB, replace URLs with epub paths.
 
     Returns (modified_markdown, image_count, total_bytes).
@@ -292,7 +331,7 @@ def embed_images(markdown_text, book, image_width=480, jpeg_quality=88):
         url = m.group(2)
         if url in url_to_epub_path:
             continue
-        data = download_image(url)
+        data = download_image(url, base_dir=base_dir)
         if not data:
             continue
         compressed = compress_image(data, image_width, jpeg_quality)
@@ -348,24 +387,73 @@ def extract_title(content):
     return None
 
 
+def has_reader_preface(content):
+    """Return True when pre-## content has more than a standalone book title."""
+    saw_first_nonblank = False
+    for line in content.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if not saw_first_nonblank:
+            saw_first_nonblank = True
+            if stripped.startswith("# "):
+                continue
+        return True
+    return False
+
+
+def strip_leading_heading(content, title):
+    """Remove a leading Markdown heading when build_xhtml already renders it."""
+    lines = content.splitlines()
+    for idx, line in enumerate(lines):
+        if not line.strip():
+            continue
+        match = re.match(r"^(#{1,6})\s+(.+?)\s*#*\s*$", line)
+        if match and match.group(2).strip() == title:
+            del lines[idx]
+            while lines and not lines[0].strip():
+                del lines[0]
+            return "\n".join(lines)
+        return content
+    return content
+
+
 def split_chapters(body):
     """Split content on ## headings. Returns [(chapter_title, content), ...]."""
     lines = body.split('\n')
     chapters = []
-    cur_title = cur_lines = None
+    cur_title = None
+    cur_lines = []
+    preface_lines = []
+    in_fence = False
 
     for line in lines:
-        if line.startswith('## '):
+        if re.match(r"^\s*(```+|~~~+)", line):
+            in_fence = not in_fence
+
+        if not in_fence and line.startswith('## '):
             if cur_title is not None:
                 chapters.append((cur_title, '\n'.join(cur_lines).strip()))
+            elif any(ln.strip() for ln in preface_lines):
+                preface = '\n'.join(preface_lines).strip()
+                if has_reader_preface(preface):
+                    preface_title = extract_title(preface) or "前言"
+                    chapters.append((preface_title, strip_leading_heading(preface, preface_title)))
             cur_title = line[3:].strip()
-            cur_lines = [line]
+            cur_lines = []
         else:
             if cur_title is not None:
                 cur_lines.append(line)
+            else:
+                preface_lines.append(line)
 
     if cur_title is not None:
         chapters.append((cur_title, '\n'.join(cur_lines).strip()))
+    elif any(ln.strip() for ln in preface_lines):
+        preface = '\n'.join(preface_lines).strip()
+        if has_reader_preface(preface):
+            preface_title = extract_title(preface) or "正文"
+            chapters.append((preface_title, strip_leading_heading(preface, preface_title)))
 
     return chapters
 
@@ -510,7 +598,7 @@ def build_epub(args):
         print(f"  [{idx}/{len(chapters_data)}] {ch_title}")
 
         ch_body, img_count, img_bytes = embed_images(
-            ch_body, book, args.image_width, args.image_quality
+            ch_body, book, args.image_width, args.image_quality, base_dir=md_path.parent
         )
         total_imgs += img_count
         total_img_bytes += img_bytes
@@ -565,14 +653,17 @@ def main():
     cover_group.add_argument("--cover-svg", action="store_true", help="生成 SVG 封面（KDP 1600×2560）")
     cover_group.add_argument("--cover-html", action="store_true", help="生成 HTML 封面")
     cover_group.add_argument("--cover", help="自定义封面图片路径（JPG/PNG）")
-    parser.add_argument("--cover-theme", help="封面主题：tech/business/design/literature/science/personal（自动检测）")
-    parser.add_argument("--cover-layout", default="minimal", help="SVG 布局：minimal/classic/modern（默认：minimal）")
+    parser.add_argument("--cover-theme", choices=COVER_THEMES, help="封面主题（默认自动检测）")
+    parser.add_argument("--cover-layout", choices=COVER_LAYOUTS, default="minimal", help="SVG 布局（默认：minimal）")
     parser.add_argument("--subtitle", help="封面副标题")
 
     parser.add_argument("--image-quality", type=int, default=88, help="JPEG 质量 1-100（默认：88）")
     parser.add_argument("--image-width", type=int, default=480, help="图片最大宽度 px（默认：480）")
 
     args = parser.parse_args()
+    option_errors = validate_epub_options(args.image_quality, args.image_width)
+    if option_errors:
+        parser.error("; ".join(option_errors))
     output = build_epub(args)
     print(f"OUTPUT:{output}")
 

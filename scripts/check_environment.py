@@ -58,8 +58,8 @@ def version_at_least(current: tuple[int, int, int], minimum: tuple[int, int, int
     return current >= minimum
 
 
-def run_command(cmd: list[str]) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True)
+def run_command(cmd: list[str], timeout: int = 30) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True, timeout=timeout)
 
 
 def check_python_version() -> CheckResult:
@@ -108,7 +108,16 @@ with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
     browser.close()
 """
-    result = run_command([sys.executable, "-c", code])
+    try:
+        result = run_command([sys.executable, "-c", code], timeout=45)
+    except subprocess.TimeoutExpired:
+        return CheckResult(
+            "playwright-chromium",
+            "Playwright Chromium",
+            FAIL,
+            "browser launch timed out",
+            ["python -m playwright install chromium"],
+        )
     if result.returncode == 0:
         return CheckResult("playwright-chromium", "Playwright Chromium", OK, "launch OK")
 

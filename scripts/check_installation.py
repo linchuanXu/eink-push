@@ -15,6 +15,11 @@ from typing import Any
 
 import yaml
 
+try:
+    from .check_package import audit_package, collect_package_files
+except ImportError:
+    from check_package import audit_package, collect_package_files
+
 ROOT = Path(__file__).resolve().parent.parent
 SKILL_NAME = "eink-push"
 DEFAULT_SCAN_DEPTH = 3
@@ -160,7 +165,37 @@ def collect_records(roots: list[Path]) -> list[SkillRecord]:
     return sorted(records, key=lambda record: str(record.path).lower())
 
 
-def audit(records: list[SkillRecord], require_installed: bool = False) -> tuple[str, list[str]]:
+def _summarize_paths(paths: list[str], limit: int = 5) -> str:
+    shown = ", ".join(paths[:limit])
+    if len(paths) > limit:
+        shown += f", ... (+{len(paths) - limit} more)"
+    return shown
+
+
+def _runtime_drift(source_root: Path, target_root: Path, runtime_files: list[str]) -> tuple[list[str], list[str]]:
+    missing: list[str] = []
+    different: list[str] = []
+    for rel_path in runtime_files:
+        source = source_root / rel_path
+        target = target_root / rel_path
+        if not target.exists():
+            missing.append(rel_path)
+            continue
+        try:
+            if file_sha256(source) != file_sha256(target):
+                different.append(rel_path)
+        except OSError:
+            different.append(rel_path)
+    return missing, different
+
+
+def audit(
+    records: list[SkillRecord],
+    require_installed: bool = False,
+    *,
+    runtime_files: list[str] | None = None,
+    source_root: Path = ROOT,
+) -> tuple[str, list[str]]:
     issues = []
     installed = [record for record in records if not record.is_current_repo]
 
@@ -177,6 +212,18 @@ def audit(records: list[SkillRecord], require_installed: bool = False) -> tuple[
                 issues.append(f"installed SKILL.md differs from source: {record.path}")
             if record.openai_yaml_sha256 != current.openai_yaml_sha256:
                 issues.append(f"installed agents/openai.yaml differs from source: {record.path}")
+            if runtime_files:
+                missing, different = _runtime_drift(source_root, record.path, runtime_files)
+                if missing:
+                    issues.append(
+                        f"installed runtime files missing from {record.path}: "
+                        + _summarize_paths(missing)
+                    )
+                if different:
+                    issues.append(
+                        f"installed runtime files differ from source at {record.path}: "
+                        + _summarize_paths(different)
+                    )
 
     for record in records:
         issues.extend(f"{record.path}: {error}" for error in record.errors)
@@ -218,12 +265,18 @@ def main() -> int:
 
     roots = unique_existing_dirs(default_skill_roots() + [Path(root) for root in args.root])
     records = collect_records(roots)
-    status, issues = audit(records, require_installed=args.require_installed)
+    package_audit = audit_package(collect_package_files(ROOT))
+    status, issues = audit(
+        records,
+        require_installed=args.require_installed,
+        runtime_files=package_audit.runtime_files,
+    )
 
     if args.json:
         print(json.dumps({
             "status": status,
             "roots": [str(root) for root in roots],
+            "runtime_file_count": len(package_audit.runtime_files),
             "records": [record.as_dict() for record in records],
             "issues": issues,
         }, ensure_ascii=False, indent=2))

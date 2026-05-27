@@ -1,11 +1,13 @@
 # Keep Skill frontmatter validator-compatible across Windows checkouts.
 SKILL.md text eol=lf
+.gitattributes text eol=lf
 .gitignore text eol=lf
 *.md text eol=lf
 *.py text eol=lf
 *.mjs text eol=lf
 *.js text eol=lf
 *.json text eol=lf
+*.ini text eol=lf
 *.yaml text eol=lf
 *.yml text eol=lf
 *.html text eol=lf

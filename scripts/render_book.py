@@ -32,6 +32,7 @@ _NODE_SCRIPT = _SCRIPT_DIR / "render_book_pages.mjs"
 # Pillow 9+：Resampling 枚举；旧版回退到 Image.BOX / Image.LANCZOS
 _RES_BOX = getattr(getattr(Image, "Resampling", Image), "BOX", Image.BOX)
 _RES_LANCZOS = getattr(getattr(Image, "Resampling", Image), "LANCZOS", Image.LANCZOS)
+_NODE_VERSION_RE = re.compile(r"v?(\d+)(?:\.(\d+))?(?:\.(\d+))?")
 
 
 def _resize_to_device(img: Image.Image, target_w: int, target_h: int) -> Image.Image:
@@ -44,6 +45,13 @@ def _resize_to_device(img: Image.Image, target_w: int, target_h: int) -> Image.I
     return img.resize((target_w, target_h), _RES_LANCZOS)
 
 
+def _parse_node_version(text: str) -> tuple[int, int, int] | None:
+    match = _NODE_VERSION_RE.search(text.strip())
+    if not match:
+        return None
+    return tuple(int(part or 0) for part in match.groups())
+
+
 def _check_node():
     try:
         result = subprocess.run(
@@ -51,6 +59,14 @@ def _check_node():
         )
         if result.returncode != 0:
             raise RuntimeError("node 返回非零退出码")
+        version_text = (result.stdout or result.stderr or "").strip()
+        version = _parse_node_version(version_text)
+        if version is None or version < (18, 0, 0):
+            print(
+                f"[ERROR] Node.js >= 18 is required; found {version_text or 'unknown'}.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
     except (FileNotFoundError, RuntimeError):
         print(
             "[ERROR] 未找到 Node.js。请安装 Node.js >= 18：https://nodejs.org/",
@@ -197,8 +213,6 @@ def _preprocess_frontmatter(md_text: str) -> str:
 
     title: str | None = None
     extras: list[str] = []
-    skip_indented = False  # 遇到块标量后跳过后续缩进行
-
     for line in meta_lines:
         stripped = line.strip()
 
@@ -223,10 +237,8 @@ def _preprocess_frontmatter(md_text: str) -> str:
 
         # 块标量：值为 > 或 | 等，实际内容在后续缩进行中（我们跳过）
         if not val or val in _YAML_BLOCK_SCALARS:
-            skip_indented = True
             continue
 
-        skip_indented = False
         val = _strip_yaml_quotes(val)
 
         if not val:
@@ -278,6 +290,7 @@ def build_book(
     if not output_path:
         output_path = md_path.with_suffix(".xtc")
     output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         processed_md = Path(tmp_dir) / "input.md"
