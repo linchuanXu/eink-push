@@ -3,679 +3,708 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>阅星曈 — 你的个人 AI 终端</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <title>阅星曈 Skill - 把 AI 内容推到墨水屏</title>
+  <meta name="description" content="eink-push 是面向阅星曈墨水屏设备的 OpenClaw Skill，可推送卡片、Markdown 电子书、EPUB，并查询书架、阅读进度和书签摘录。">
   <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f3eb;
+      --paper-deep: #efe5d8;
+      --surface: rgba(255, 251, 245, 0.92);
+      --surface-strong: #fffaf3;
+      --ink: #171412;
+      --muted: #655c55;
+      --line: rgba(84, 63, 47, 0.14);
+      --line-strong: rgba(84, 63, 47, 0.28);
+      --accent: #b65f46;
+      --accent-deep: #8a452f;
+      --sage: #436157;
+      --gold: #936f39;
+      --shadow: 0 24px 70px rgba(43, 30, 21, 0.1);
+    }
+
+    * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
-      font-family: 'Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(182, 95, 70, 0.08), transparent 26%),
+        radial-gradient(circle at top right, rgba(67, 97, 87, 0.08), transparent 22%),
+        linear-gradient(180deg, #fbf8f2 0%, var(--paper) 44%, #f4ede3 100%);
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       -webkit-font-smoothing: antialiased;
-      background-color: #FAF8F4;
-      color: #1C1917;
+      text-rendering: optimizeLegibility;
     }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
 
-    /* Gradient text — orange to amber */
-    .grad-text {
-      background: linear-gradient(135deg, #EA580C 0%, #F97316 50%, #D97706 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(84, 63, 47, 0.08);
+      background: rgba(251, 248, 242, 0.84);
+      backdrop-filter: blur(16px);
     }
-
-    /* Hero radial warm glow */
-    .hero-glow {
-      background: radial-gradient(ellipse 70% 55% at 50% 45%,
-        rgba(251,191,36,0.13) 0%,
-        rgba(249,115,22,0.07) 40%,
-        transparent 70%);
+    .nav-inner {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
     }
-
-    /* Feature card */
-    .feat-card { transition: transform 0.18s ease, box-shadow 0.18s ease; }
-    .feat-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 36px rgba(180,100,20,0.10);
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      min-width: 0;
     }
-    .feat-card-soon { transition: transform 0.18s ease; }
-    .feat-card-soon:hover { transform: translateY(-2px); }
-
-    /* Scenario card */
-    .scen-card { transition: box-shadow 0.18s ease; }
-    .scen-card:hover { box-shadow: 0 8px 28px rgba(180,100,20,0.09); }
-
-    /* User bubble — WeChat green */
-    .u-bubble {
-      background: #95EC69;
-      color: #1a1a1a;
-      border-radius: 8px 8px 2px 8px;
+    .brand strong {
+      font-size: 18px;
+      font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+    .brand span { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-cta {
+      color: #fff7f0;
+      background: var(--accent-deep);
+      border-radius: 8px;
       padding: 10px 14px;
-      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(138, 69, 47, 0.18);
+    }
+
+    .hero {
+      position: relative;
+      min-height: calc(100vh - 64px);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(182, 95, 70, 0.28), transparent 28%),
+        radial-gradient(circle at 80% 0%, rgba(147, 111, 57, 0.18), transparent 24%),
+        linear-gradient(135deg, #181310 0%, #221815 56%, #2a1d18 100%);
+    }
+    .hero-media {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-auto-rows: 34vh;
+      gap: 16px;
+      padding: 22px;
+      opacity: 0.42;
+      transform: scale(1.04);
+    }
+    .hero-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border: 1px solid rgba(255, 245, 235, 0.22);
+      border-radius: 8px;
+      filter: grayscale(1) contrast(1.05) sepia(0.14);
+      background: #eef1eb;
+    }
+    .hero-media img:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+    .hero-media img:nth-child(2) { grid-column: span 2; }
+    .hero-media img:nth-child(3) { grid-column: span 2; grid-row: span 2; }
+    .hero-media img:nth-child(4) { grid-column: span 2; }
+    .hero-media img:nth-child(5) { grid-column: span 2; }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(23, 20, 18, 0.93), rgba(23, 20, 18, 0.8) 46%, rgba(23, 20, 18, 0.34));
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 90px 0 110px;
+      color: var(--surface);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #f0dfd4;
+      border: 1px solid rgba(240, 223, 212, 0.28);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      background: rgba(255, 250, 243, 0.04);
+    }
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #dd8f73;
+    }
+    h1 {
+      max-width: 760px;
+      margin: 28px 0 22px;
+      font-size: clamp(44px, 9vw, 92px);
+      line-height: 0.96;
+      letter-spacing: 0;
+      font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
+      font-weight: 700;
+    }
+    .hero-lede {
+      max-width: 640px;
+      margin: 0 0 34px;
+      color: #e7ddd4;
+      font-size: clamp(17px, 2vw, 21px);
+      line-height: 1.75;
+    }
+    .install-box {
+      width: min(680px, 100%);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid rgba(255, 245, 235, 0.24);
+      border-radius: 8px;
+      background: rgba(255, 250, 243, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    .install-box code {
+      min-width: 0;
+      color: #fff7ef;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: #f0dfd4;
+      color: #2c1d18;
+      box-shadow: 0 12px 30px rgba(182, 95, 70, 0.16);
+    }
+    .btn-secondary { background: var(--ink); color: #fffaf3; }
+    .btn-outline { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .hero-note {
+      margin-top: 34px;
+      color: #cdbfb2;
+      font-size: 13px;
+    }
+
+    .section {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 88px 0;
+    }
+    .section-tight { padding: 68px 0; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+      gap: 48px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+    .kicker {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin: 0 0 12px;
+    }
+    h2 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 54px);
+      line-height: 1.05;
+      letter-spacing: 0;
+      font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
+      font-weight: 700;
+    }
+    .section-head p,
+    .muted {
+      color: var(--muted);
+      line-height: 1.75;
+      margin: 0;
+    }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .tile {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      padding: 22px;
+      min-height: 228px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .tile:hover { border-color: var(--line-strong); }
+    .tile-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #f4e0d6;
+      color: var(--accent-deep);
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+    .tile:nth-child(2) .tile-mark { background: #e4ece8; color: var(--sage); }
+    .tile:nth-child(3) .tile-mark { background: #f1e6cf; color: var(--gold); }
+    .tile:nth-child(4) .tile-mark { background: #eee6dc; color: #57483d; }
+    .tile h3 {
+      margin: 0 0 10px;
+      font-size: 19px;
+    }
+    .tile p {
+      color: var(--muted);
       line-height: 1.65;
-      align-self: flex-end;
+      margin: 0;
+      font-size: 14px;
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+    .tag {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 9px;
+      color: #4b514b;
+      font-size: 12px;
+      background: rgba(255, 250, 243, 0.84);
     }
 
-    /* AI bubble — WeChat received (white) */
-    .ai-bubble {
-      background: #ffffff;
-      border: none;
-      border-radius: 8px 8px 8px 2px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      padding: 10px 14px;
-      font-size: 13.5px;
+    .split {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-strong);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+    .panel-dark {
+      background:
+        radial-gradient(circle at top right, rgba(182, 95, 70, 0.16), transparent 34%),
+        linear-gradient(160deg, #1d1613 0%, #261b17 100%);
+      color: #fff7ef;
+      border-color: rgba(255, 240, 224, 0.08);
+    }
+    .list {
+      display: grid;
+      gap: 12px;
+      margin: 22px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .list li {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .list strong { color: var(--ink); }
+    .panel-dark .list li { color: #d5dbd0; }
+    .panel-dark .list strong { color: #ffffff; }
+    .index {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: var(--surface);
+      background: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .command-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .command {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 251, 245, 0.82);
+      padding: 18px;
+      min-height: 164px;
+      box-shadow: var(--shadow);
+    }
+    .command p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 10px 0 0;
+    }
+    .bubble {
+      background: #f2e7dd;
+      border: 1px solid rgba(182, 95, 70, 0.18);
+      border-radius: 8px;
+      padding: 12px;
+      line-height: 1.55;
+      font-size: 14px;
+      color: #20251f;
+    }
+
+    .security-band {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(239, 229, 216, 0.7), rgba(247, 243, 235, 0.8));
+    }
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .security-grid h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+    .security-grid p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .cta {
+      text-align: center;
+      padding: 90px 0;
+    }
+    .cta p {
+      color: var(--muted);
+      margin: 16px auto 28px;
+      max-width: 560px;
       line-height: 1.7;
-      color: #1a1a1a;
+    }
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 28px 0;
+      background: rgba(255, 250, 243, 0.7);
+    }
+    .footer-inner {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
     }
 
-    /* Role card (OpenClaw) */
-    .role-card {
-      transition: box-shadow 0.18s ease, transform 0.18s ease;
-    }
-    .role-card:hover {
-      box-shadow: 0 6px 24px rgba(180,100,20,0.10);
-      transform: translateY(-2px);
+    @media (max-width: 860px) {
+      .nav-links a:not(.nav-cta) { display: none; }
+      .hero { min-height: auto; }
+      .hero-media {
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 190px;
+        opacity: 0.33;
+      }
+      .hero::after {
+        background: linear-gradient(180deg, rgba(24, 24, 23, 0.92), rgba(24, 24, 23, 0.72));
+      }
+      .hero-content { padding: 74px 0 86px; }
+      .install-box { grid-template-columns: 1fr; }
+      .btn { width: 100%; }
+      .section { padding: 64px 0; }
+      .section-head,
+      .split,
+      .workflow,
+      .command-grid,
+      .security-grid {
+        grid-template-columns: 1fr;
+      }
+      .tile { min-height: auto; }
     }
 
-    /* Animations */
-    @keyframes bounce-slow {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50%       { transform: translateX(-50%) translateY(7px); }
-    }
-    .scroll-indicator { animation: bounce-slow 2.2s ease-in-out infinite; }
-
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
-    .blink { animation: blink 2s ease-in-out infinite; }
-
-    /* Section divider */
-    .warm-line {
-      background: linear-gradient(90deg, transparent, #E7DDD0, transparent);
-      height: 1px;
+    @media (max-width: 520px) {
+      .nav-inner { width: min(100% - 24px, 1120px); }
+      .brand span { display: none; }
+      .nav-cta { padding: 9px 11px; font-size: 12px; }
+      .hero-content,
+      .section,
+      .footer-inner { width: min(100% - 24px, 1120px); }
+      .hero-lede { font-size: 16px; }
+      .panel,
+      .tile,
+      .command { padding: 18px; }
     }
   </style>
 </head>
-<body class="overflow-x-hidden">
-
-  <!-- ─── NAV ──────────────────────────────────────────────────────────── -->
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-[#FAF8F4]/88 backdrop-blur-xl border-b border-stone-200/60">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <span class="text-xl font-black tracking-tight text-stone-900">阅星曈</span>
-        <span class="hidden sm:block text-xs text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full">YuXingTong</span>
-      </div>
-      <div class="flex items-center gap-6">
-        <a href="#features"  class="text-sm text-stone-500 hover:text-stone-900 transition-colors hidden sm:block">功能</a>
-        <a href="#scenarios" class="text-sm text-stone-500 hover:text-stone-900 transition-colors hidden sm:block">使用场景</a>
-        <a href="#openclaw"  class="text-sm text-stone-500 hover:text-stone-900 transition-colors hidden sm:block">OpenClaw</a>
-        <a href="#cta" class="text-sm font-semibold bg-orange-500 text-white px-5 py-2 rounded-full hover:bg-orange-600 transition-colors">了解更多</a>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#">
+        <strong>阅星曈 Skill</strong>
+        <span>eink-push for OpenClaw</span>
+      </a>
+      <div class="nav-links">
+        <a href="#workflow">能力</a>
+        <a href="#examples">话术</a>
+        <a href="#security">安全</a>
+        <a class="nav-cta" href="landing-v2.html">安装配置</a>
       </div>
     </div>
   </nav>
 
-  <!-- ─── HERO ──────────────────────────────────────────────────────────── -->
-  <section class="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 pb-16 bg-[#FAF8F4] overflow-hidden">
+  <main>
+    <section class="hero">
+      <div class="hero-media" aria-hidden="true">
+        <img src="references/framework-samples/04-dashboard.preview.png" alt="">
+        <img src="references/framework-samples/08-editorial.preview.png" alt="">
+        <img src="references/framework-samples/13-infographic.preview.png" alt="">
+        <img src="references/framework-samples/11-timeline.preview.png" alt="">
+        <img src="references/framework-samples/05-newspaper.preview.png" alt="">
+      </div>
+      <div class="hero-content">
+        <span class="eyebrow">推送、阅读、书签、调研，一条 skill 串起来</span>
+        <h1>把 AI 做好的内容，送到你的墨水屏。</h1>
+        <p class="hero-lede">eink-push 面向阅星曈/Yue Xingtong 设备。它能把短内容做成卡片，把长内容做成 Markdown 翻页电子书；当你明确需要 EPUB 时，也能生成带封面的 EPUB。它还能查询书架、阅读进度和书签摘录，把阅读数据重新整理成可读内容。</p>
+        <div class="install-box">
+          <code id="installText">安装技能 https://github.com/linchuanXu/eink-push，并引导我完成阅星曈账号配置</code>
+          <button class="btn btn-primary" type="button" data-copy-target="installText">复制安装提示</button>
+        </div>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="landing-v2.html">查看安装配置</a>
+          <a class="btn" style="border-color:rgba(255,255,255,.36);color:#fff;background:transparent" href="#workflow">看能力边界</a>
+        </div>
+        <p class="hero-note">凭证优先读取环境变量；本地文件只作为 fallback。请求只发往官方域名 api-prod.xteink.cn。</p>
+      </div>
+    </section>
 
-    <!-- Warm radial glow -->
-    <div class="hero-glow absolute inset-0 pointer-events-none"></div>
-
-    <!-- Subtle decorative ring -->
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[640px] rounded-full border border-orange-200/30 pointer-events-none"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full border border-orange-100/20 pointer-events-none"></div>
-
-    <div class="relative z-10 max-w-5xl mx-auto">
-
-      <!-- Tag -->
-      <div class="inline-flex items-center gap-2.5 bg-orange-50 border border-orange-200 rounded-full px-5 py-2 mb-10">
-        <span class="w-1.5 h-1.5 rounded-full bg-orange-400 blink"></span>
-        <span class="text-orange-600 text-sm font-medium tracking-wide">个人 AI 终端 · 墨水屏设备</span>
+    <section id="workflow" class="section">
+      <div class="section-head">
+        <div>
+          <p class="kicker">Current Skill</p>
+          <h2>最新能力，按真实流程拆开。</h2>
+        </div>
+        <p>这版页面不再混入日历、漫画、PDF OCR 等未由当前 skill 直接承诺的能力。核心只讲已经在脚本和 SKILL.md 中落地的工作流。</p>
       </div>
 
-      <!-- Headline -->
-      <h1 class="font-black leading-none tracking-tight mb-8">
-        <span class="block text-7xl md:text-9xl text-stone-900 mb-2">你在生活</span>
-        <span class="block text-7xl md:text-9xl grad-text">AI 在工作</span>
-      </h1>
+      <div class="workflow">
+        <article class="tile">
+          <div class="tile-mark">A</div>
+          <h3>推送卡片</h3>
+          <p>短内容、摘要、仪表盘、书摘卡片走 HTML 渲染，再推送为单张或多张墨水屏图片。</p>
+          <div class="tag-row">
+            <span class="tag">≤2000 字</span>
+            <span class="tag">render_image.py</span>
+          </div>
+        </article>
+        <article class="tile">
+          <div class="tile-mark">B</div>
+          <h3>翻页电子书</h3>
+          <p>长文、报告、阅读笔记优先写 Markdown，渲染为适合设备翻页阅读的电子书文件。</p>
+          <div class="tag-row">
+            <span class="tag">&gt;2000 字</span>
+            <span class="tag">render_book.py</span>
+          </div>
+        </article>
+        <article class="tile">
+          <div class="tile-mark">C</div>
+          <h3>EPUB 电子书</h3>
+          <p>只有当用户明确说 EPUB 时启用；适合图文混排、封面、设备电子书阅读器场景。</p>
+          <div class="tag-row">
+            <span class="tag">明确触发</span>
+            <span class="tag">cover-svg</span>
+          </div>
+        </article>
+        <article class="tile">
+          <div class="tile-mark">D</div>
+          <h3>阅读数据回流</h3>
+          <p>查书架、进度、书签和摘录，再生成书摘卡片、阅读笔记电子书或阅读看板。</p>
+          <div class="tag-row">
+            <span class="tag">fetch_reading.py</span>
+            <span class="tag">compact 输出</span>
+          </div>
+        </article>
+      </div>
+    </section>
 
-      <!-- Subtitle -->
-      <p class="text-stone-500 text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-14">
-        墨水屏，是 AI 世界和你的生活之间<br>
-        <span class="text-stone-700 font-medium">唯一安静的接口</span>
-      </p>
-
-      <!-- Install CTA -->
-      <div class="max-w-xl mx-auto w-full mb-5">
-        <p class="text-stone-400 text-xs mb-3">复制发给 OpenClaw，即可安装技能</p>
-        <div class="flex items-center gap-3 bg-white border border-orange-200 rounded-2xl px-5 py-3.5 shadow-sm">
-          <code class="flex-1 text-stone-700 text-sm font-mono text-left leading-relaxed select-all">
-            安装更新技能 https://github.com/linchuanXu/eink-push
-          </code>
-          <button onclick="copyInstall()" id="copy-btn"
-            class="flex-shrink-0 flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors whitespace-nowrap">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-            </svg>
-            复制
-          </button>
+    <section class="section section-tight">
+      <div class="split">
+        <div class="panel">
+          <p class="kicker">Decision Route</p>
+          <h2>一句话之后，skill 会先判断形式。</h2>
+          <ul class="list">
+            <li><span class="index">1</span><span><strong>发到阅星曈</strong>：按字数走卡片或 Markdown 翻页电子书。</span></li>
+            <li><span class="index">2</span><span><strong>明确说卡片</strong>：生成 HTML 卡片并推送。</span></li>
+            <li><span class="index">3</span><span><strong>明确说电子书</strong>：整理 Markdown 并推送。</span></li>
+            <li><span class="index">4</span><span><strong>明确说 EPUB</strong>：生成 EPUB，必要时带封面。</span></li>
+          </ul>
         </div>
-        <a href="#scenarios" class="inline-block mt-4 text-sm text-stone-400 hover:text-orange-500 transition-colors">
-          查看使用场景 →
-        </a>
+        <div class="panel panel-dark">
+          <p class="kicker" style="color:#9cd5ad">Quality Pass</p>
+          <h2>最新脚本把粗糙处收紧了。</h2>
+          <ul class="list">
+            <li><span class="index">OK</span><span><strong>参数早校验</strong>：尺寸、Gamma、图片质量、分页参数会给出清楚错误。</span></li>
+            <li><span class="index">OK</span><span><strong>安装审计更完整</strong>：会检查 runtime 文件是否和源码漂移。</span></li>
+            <li><span class="index">OK</span><span><strong>EPUB 更顺</strong>：保留前言正文，避免重复章节标题。</span></li>
+            <li><span class="index">OK</span><span><strong>测试边界明确</strong>：pytest 只收集本仓库测试。</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="examples" class="section">
+      <div class="section-head">
+        <div>
+          <p class="kicker">Examples</p>
+          <h2>这些话术会落到明确流程。</h2>
+        </div>
+        <p>页面上的示例只覆盖当前 skill 明确支持的动作：推送、书架、书签、阅读产物和联网调研。</p>
       </div>
 
-      <!-- Stats -->
-      <div class="mt-20 flex items-center justify-center gap-12 flex-wrap">
-        <div class="text-center">
-          <div class="text-stone-900 font-black text-3xl">6+</div>
-          <div class="text-stone-400 text-xs mt-1">已上线功能</div>
-        </div>
-        <div class="w-px h-8 bg-stone-200"></div>
-        <div class="text-center">
-          <div class="text-stone-900 font-black text-3xl">3层</div>
-          <div class="text-stone-400 text-xs mt-1">设备 · 云端 · AI</div>
-        </div>
-        <div class="w-px h-8 bg-stone-200"></div>
-        <div class="text-center">
-          <div class="grad-text font-black text-3xl">∞</div>
-          <div class="text-stone-400 text-xs mt-1">知识飞轮</div>
-        </div>
+      <div class="command-grid">
+        <article class="command">
+          <div class="bubble">把这段内容做成墨水屏卡片，推到阅星曈。</div>
+          <p>适合短摘要、结论、清单、看板。多页会打包为翻页图片集。</p>
+        </article>
+        <article class="command">
+          <div class="bubble">整理《百年孤独》的书签，做成阅读笔记电子书。</div>
+          <p>先拉取书签，再按章节整理为 Markdown 翻页电子书。</p>
+        </article>
+        <article class="command">
+          <div class="bubble">生成 EPUB 发到设备，要带封面。</div>
+          <p>只有明确提到 EPUB 时才走 EPUB 生成路径。</p>
+        </article>
+        <article class="command">
+          <div class="bubble">看一下我的书架和最近阅读进度。</div>
+          <p>默认使用 compact 输出，减少上下文占用，只展示常用字段。</p>
+        </article>
+        <article class="command">
+          <div class="bubble">把最近书签挑 6 条精彩摘录做成卡片。</div>
+          <p>适合复习、回顾、摘录分享和设备端轻阅读。</p>
+        </article>
+        <article class="command">
+          <div class="bubble">查一下这个主题的最新资料，整理后推到设备。</div>
+          <p>阅星曈推送场景中可调用联网搜索，并保留引用来源。</p>
+        </article>
       </div>
-    </div>
+    </section>
 
-    <!-- Scroll hint -->
-    <div class="scroll-indicator absolute bottom-10 left-1/2 flex flex-col items-center gap-1 text-stone-300">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/>
-      </svg>
-    </div>
-  </section>
-
-  <!-- ─── THREE PILLARS ─────────────────────────────────────────────────── -->
-  <section class="py-24 px-6 bg-white">
-    <div class="max-w-5xl mx-auto">
-      <div class="grid md:grid-cols-3 gap-1">
-
-        <div class="p-10 text-center group">
-          <div class="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center mx-auto mb-7 group-hover:bg-stone-200 transition-colors">
-            <svg class="w-8 h-8 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
+    <section id="security" class="security-band">
+      <div class="section section-tight">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Setup & Safety</p>
+            <h2>安装、凭证和环境都讲清楚。</h2>
           </div>
-          <h3 class="text-xl font-bold text-stone-900 mb-3">安静的输出</h3>
-          <p class="text-stone-500 text-sm leading-relaxed">没有弹窗，没有震动<br>AI 完成了，结果就在那里</p>
+          <p>真正影响体验的不是功能列表，而是首次使用时能不能顺利跑起来。最新 skill 内置环境预检、凭证结构检查、安装漂移审计和离线 smoke test。</p>
         </div>
-
-        <div class="p-10 text-center group border-x border-stone-100">
-          <div class="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-7 group-hover:bg-orange-100 transition-colors">
-            <svg class="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-            </svg>
+        <div class="security-grid">
+          <div>
+            <h3>环境预检</h3>
+            <p>运行 `python scripts/check_environment.py`，缺依赖时直接给出 fix 命令。</p>
           </div>
-          <h3 class="text-xl font-bold text-stone-900 mb-3">持续工作的 AI</h3>
-          <p class="text-stone-500 text-sm leading-relaxed">你睡觉、开会、散步<br>后台一直在跑</p>
-        </div>
-
-        <div class="p-10 text-center group">
-          <div class="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center mx-auto mb-7 group-hover:bg-stone-200 transition-colors">
-            <svg class="w-8 h-8 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
+          <div>
+            <h3>凭证来源</h3>
+            <p>优先 `XTEINK_USERNAME` / `XTEINK_PASSWORD`，再兼容 `YUEXINGTONG_*`，最后 fallback 到 `.credentials.json`。</p>
           </div>
-          <h3 class="text-xl font-bold text-stone-900 mb-3">越用越懂你</h3>
-          <p class="text-stone-500 text-sm leading-relaxed">知识飞轮越转越快<br>积累越来越有价值</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <div class="warm-line max-w-5xl mx-auto"></div>
-
-  <!-- ─── FEATURES ──────────────────────────────────────────────────────── -->
-  <section id="features" class="py-24 px-6 bg-[#FAF8F4]">
-    <div class="max-w-6xl mx-auto">
-
-      <div class="text-center mb-16">
-        <p class="text-xs font-semibold text-orange-500 mb-4 uppercase tracking-widest">核心功能</p>
-        <h2 class="text-4xl md:text-5xl font-black text-stone-900 mb-5 leading-tight">现在就能用<br>更多正在路上</h2>
-        <p class="text-stone-400 text-base">设备 · 星曈云 · AI 推理，三层架构一体协作</p>
-      </div>
-
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-
-        <!-- ✅ LIVE -->
-        <div class="feat-card bg-white rounded-2xl p-7 border border-stone-200">
-          <div class="flex items-start justify-between mb-5">
-            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-2xl">📡</div>
-            <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full font-medium">✓ 已上线</span>
-          </div>
-          <h3 class="font-bold text-stone-900 mb-2">信息订阅</h3>
-          <p class="text-sm text-stone-500 leading-relaxed">订阅公众号、博客、RSS，打开设备就有新内容，像有人帮你选好了今天该读什么</p>
-        </div>
-
-        <div class="feat-card bg-white rounded-2xl p-7 border border-stone-200">
-          <div class="flex items-start justify-between mb-5">
-            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-2xl">☁️</div>
-            <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full font-medium">✓ 已上线</span>
-          </div>
-          <h3 class="font-bold text-stone-900 mb-2">云端推书</h3>
-          <p class="text-sm text-stone-500 leading-relaxed">手机上找到的书或文章，点一下，设备上马上就有了，无需数据线、无需 SD 卡</p>
-        </div>
-
-        <div class="feat-card bg-white rounded-2xl p-7 border border-stone-200">
-          <div class="flex items-start justify-between mb-5">
-            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-2xl">🧠</div>
-            <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full font-medium">✓ 已上线</span>
-          </div>
-          <h3 class="font-bold text-stone-900 mb-2">智能摘要</h3>
-          <p class="text-sm text-stone-500 leading-relaxed">8000 字报告变成 400 字要点卡片，5 分钟消化一篇长文，碎片时间也能高效吸收</p>
-        </div>
-
-        <div class="feat-card bg-white rounded-2xl p-7 border border-stone-200">
-          <div class="flex items-start justify-between mb-5">
-            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-2xl">🧹</div>
-            <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full font-medium">✓ 已上线</span>
-          </div>
-          <h3 class="font-bold text-stone-900 mb-2">原文清洗</h3>
-          <p class="text-sm text-stone-500 leading-relaxed">广告、跳转链接、水印全部过滤，推到设备上读起来像一本正经的书</p>
-        </div>
-
-        <div class="feat-card bg-white rounded-2xl p-7 border border-stone-200">
-          <div class="flex items-start justify-between mb-5">
-            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-2xl">📅</div>
-            <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full font-medium">✓ 已上线</span>
-          </div>
-          <h3 class="font-bold text-stone-900 mb-2">日历提醒</h3>
-          <p class="text-sm text-stone-500 leading-relaxed">安静提示接下来的事，不震动不弹窗，不会让你忍不住刷起来</p>
-        </div>
-
-        <div class="feat-card bg-white rounded-2xl p-7 border border-stone-200">
-          <div class="flex items-start justify-between mb-5">
-            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-2xl">🎨</div>
-            <span class="text-xs bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full font-medium">✓ 已上线</span>
-          </div>
-          <h3 class="font-bold text-stone-900 mb-2">漫画智能裁边</h3>
-          <p class="text-sm text-stone-500 leading-relaxed">AI 自动识别白边，让画面最大化填满屏幕，不用手动处理图片</p>
-        </div>
-
-        <!-- 🔄 COMING SOON -->
-        <div class="feat-card-soon bg-stone-50 rounded-2xl p-7 border border-dashed border-stone-200">
-          <div class="flex items-start justify-between mb-5">
-            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl opacity-50">📚</div>
-            <span class="text-xs text-stone-400 border border-stone-200 bg-white px-3 py-1 rounded-full font-medium">Coming Soon</span>
-          </div>
-          <h3 class="font-bold text-stone-500 mb-2">个人知识库</h3>
-          <p class="text-sm text-stone-400 leading-relaxed">好内容有地方存，AI 帮你整理归档，再也不怕「收藏了就是看过了」</p>
-        </div>
-
-        <div class="feat-card-soon bg-stone-50 rounded-2xl p-7 border border-dashed border-stone-200">
-          <div class="flex items-start justify-between mb-5">
-            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl opacity-50">🎙️</div>
-            <span class="text-xs text-stone-400 border border-stone-200 bg-white px-3 py-1 rounded-full font-medium">Coming Soon</span>
-          </div>
-          <h3 class="font-bold text-stone-500 mb-2">录音转写</h3>
-          <p class="text-sm text-stone-400 leading-relaxed">会议录音交给 AI，转写整理后推到设备，告别手忙脚乱记笔记</p>
-        </div>
-
-        <div class="feat-card-soon bg-stone-50 rounded-2xl p-7 border border-dashed border-stone-200">
-          <div class="flex items-start justify-between mb-5">
-            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl opacity-50">📄</div>
-            <span class="text-xs text-stone-400 border border-stone-200 bg-white px-3 py-1 rounded-full font-medium">Coming Soon</span>
-          </div>
-          <h3 class="font-bold text-stone-500 mb-2">文档结构识别</h3>
-          <p class="text-sm text-stone-400 leading-relaxed">复杂 PDF 丢进来，AI 识别结构转成 EPUB，图表在该在的位置</p>
-        </div>
-
-        <div class="feat-card-soon bg-stone-50 rounded-2xl p-7 border border-dashed border-stone-200 sm:col-span-2 lg:col-span-3">
-          <div class="flex items-start justify-between mb-5">
-            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl opacity-50">🎯</div>
-            <span class="text-xs text-stone-400 border border-stone-200 bg-white px-3 py-1 rounded-full font-medium">Coming Soon</span>
-          </div>
-          <h3 class="font-bold text-stone-500 mb-2">个性化内容推送</h3>
-          <p class="text-sm text-stone-400 leading-relaxed">AI 学会你的阅读口味，过滤低质内容，像私人编辑每天帮你选好。用得越久，推送越准</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── USAGE SCENARIOS ───────────────────────────────────────────────── -->
-  <section id="scenarios" class="py-24 px-6 bg-white">
-    <div class="max-w-6xl mx-auto">
-
-      <div class="text-center mb-16">
-        <p class="text-xs font-semibold text-orange-500 mb-4 uppercase tracking-widest">使用场景</p>
-        <h2 class="text-4xl md:text-5xl font-black text-stone-900 mb-5 leading-tight">一句话<br>AI 就明白了</h2>
-        <p class="text-stone-400 text-base">看看大家都在怎么用</p>
-      </div>
-
-      <!-- ── 信息获取 ── -->
-      <div class="mb-14">
-        <div class="flex items-center gap-3 mb-6">
-          <span class="text-orange-400 text-base font-bold">+</span>
-          <h3 class="text-base font-semibold text-stone-600">信息获取</h3>
-          <div class="flex-1 h-px bg-stone-100"></div>
-        </div>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
-            <div class="u-bubble">「把这篇 8000 字的行业报告摘要一下，推到设备上」</div>
-            <div class="ai-bubble">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
-                <span class="text-xs font-medium text-stone-400">阅星曈</span>
-              </div>
-              已提炼 7 个核心观点，400 字要点卡片推送完成，设备上可以读了
-            </div>
-          </div>
-          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
-            <div class="u-bubble">「我订阅的科技博主昨天更新了，帮我清洗推到设备」</div>
-            <div class="ai-bubble">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
-                <span class="text-xs font-medium text-stone-400">阅星曈</span>
-              </div>
-              找到 2 篇新文章，已过滤广告和跳转链接，推送完成
-            </div>
-          </div>
-          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
-            <div class="u-bubble">「微信收到的 PDF 报告，图表要保留，推到设备」</div>
-            <div class="ai-bubble">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
-                <span class="text-xs font-medium text-stone-400">阅星曈</span>
-              </div>
-              识别 12 处图表，转换 EPUB 格式，排版已还原，推送完成
-            </div>
+          <div>
+            <h3>官方域名</h3>
+            <p>凭证只用于阅星曈官方 API：`api-prod.xteink.cn`。不会写入仓库，也不会传给其他域名。</p>
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- ── 专注工作 ── -->
-      <div class="mb-14">
-        <div class="flex items-center gap-3 mb-6">
-          <span class="text-orange-400 text-base font-bold">+</span>
-          <h3 class="text-base font-semibold text-stone-600">专注工作</h3>
-          <div class="flex-1 h-px bg-stone-100"></div>
-        </div>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
-            <div class="u-bubble">「把今天的日历推到设备，我要进专注模式了」</div>
-            <div class="ai-bubble">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
-                <span class="text-xs font-medium text-stone-400">阅星曈</span>
-              </div>
-              今日 4 个日程已推送，下一个是 14:30 产品评审会，安静等你
-            </div>
-          </div>
-          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
-            <div class="u-bubble">「一小时的会议录音，帮我整理要点推到设备」</div>
-            <div class="ai-bubble">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
-                <span class="text-xs font-medium text-stone-400">阅星曈</span>
-              </div>
-              转写完成，提炼 5 个决策事项和 8 条待办清单，已推送到设备
-            </div>
-          </div>
-          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
-            <div class="u-bubble">「帮我生成今天的执行计划，推到设备上」</div>
-            <div class="ai-bubble">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
-                <span class="text-xs font-medium text-stone-400">阅星曈</span>
-              </div>
-              结合日历和待办，生成 6 个番茄钟计划，已推送，专注模式随时可以开始
-            </div>
-          </div>
+    <section class="cta">
+      <div class="section-tight" style="padding-top:0;padding-bottom:0">
+        <p class="kicker">Ready</p>
+        <h2>让 AI 的产出，有一个安静的落点。</h2>
+        <p>如果你已经安装了 skill，直接说“发到阅星曈”就行。首次使用从安装配置页开始，会更稳。</p>
+        <div class="hero-actions" style="justify-content:center">
+          <a class="btn btn-secondary" href="landing-v2.html">打开安装配置页</a>
+          <a class="btn btn-outline" href="https://github.com/linchuanXu/eink-push">查看 GitHub</a>
         </div>
       </div>
+    </section>
+  </main>
 
-      <!-- ── 委托与等待 ── -->
-      <div class="mb-14">
-        <div class="flex items-center gap-3 mb-6">
-          <span class="text-orange-400 text-base font-bold">+</span>
-          <h3 class="text-base font-semibold text-stone-600">委托与等待</h3>
-          <div class="flex-1 h-px bg-stone-100"></div>
-        </div>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
-            <div class="u-bubble">「帮我调研竞品 X 最近的动作，我去开会了」</div>
-            <div class="ai-bubble">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
-                <span class="text-xs font-medium text-stone-400">阅星曈</span>
-              </div>
-              <p>好的，调研完成后直接推到你的设备，你回来就能看</p>
-              <div class="mt-3 pt-3 border-t border-stone-100">
-                <span class="text-xs text-stone-400">2 小时后 · </span>
-                <span class="text-xs text-orange-500 font-medium">调研报告已静静推到墨水屏 🖤</span>
-              </div>
-            </div>
-          </div>
-          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
-            <div class="u-bubble">「帮我把这周工作产出整理成 EPUB 推到设备」</div>
-            <div class="ai-bubble">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
-                <span class="text-xs font-medium text-stone-400">阅星曈</span>
-              </div>
-              整理了 23 篇内容，按主题分 4 章，已推送，今晚可以读
-            </div>
-          </div>
-          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
-            <div class="u-bubble">「睡前吩咐你做个早报，早上醒来墨水屏上有什么？」</div>
-            <div class="ai-bubble">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
-                <span class="text-xs font-medium text-stone-400">阅星曈</span>
-              </div>
-              昨晚监控了 12 个信息源，筛出 5 条值得读的内容，今日 3 个日程，天气多云转晴，早报已推送
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── 阅读与知识库 ── -->
-      <div>
-        <div class="flex items-center gap-3 mb-6">
-          <span class="text-orange-400 text-base font-bold">+</span>
-          <h3 class="text-base font-semibold text-stone-600">阅读与知识库</h3>
-          <div class="flex-1 h-px bg-stone-100"></div>
-        </div>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
-            <div class="u-bubble">「我最近读了哪些书，进度怎么样？」</div>
-            <div class="ai-bubble">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
-                <span class="text-xs font-medium text-stone-400">阅星曈</span>
-              </div>
-              书架 8 本：《人类简史》已读完 ✓，《百年孤独》82%，最近活跃是昨天的《悉达多》
-            </div>
-          </div>
-          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
-            <div class="u-bubble">「把《百年孤独》的书签整理成笔记推到设备」</div>
-            <div class="ai-bubble">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
-                <span class="text-xs font-medium text-stone-400">阅星曈</span>
-              </div>
-              找到 23 条书签，按章节整理成 EPUB，像你自己写的读书笔记，已推送
-            </div>
-          </div>
-          <div class="scen-card bg-[#EDEDED] rounded-2xl p-5 flex flex-col gap-3">
-            <div class="u-bubble">「把这半年的知识积累整理成一本年鉴」</div>
-            <div class="ai-bubble">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="w-5 h-5 rounded-lg bg-[#07C160] flex items-center justify-center text-white font-bold" style="font-size:9px">AI</span>
-                <span class="text-xs font-medium text-stone-400">阅星曈</span>
-              </div>
-              整理了 200 篇收藏，按主题分章，《2026 上半年知识手册》已推送
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ─── OPENCLAW ──────────────────────────────────────────────────────── -->
-  <section id="openclaw" class="py-28 px-6 bg-[#FDF5EA] relative overflow-hidden">
-
-    <!-- Subtle warm glow -->
-    <div class="absolute top-0 right-0 w-[500px] h-[400px] pointer-events-none"
-         style="background: radial-gradient(ellipse, rgba(251,191,36,0.12) 0%, transparent 65%);"></div>
-    <div class="absolute bottom-0 left-0 w-[400px] h-[300px] pointer-events-none"
-         style="background: radial-gradient(ellipse, rgba(249,115,22,0.08) 0%, transparent 65%);"></div>
-
-    <div class="max-w-6xl mx-auto relative z-10">
-
-      <!-- Header -->
-      <div class="text-center mb-20">
-        <div class="inline-flex items-center gap-2.5 bg-orange-100 border border-orange-200 rounded-full px-5 py-2 mb-8">
-          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 blink"></span>
-          <span class="text-orange-700 text-sm font-medium">规划中 · 战略核心</span>
-        </div>
-        <h2 class="font-black text-stone-900 text-5xl md:text-6xl leading-tight mb-8">
-          OpenClaw<br>
-          <span class="grad-text">你的数字分身</span>
-        </h2>
-        <p class="text-stone-500 text-lg max-w-2xl mx-auto leading-relaxed">
-          AI 团队持续在信息世界里工作<br>
-          你在生活、休息、专注<br>
-          <span class="text-stone-700 font-medium">墨水屏，是这两个世界之间唯一的安静接口</span>
-        </p>
-      </div>
-
-      <!-- Four Roles -->
-      <p class="text-stone-400 text-xs font-semibold uppercase tracking-widest text-center mb-8">设备四个角色</p>
-      <div class="grid md:grid-cols-2 gap-4 mb-20">
-
-        <div class="role-card bg-white rounded-2xl p-8 border border-orange-100">
-          <div class="flex items-center gap-4 mb-5">
-            <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-2xl">📡</div>
-            <div>
-              <div class="text-stone-900 font-bold text-lg">监控端</div>
-              <div class="text-orange-500 text-xs">实时状态</div>
-            </div>
-          </div>
-          <p class="text-stone-500 text-sm leading-relaxed">实时显示 OpenClaw 的运行状态——当前执行什么任务、进度百分比、有无需要介入。不解锁手机，抬头扫一眼，AI 团队在干什么一目了然</p>
-        </div>
-
-        <div class="role-card bg-white rounded-2xl p-8 border border-orange-100">
-          <div class="flex items-center gap-4 mb-5">
-            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-2xl">🔔</div>
-            <div>
-              <div class="text-stone-900 font-bold text-lg">显示端</div>
-              <div class="text-amber-600 text-xs">安静通知</div>
-            </div>
-          </div>
-          <p class="text-stone-500 text-sm leading-relaxed">OpenClaw 通过星曈云把消息、通知、任务完成提醒推送到设备。重要信息静静出现在屏幕上，不震动不弹窗，你看到了自然会看到</p>
-        </div>
-
-        <div class="role-card bg-white rounded-2xl p-8 border border-orange-100">
-          <div class="flex items-center gap-4 mb-5">
-            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-2xl">📖</div>
-            <div>
-              <div class="text-stone-900 font-bold text-lg">输出端</div>
-              <div class="text-emerald-600 text-xs">AI 产出文库</div>
-            </div>
-          </div>
-          <p class="text-stone-500 text-sm leading-relaxed">调研报告、知识手册、会议纪要、个人年鉴，经星曈云整理推送。每天有新内容等你读——不是算法喂给你的，是你的 AI 帮你生产的</p>
-        </div>
-
-        <div class="role-card bg-white rounded-2xl p-8 border border-orange-100">
-          <div class="flex items-center gap-4 mb-5">
-            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-2xl">🔄</div>
-            <div>
-              <div class="text-stone-900 font-bold text-lg">反馈端</div>
-              <div class="text-amber-600 text-xs">知识飞轮</div>
-            </div>
-          </div>
-          <p class="text-stone-500 text-sm leading-relaxed">设备上的阅读行为和标记，通过星曈云反哺知识库和 OpenClaw 的偏好模型。AI 知道你在意什么，下次推得更准</p>
-        </div>
-
-      </div>
-
-      <!-- Scenarios -->
-      <p class="text-stone-400 text-xs font-semibold uppercase tracking-widest text-center mb-8">典型场景</p>
-      <div class="grid md:grid-cols-3 gap-5 mb-20">
-
-        <div class="bg-white rounded-2xl p-7 border border-orange-100">
-          <div class="text-orange-500 text-xs font-semibold uppercase tracking-widest mb-4">AI 早报</div>
-          <p class="text-stone-500 text-sm leading-relaxed">你睡觉，OpenClaw 后台运行。早上醒来，墨水屏上是昨晚的"AI 夜班日志"——发现了什么值得关注、今天有什么日程安排。拿起手机的第一眼，变成有价值的信息</p>
-        </div>
-
-        <div class="bg-white rounded-2xl p-7 border border-orange-100">
-          <div class="text-amber-600 text-xs font-semibold uppercase tracking-widest mb-4">长任务异步</div>
-          <p class="text-stone-500 text-sm leading-relaxed">微信告诉 OpenClaw "帮我调研竞品"，放下手机去开会。两小时后墨水屏上静静出现完成卡，点开是整理好的调研报告。不用等、不用盯，AI 干完了自然告诉你</p>
-        </div>
-
-        <div class="bg-white rounded-2xl p-7 border border-orange-100">
-          <div class="text-emerald-600 text-xs font-semibold uppercase tracking-widest mb-4">AI 个人年鉴</div>
-          <p class="text-stone-500 text-sm leading-relaxed">OpenClaw 每月自动把知识积累、深度对话精华、工作产出整理成一本 EPUB 推到设备。每季度回顾，看到的是自己真实的成长轨迹，而不是刷过就忘的信息流</p>
-        </div>
-
-      </div>
-
-      <!-- Flywheel -->
-      <div class="text-center border-t border-orange-100 pt-16 max-w-3xl mx-auto mb-20">
-        <p class="text-stone-400 text-xs uppercase tracking-widest mb-6">知识库飞轮</p>
-        <p class="text-stone-600 text-lg leading-relaxed">
-          用得越久，系统越懂你，推送越精准，积累越有价值
-        </p>
-        <p class="text-stone-900 font-bold text-xl mt-3">这是一个正向飞轮，不是用完即走的工具</p>
-      </div>
-
-
-    </div>
-  </section>
-
-  <!-- ─── CTA ───────────────────────────────────────────────────────────── -->
-  <section id="cta" class="py-32 px-6 bg-white text-center">
-    <div class="max-w-2xl mx-auto">
-      <p class="text-orange-500 text-xs font-semibold uppercase tracking-widest mb-6">阅星曈 · YuXingTong</p>
-      <h2 class="text-5xl md:text-6xl font-black text-stone-900 leading-tight mb-6">
-        AI 时代的<br>个人终端
-      </h2>
-      <p class="text-stone-400 text-lg mb-14 leading-relaxed">
-        让你的 AI，有一个安静的家
-      </p>
-      <a href="#" class="inline-flex items-center gap-2 bg-orange-500 text-white px-10 py-4 rounded-full font-semibold text-base hover:bg-orange-600 transition-colors">
-        了解更多
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-        </svg>
-      </a>
-    </div>
-  </section>
-
-  <!-- ─── FOOTER ────────────────────────────────────────────────────────── -->
-  <footer class="border-t border-stone-100 py-8 px-6 bg-[#FAF8F4]">
-    <div class="max-w-6xl mx-auto flex items-center justify-between text-sm text-stone-400">
-      <span class="font-semibold text-stone-600">阅星曈</span>
-      <span>个人 AI 终端 · 墨水屏设备</span>
+  <footer>
+    <div class="footer-inner">
+      <span>阅星曈 Skill · eink-push</span>
+      <span>Python >= 3.10 · Node.js >= 18 · Windows/macOS/Linux</span>
     </div>
   </footer>
 
   <script>
-    function copyInstall() {
-      const text = '安装更新技能 https://github.com/linchuanXu/eink-push';
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById('copy-btn');
-        btn.textContent = '已复制 ✓';
-        btn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
-        btn.classList.add('bg-emerald-500');
-        setTimeout(() => {
-          btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> 复制`;
-          btn.classList.remove('bg-emerald-500');
-          btn.classList.add('bg-orange-500', 'hover:bg-orange-600');
-        }, 2000);
-      });
+    function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.left = '-9999px';
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand('copy');
+      document.body.removeChild(area);
+      return Promise.resolve();
     }
+
+    document.querySelectorAll('[data-copy-target]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const target = document.getElementById(button.dataset.copyTarget);
+        const original = button.textContent;
+        copyText(target.textContent.trim()).then(() => {
+          button.textContent = '已复制';
+          setTimeout(() => { button.textContent = original; }, 1600);
+        });
+      });
+    });
   </script>
 </body>
 </html>
-
-
