@@ -1,5 +1,6 @@
 ---
 name: eink-push
+version: 0.2.0
 description: >
   将内容推送到阅星曈/Yue Xingtong 墨水屏设备；生成卡片、翻页图片集、
   Markdown/EPUB 电子书；查询书架、阅读进度、书签摘录；在阅星曈推送场景中调用联网搜索。
@@ -46,6 +47,7 @@ python {baseDir}/scripts/check_environment.py
 ```
 
 若输出 `MISSING` 或 `FAIL`，按脚本给出的 `fix:` 命令处理；需要展开说明时 Read `{baseDir}/references/SETUP.md`。
+若输出 `UPDATE`，说明本地 Skill 版本落后；按脚本给出的 `update:` 命令更新后重试。
 
 > **Windows 提示**：`python` 不存在时用 `py -3`；`pip` 不存在时用 `python -m pip`。
 

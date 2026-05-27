@@ -42,6 +42,12 @@
 python scripts/check_environment.py
 ```
 
+也可以只检查 Skill 是否有新版本：
+
+```powershell
+python scripts/check_update.py
+```
+
 凭证文件 `.credentials.json`、环境变量和设备绑定不会因为更新仓库文件而被覆盖。
 
 如果你本机有这个 Git 仓库，并且用 `scripts/install_skill.py` 同步到本地 Skill 目录，更新流程是：
@@ -58,6 +64,8 @@ python scripts/check_environment.py
 ```powershell
 npm install marknative
 ```
+
+版本检查机制类似微信读书 Skill：`SKILL.md` 声明 `version`，`check_update.py` 会读取本地版本并对比 GitHub 最新版本；`check_environment.py` 会把可用更新显示为非阻断的 `UPDATE` 提示。
 
 ---
 
@@ -242,6 +250,12 @@ After updating, ask it to run the environment check again:
 python scripts/check_environment.py
 ```
 
+You can also check only whether a newer Skill version is available:
+
+```powershell
+python scripts/check_update.py
+```
+
 Your `.credentials.json`, environment variables, and device binding are not overwritten by updating the repository files.
 
 If you keep a local Git checkout and sync it into your local Skill directory with `scripts/install_skill.py`, update with:
@@ -258,6 +272,8 @@ python scripts/check_environment.py
 ```powershell
 npm install marknative
 ```
+
+The update check follows the same idea as the WeRead Skill: `SKILL.md` declares a `version`, `check_update.py` reads the local version and compares it with the latest version on GitHub, and `check_environment.py` reports available updates as a non-blocking `UPDATE` notice.
 
 ---
 
