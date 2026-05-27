@@ -13,7 +13,6 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 ALLOWED_SKILL_FRONTMATTER_KEYS = {
     "name",
-    "version",
     "description",
     "license",
     "allowed-tools",

@@ -19,19 +19,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-_SCRIPTS_DIR = str(ROOT / "scripts")
-if _SCRIPTS_DIR not in sys.path:
-    sys.path.insert(0, _SCRIPTS_DIR)
-
-from check_update import check_update, default_update_commands  # noqa: E402
 MIN_PYTHON = (3, 10, 0)
 MIN_NODE = (18, 0, 0)
 
 OK = "OK"
 MISSING = "MISSING"
 FAIL = "FAIL"
-UPDATE = "UPDATE"
-UNKNOWN = "UNKNOWN"
 
 
 @dataclass
@@ -193,31 +186,8 @@ def check_marknative() -> CheckResult:
     )
 
 
-def check_skill_update() -> CheckResult:
-    result = check_update(timeout=5)
-    if result.status == UPDATE:
-        return CheckResult(
-            "skill-update",
-            "eink-push Skill",
-            UPDATE,
-            result.detail,
-            result.update_commands or default_update_commands(),
-            required=False,
-        )
-    if result.status == OK:
-        return CheckResult("skill-update", "eink-push Skill", OK, result.detail, required=False)
-    return CheckResult(
-        "skill-update",
-        "eink-push Skill",
-        UNKNOWN,
-        result.detail,
-        required=False,
-    )
-
-
 def collect_checks() -> list[CheckResult]:
     checks = [
-        check_skill_update(),
         check_python_version(),
         check_python_module("requests", "requests"),
         check_python_module("PIL", "Pillow"),

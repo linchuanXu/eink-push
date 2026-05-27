@@ -4,7 +4,6 @@ from scripts.check_environment import (
     FAIL,
     MISSING,
     OK,
-    UPDATE,
     CheckResult,
     has_blocking_failures,
     parse_semver,
@@ -42,10 +41,6 @@ class BlockingFailureTests(unittest.TestCase):
 
     def test_missing_optional_check_is_not_blocking(self):
         checks = [CheckResult("font", "Font", MISSING, "missing", required=False)]
-        self.assertFalse(has_blocking_failures(checks))
-
-    def test_update_notice_is_not_blocking(self):
-        checks = [CheckResult("skill-update", "Skill", UPDATE, "new version", required=False)]
         self.assertFalse(has_blocking_failures(checks))
 
 

@@ -31,7 +31,6 @@ REQUIRED_PACKAGE_FILES = (
     "scripts/fetch_reading.py",
     "scripts/search_query.py",
     "scripts/check_environment.py",
-    "scripts/check_update.py",
     "scripts/xteink_api.py",
     "references/AGENT-WORKFLOWS.md",
     "references/SETUP.md",
