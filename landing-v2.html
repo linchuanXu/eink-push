@@ -165,7 +165,7 @@
         radial-gradient(circle at top right, rgba(204, 120, 92, 0.1), transparent 36%),
         linear-gradient(160deg, #faf9f5 0%, #efe9de 100%);
       color: var(--ink);
-      min-height: 390px;
+      min-height: 210px;
       overflow: hidden;
       box-shadow: var(--shadow);
     }
@@ -484,24 +484,12 @@
       <aside class="terminal" aria-label="常用命令">
         <div class="terminal-head">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-          <span style="margin-left:8px">配置命令</span>
+          <span style="margin-left:8px">复制命令</span>
         </div>
         <div class="terminal-body">
           <div class="cmd">
-            <div class="cmd-label"><span>安装 skill</span><button class="copy-mini" data-copy-target="cmdInstall">复制</button></div>
-            <code id="cmdInstall">安装技能 https://github.com/linchuanXu/eink-push，并帮我配置阅星曈账号</code>
-          </div>
-          <div class="cmd">
-            <div class="cmd-label"><span>检查本地环境</span><button class="copy-mini" data-copy-target="cmdEnv">复制</button></div>
-            <code id="cmdEnv">python scripts/check_environment.py</code>
-          </div>
-          <div class="cmd">
-            <div class="cmd-label"><span>检查账号凭证</span><button class="copy-mini" data-copy-target="cmdCred">复制</button></div>
-            <code id="cmdCred">python scripts/push_to_device.py --check-credentials</code>
-          </div>
-          <div class="cmd">
-            <div class="cmd-label"><span>完整离线检查</span><button class="copy-mini" data-copy-target="cmdVerify">复制</button></div>
-            <code id="cmdVerify">python scripts/verify.py</code>
+            <div class="cmd-label"><span>npx 安装</span><button class="copy-mini" data-copy-target="cmdInstall">复制</button></div>
+            <code id="cmdInstall">npx --yes skills add https://github.com/linchuanXu/eink-push -a openclaw -y</code>
           </div>
         </div>
       </aside>
@@ -520,10 +508,10 @@
         <article class="step">
           <div>
             <h3>安装 Skill</h3>
-            <p>在 OpenClaw 中发送这句话。已经安装过时，也可以用同一句更新到最新版本。</p>
+            <p>在终端中运行这条命令。已经安装过时，也可以用同一条命令更新到最新版本。</p>
             <div class="command-line">
-              <code id="installLine">安装技能 https://github.com/linchuanXu/eink-push，并帮我配置阅星曈账号</code>
-              <button data-copy-target="installLine">复制这句话</button>
+              <code id="installLine">npx --yes skills add https://github.com/linchuanXu/eink-push -a openclaw -y</code>
+              <button data-copy-target="installLine">复制命令</button>
             </div>
           </div>
         </article>
