@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>阅星曈 Skill - 内容发送到墨水屏</title>
-  <meta name="description" content="把摘要、长文、书签和调研资料整理成适合阅星曈阅读的卡片或电子书。">
+  <title>阅星曈 Skill - 把内容送到墨水屏</title>
+  <meta name="description" content="让 AI 把摘要、长文、书签和调研资料整理成适合阅星曈阅读的卡片或电子书。">
   <style>
     :root {
       color-scheme: light;
@@ -12,7 +12,7 @@
       --paper-deep: #f5f0e8;
       --surface: #faf9f5;
       --surface-strong: #efe9de;
-      --ink: #141413;
+      --ink: #25231f;
       --body: #3d3d3a;
       --muted: #6c6a64;
       --line: #e6dfd8;
@@ -28,10 +28,7 @@
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      background:
-        radial-gradient(circle at top left, rgba(204, 120, 92, 0.08), transparent 26%),
-        radial-gradient(circle at top right, rgba(93, 184, 166, 0.06), transparent 22%),
-        linear-gradient(180deg, var(--paper) 0%, #f7f2ea 52%, var(--paper-deep) 100%);
+      background: linear-gradient(180deg, var(--paper) 0%, #f7f2ea 52%, var(--paper-deep) 100%);
       color: var(--ink);
       font-family: "Avenir Next", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -95,9 +92,10 @@
       align-items: center;
       border-bottom: 1px solid var(--line);
       background:
-        radial-gradient(circle at 18% 18%, rgba(204, 120, 92, 0.12), transparent 30%),
-        radial-gradient(circle at 78% 0%, rgba(232, 165, 90, 0.12), transparent 26%),
+        linear-gradient(90deg, rgba(204, 120, 92, 0.08) 0 1px, transparent 1px 100%),
+        linear-gradient(180deg, rgba(204, 120, 92, 0.08) 0 1px, transparent 1px 100%),
         linear-gradient(135deg, var(--paper) 0%, #f6f0e7 56%, #efe9de 100%);
+      background-size: 42px 42px, 42px 42px, auto;
     }
     .hero-media {
       position: absolute;
@@ -329,9 +327,7 @@
       box-shadow: var(--shadow);
     }
     .panel-dark {
-      background:
-        radial-gradient(circle at top right, rgba(182, 95, 70, 0.1), transparent 34%),
-        linear-gradient(160deg, #faf9f5 0%, #efe9de 100%);
+      background: linear-gradient(160deg, #faf9f5 0%, #efe9de 100%);
       color: var(--ink);
       border-color: var(--line);
     }
@@ -396,8 +392,7 @@
     .security-band {
       border-top: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
-      background:
-        linear-gradient(180deg, rgba(239, 229, 216, 0.7), rgba(247, 243, 235, 0.8));
+      background: linear-gradient(180deg, rgba(239, 229, 216, 0.7), rgba(247, 243, 235, 0.8));
     }
     .security-grid {
       display: grid;
@@ -506,9 +501,9 @@
         <img src="references/framework-samples/05-newspaper.preview.png" alt="">
       </div>
       <div class="hero-content">
-        <span class="eyebrow">摘要、长文、书签，都可以在墨水屏上读</span>
-        <h1>阅星曈 Skill</h1>
-        <p class="hero-lede">把整理好的内容发送到阅星曈。短内容生成卡片，长内容生成电子书；书签、摘录和阅读进度，也可以继续整理成适合回看的内容。</p>
+        <span class="eyebrow">给 OpenClaw 的阅星曈 Skill</span>
+        <h1>把内容送到你的墨水屏。</h1>
+        <p class="hero-lede">让 AI 把摘要、文章、调研资料和读书摘录整理成适合阅星曈阅读的形式。短内容做成卡片，长内容排成电子书，书架和书签也能继续整理。</p>
         <div class="install-box">
           <code id="installText">npx --yes skills add https://github.com/linchuanXu/eink-push -a openclaw -y</code>
           <button class="btn btn-primary" type="button" data-copy-target="installText">复制命令</button>
@@ -517,7 +512,7 @@
           <a class="btn btn-primary" href="landing-v2.html">开始配置</a>
           <a class="btn btn-outline" href="#workflow">查看功能</a>
         </div>
-        <p class="hero-note">配置完成后，可以直接让 AI 把内容发送到阅星曈。</p>
+        <p class="hero-note">安装后，在对话里说“发到阅星曈”就可以开始使用。</p>
       </div>
     </section>
 
@@ -525,46 +520,46 @@
       <div class="section-head">
         <div>
           <p class="kicker">功能</p>
-          <h2>内容发送前，先整理成适合阅读的形式。</h2>
+          <h2>从对话到墨水屏，少一点手动整理。</h2>
         </div>
-        <p>页面保留最直接的入口：卡片、电子书、EPUB、书签和阅读进度。</p>
+        <p>它不是把文字原样丢给设备，而是先判断内容类型，再选择适合墨水屏阅读的呈现方式。</p>
       </div>
 
       <div class="workflow">
         <article class="tile">
           <div class="tile-mark">A</div>
-          <h3>内容卡片</h3>
-          <p>摘要、清单、结论和摘录，整理成适合墨水屏查看的卡片。</p>
+          <h3>短内容卡片</h3>
+          <p>摘要、清单、结论和摘录，会整理成一眼能读完的墨水屏卡片。</p>
           <div class="tag-row">
-            <span class="tag">≤2000 字</span>
-            <span class="tag">render_image.py</span>
+            <span class="tag">适合快速查看</span>
+            <span class="tag">自动排版</span>
           </div>
         </article>
         <article class="tile">
           <div class="tile-mark">B</div>
-          <h3>翻页电子书</h3>
-          <p>文章、报告和阅读笔记，整理成适合连续阅读的电子书。</p>
+          <h3>长文电子书</h3>
+          <p>文章、报告和长笔记，会排成适合连续阅读的翻页电子书。</p>
           <div class="tag-row">
-            <span class="tag">&gt;2000 字</span>
-            <span class="tag">render_book.py</span>
+            <span class="tag">适合深读</span>
+            <span class="tag">保留结构</span>
           </div>
         </article>
         <article class="tile">
           <div class="tile-mark">C</div>
-          <h3>EPUB</h3>
-          <p>明确需要 EPUB 时，生成带封面的电子书文件。</p>
+          <h3>EPUB 文件</h3>
+          <p>明确需要 EPUB 时，会生成带封面的电子书文件，适合长期保存。</p>
           <div class="tag-row">
-            <span class="tag">明确触发</span>
-            <span class="tag">cover-svg</span>
+            <span class="tag">可收藏</span>
+            <span class="tag">可带封面</span>
           </div>
         </article>
         <article class="tile">
           <div class="tile-mark">D</div>
           <h3>书签与进度</h3>
-          <p>书架、进度、书签和摘录，可以整理成卡片、笔记或阅读小结。</p>
+          <p>书架、阅读进度、书签和摘录，可以整理成卡片、笔记或阅读小结。</p>
           <div class="tag-row">
-            <span class="tag">fetch_reading.py</span>
-            <span class="tag">compact 输出</span>
+            <span class="tag">读书回顾</span>
+            <span class="tag">摘录整理</span>
           </div>
         </article>
       </div>
@@ -574,22 +569,22 @@
       <div class="split">
         <div class="panel">
           <p class="kicker">发送方式</p>
-          <h2>按内容选择阅读形式。</h2>
+          <h2>你只需要说清楚想读什么。</h2>
           <ul class="list">
-            <li><span class="index">1</span><span><strong>发送到阅星曈</strong>：会根据内容长短，选择卡片或电子书。</span></li>
-            <li><span class="index">2</span><span><strong>做成卡片</strong>：适合摘要、清单和摘录这类短内容。</span></li>
-            <li><span class="index">3</span><span><strong>整理成电子书</strong>：适合文章、报告和阅读笔记。</span></li>
-            <li><span class="index">4</span><span><strong>生成 EPUB</strong>：明确提出 EPUB 时，会按 EPUB 文件准备。</span></li>
+            <li><span class="index">1</span><span><strong>发到阅星曈</strong>：让 AI 判断该做卡片还是电子书。</span></li>
+            <li><span class="index">2</span><span><strong>做成卡片</strong>：适合摘要、清单、摘录和临时备忘。</span></li>
+            <li><span class="index">3</span><span><strong>整理成电子书</strong>：适合文章、报告和完整阅读笔记。</span></li>
+            <li><span class="index">4</span><span><strong>生成 EPUB</strong>：明确需要文件时，再生成 EPUB。</span></li>
           </ul>
         </div>
         <div class="panel panel-dark">
           <p class="kicker">体验优化</p>
-          <h2>配置、渲染和排版都有检查。</h2>
+          <h2>少解释，多交付。</h2>
           <ul class="list">
-            <li><span class="index">OK</span><span><strong>错误提示更清楚</strong>：尺寸、分页、图片参数有问题时，会给出可处理的提示。</span></li>
-            <li><span class="index">OK</span><span><strong>安装状态可检查</strong>：可以确认本地实际运行的版本是否和源码一致。</span></li>
-            <li><span class="index">OK</span><span><strong>EPUB 排版更稳</strong>：保留前言正文，避免重复章节标题。</span></li>
-            <li><span class="index">OK</span><span><strong>关键路径有测试</strong>：卡片、电子书、EPUB 和安装检查都有覆盖。</span></li>
+            <li><span class="index">OK</span><span><strong>自动选择格式</strong>：短内容用卡片，长内容用电子书，EPUB 只在你明确需要时生成。</span></li>
+            <li><span class="index">OK</span><span><strong>保留阅读上下文</strong>：书签、进度和摘录会按读书场景整理，而不是只列原始数据。</span></li>
+            <li><span class="index">OK</span><span><strong>推送前先排版</strong>：内容会先变成适合墨水屏查看的页面，再发送到设备。</span></li>
+            <li><span class="index">OK</span><span><strong>出错时能继续</strong>：账号、设备或网络有问题时，会给出下一步处理方式。</span></li>
           </ul>
         </div>
       </div>
@@ -599,9 +594,9 @@
       <div class="section-head">
         <div>
           <p class="kicker">常用说法</p>
-          <h2>几种常见入口。</h2>
+          <h2>几句自然的话就够了。</h2>
         </div>
-        <p>这里保留用户能直接理解的动作：发送卡片、生成电子书、整理书签、查看阅读进度，以及搜索后整理。</p>
+        <p>不用记命令，也不用先决定格式。说清楚内容和目的，Skill 会选择合适的阅读形态。</p>
       </div>
 
       <div class="command-grid">
@@ -637,22 +632,22 @@
         <div class="section-head">
           <div>
             <p class="kicker">配置</p>
-            <h2>先完成账号和设备配置。</h2>
+            <h2>先让 Skill 知道该发到哪里。</h2>
           </div>
-          <p>第一次使用需要确认本地环境、账号凭证和设备绑定。确认完成后，就可以把内容发送到阅星曈。</p>
+          <p>第一次使用只需要安装 Skill，并完成阅星曈账号和设备绑定。之后就可以在对话里直接发送内容。</p>
         </div>
         <div class="security-grid">
           <div>
-            <h3>检查本地环境</h3>
-            <p>运行 `python scripts/check_environment.py`，缺什么会直接告诉你怎么补。</p>
+            <h3>安装 Skill</h3>
+            <p>复制页面上的 npx 命令运行即可。安装完成后，OpenClaw 会使用最新的 GitHub 版本。</p>
           </div>
           <div>
-            <h3>配置账号凭证</h3>
-            <p>优先读取环境变量，也兼容本地凭证文件。凭证不会写入仓库。</p>
+            <h3>确认账号</h3>
+            <p>按提示提供阅星曈账号信息。凭证只用于登录和发送到你的设备。</p>
           </div>
           <div>
-            <h3>只连官方接口</h3>
-            <p>凭证只用于阅星曈官方 API：`api-prod.xteink.cn`，不会被写进仓库。</p>
+            <h3>绑定设备</h3>
+            <p>确认设备已经在阅星曈 App 中绑定到同一账号，发送内容时就能接收。</p>
           </div>
         </div>
       </div>
@@ -661,8 +656,8 @@
     <section class="cta">
       <div class="section-tight" style="padding-top:0;padding-bottom:0">
         <p class="kicker">开始使用</p>
-        <h2>把内容发送到阅星曈。</h2>
-        <p>摘要、长文、书签和调研资料，都可以整理成适合墨水屏阅读的形式。</p>
+        <h2>让内容在墨水屏上更好读。</h2>
+        <p>安装完成后，把摘要、文章、摘录或调研资料交给 AI，就可以发送到阅星曈。</p>
         <div class="hero-actions" style="justify-content:center">
           <a class="btn btn-secondary" href="landing-v2.html">去完成配置</a>
           <a class="btn btn-outline" href="https://github.com/linchuanXu/eink-push">查看项目</a>
